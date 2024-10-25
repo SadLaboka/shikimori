@@ -13,16 +13,21 @@
 body {
 background: rgba(0, 0, 0, 0.3);
 }
+/*
 body:after {
   background-image: url(https://imgur.com/j0RjsTD.jpg);
 }
-
-/*
+*/
 body:after {
-  background-image: url(https://imgur.com/hrlGXs8.jpg), url(https://imgur.com/oUIR9XS.gif);
+background-image: url(https://imgur.com/JaAxOvL.jpg);
+}
+@media (min-width: 1280px) {
+body:after {
+  background-image: url(https://imgur.com/JaAxOvL.jpg), url(https://imgur.com/xivfA6P.gif);
   background-size: contain, contain;
   background-position: left center, right center;
   background-color: black;
+}
 }
 */
 .l-footer:after {
@@ -128,45 +133,51 @@ html:root {
 
 
 /* animated border */
-/*
+
 .subheadline {
-  background: rgba(var(--block-color));
+  background-color: rgba(var(--block-color));
+  margin-top: 4px;
+  margin-left: 4px;
+  margin-right: 4px;
 }
 
-
-.subheadline::after, .subheadline::before{
+.subheadline::before, .subheadline::after {
   content: '';
   position: absolute;
-  height: 100%;
-  width: 100%;
-  background: transparent;
-  top: 50%;
-  left: 50%;
-  translate: -50% -50%;
+  left: -2px;
+  top: -2px;
+  background: linear-gradient(
+    90deg, 
+    transparent 40%, 
+    #333dff, 
+    transparent 50%, 
+    #bd0f56, 
+    transparent 60%);
+  background-size: 400%;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
   z-index: -1;
-  padding: 2px;
-  border-radius: 12px;
-  animation: 3s blinking linear infinite;
+  border-radius: 15px;
+  animation: animation_border 15s linear infinite;
 }
+
 .subheadline::before{
-  filter: blur(1.5rem);
+  filter: blur(0.7rem);
   opacity: 0.9;
 }
-@keyframes blinking
-{
-  0%,1%,7.1%,8%
-  {
-    background: #333dff;
+
+@keyframes animation_border{
+  0%{
+    background-position: 0 0;
   }
-  35.1%,36%,42.1%,43%
-  {
-    background: #bd0f56;
+  50%{
+    background-position: 400% 0;
   }
-  1.1%,7%,8.1%,35%,36.1%,42%,43.1%,99%
-  {
-    background: transparent;
+  100%{
+    background-position: 0 0;
   }
 }
+
 
 /* Gif-аватар */
 .p-profiles .profile-head .avatar, .p-user_rates-index .l-menu .avatar {
