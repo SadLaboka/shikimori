@@ -14,17 +14,13 @@
 body {
 background: rgba(0, 0, 0, 0.3);
 }
-/*
+
 body:after {
-  background-image: url(https://imgur.com/j0RjsTD.jpg);
-}
-*/
-body:after {
-background-image: url(https://imgur.com/JaAxOvL.jpg);
+background-color: black;
 }
 @media (min-width: 1280px) {
 body:after {
-  background-image: url(https://imgur.com/JaAxOvL.jpg), url(https://i.ibb.co/d6c67gq/ezgif-5-b9198b050d.webp);
+  background-image: url(https://i.ibb.co/2hDmyMZ/Ja-Ax-Ov-L-Imgur-1.jpg), url(https://i.ibb.co/d6c67gq/ezgif-5-b9198b050d.webp);
   background-size: contain, contain;
   background-position: left center, right center;
   background-color: black;
@@ -65,6 +61,14 @@ html:root {
     --hundred: 1;
 }
 
+
+a {
+	color: rgba(var(--bright-color), 1);
+}
+
+.p-profiles .profile-head .c-brief .avatar .profile-actions {
+ margin-left: 12px;
+}
 
 /* shiki logo*/
 .l-top_menu-v2 .logo-container .logo {
@@ -113,6 +117,12 @@ html:root {
 }
 
 
+/* status */
+.p-profiles .profile-head .c-brief header.head .misc {
+ display: none;
+}
+
+
 /* nickname */
 .l-top_menu-v2 .menu-dropdown>span span, .l-top_menu-v2 .menu-dropdown>span a {
  overflow: visible;
@@ -146,7 +156,6 @@ html:root {
 
 
 
-
 /* animated border */
 
 .subheadline {
@@ -175,8 +184,8 @@ html:root {
     transparent 50%,
     transparent 100%
   );
-  filter: blur(0.2rem);
-  opacity: 0.95;
+  filter: blur(0.1rem);
+  opacity: 0.97;
   background-size: 200%;
   animation: animation_border_left 2s linear infinite;
 }
@@ -200,8 +209,8 @@ html:root {
     transparent 85%,
     transparent 100%
   );
-  filter: blur(0.2rem);
-  opacity: 0.95;
+  filter: blur(0.1rem);
+  opacity: 0.97;
   background-size: 200%;
   animation: animation_border_right 2s linear infinite;
 }
@@ -262,7 +271,7 @@ html:root {
   inset: 0;
   max-width: 160px;
   max-height: 160px;
-  background: url("https://i.ibb.co/wp3pLgK/ezgif-5-cf05894fba.webp") center / cover;
+  background: url("https://i.ibb.co/86BFNbF/ezgif-7-234e06a3f3.webp") center / cover;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -274,7 +283,7 @@ html:root {
   inset: 0;
   max-width: 160px;
   max-height: 160px;
-  background: url("https://i.ibb.co/wp3pLgK/ezgif-5-cf05894fba.webp") center / cover;
+  background: url("https://i.ibb.co/86BFNbF/ezgif-7-234e06a3f3.webp") center / cover;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -282,7 +291,6 @@ html:root {
 .p-profiles .profile-head .avatar img, .p-user_rates-index .l-menu .avatar img {
   opacity: 0;
 }
-
 
 
 /*Активность*/
@@ -295,6 +303,15 @@ html:root {
 /* Обо мне заголовок */
 .profile-content .about.block > div { display: none; }
 
+/*sadlaboka*/
+.aliases {
+  font-size: 0 !important;
+  background: url(https://i.ibb.co/BV2q7wC/ezgif-3-2742168d39.webp);
+  background-size: contain;
+  background-position: left center;
+  background-repeat: no-repeat;
+  height: 72px;
+}
 
 
 /* Блоки */
@@ -303,11 +320,6 @@ html:root {
  flex-direction: column;
 }
 
-/*
-#profiles_show .profile-content > .cc-2 > .c-left {
-  width: 60%;
-}
-*/
 
 .block.cc-2 {
  order: 2;
@@ -468,6 +480,12 @@ order: 3;
   background: url(https://i.ibb.co/V2cK8yj/ezgif-5-c56017d25b.webp);
 }
 
+.p-profiles .b-achievement[data-hint^='Военное'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Военное'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Военное'] .inner:after {
+  background: url(https://i.ibb.co/cbf8XxH/ezgif-1-826eaf2e82.webp);
+}
+
 .p-profiles .b-achievement[data-hint^='Фантастика'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='Фантастика'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='Фантастика'] .inner:after {
@@ -513,6 +531,10 @@ body#profiles_show .cc-franchises .b-badge img {
   height: 100% !important;
 }
 
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge {
+pointer-events: none;
+}
+
 #profiles_show.p-profiles-show .achievements .cc-franchises .b-badge:nth-child(1):before {
 background-image: url(https://i.ibb.co/FY1rdnQ/ezgif-5-d041946c29.webp);
 }
@@ -526,10 +548,10 @@ background-image: url(https://i.ibb.co/3FSzM2W/ezgif-6-eba4f65682.webp);
 background-image: url(https://i.ibb.co/RjX7Ym9/ezgif-5-d80e9e446d.webp);
 }
 #profiles_show.p-profiles-show .achievements .cc-franchises .b-badge:nth-child(5):before {
-background-image: url(https://i.ibb.co/rpsF3DV/ezgif-5-958c45afdd.webp);
+background-image: url(https://i.ibb.co/nQZdxwc/ezgif-1-46d69f5544.webp);
 }
 #profiles_show.p-profiles-show .achievements .cc-franchises .b-badge:nth-child(6):before {
-background-image: url(https://i.ibb.co/Ssgnf5j/ezgif-5-fafca6e508.webp);
+background-image: url(https://i.ibb.co/RBVLrY2/ezgif-5-20a0d03068.webp);
 }
 #profiles_show.p-profiles-show .achievements .cc-franchises .b-badge:nth-child(7):before {
 background-image: url(https://i.ibb.co/xYvwrJY/ezgif-5-5db9adef5e.webp);
