@@ -70,7 +70,7 @@ a {
  margin-left: 12px;
 }
 
-/* shiki logo*/
+/*---------------------------------------------------------------------shiki logo---------------------------------------------------------------------*/
 .l-top_menu-v2 .logo-container .logo {
   display: none;
 }
@@ -86,6 +86,7 @@ a {
  line-height: 0.70em;
  outline: none;
 }
+/*Анимация лого*/
 @keyframes logo_animation
 {
   0%,18%,20%,50.1%,60%,65.1%,80%,90.1%,92%
@@ -105,7 +106,7 @@ a {
 }
 
 
-/* top-menu */
+/*---------------------------------------------------------------------top-menu----------------------------------------------------------------------*/
 .l-top_menu-v2 .menu-dropdown>span span, .l-top_menu-v2 .menu-dropdown>span a {
   font-size: 20px;
   font-family: "Rubik Spray Paint", system-ui; 
@@ -117,13 +118,13 @@ a {
 }
 
 
-/* status */
+/*---------------------------------------------------------------------status------------------------------------------------------------------------*/
 .p-profiles .profile-head .c-brief header.head .misc {
  display: none;
 }
 
 
-/* nickname */
+/*-------------------------------------------------------------------nickname------------------------------------------------------------------------*/
 .l-top_menu-v2 .menu-dropdown>span span, .l-top_menu-v2 .menu-dropdown>span a {
  overflow: visible;
 }
@@ -136,6 +137,7 @@ a {
  font-family: "DynaPuff", system-ui;
  font-weight: 700;
 }
+/*Анимация никнейма*/
 @keyframes nickname_animation
 {
   0%,18%,20%,50.1%,60%,65.1%,80%,90.1%,92%
@@ -156,7 +158,7 @@ a {
 
 
 
-/* animated border */
+/*---------------------------------------------------------------------animated border----------------------------------------------------------------*/
 
 .subheadline {
   background-color: rgba(var(--block-color));
@@ -240,7 +242,7 @@ a {
 }
 
 
-/*sign in*/
+/*----------------------------------------------------------------------------sign in-----------------------------------------------------------------*/
 .l-top_menu-v2 .menu-icon.sign_in {
    overflow: visible;
 }
@@ -258,7 +260,7 @@ a {
 }
 
 
-/* Gif-аватар */
+/*---------------------------------------------------------------------------Gif-аватар----------------------------------------------------------------*/
 .p-profiles .profile-head .avatar, .p-user_rates-index .l-menu .avatar {
   position: relative;
 }
@@ -293,16 +295,16 @@ a {
 }
 
 
-/*Активность*/
+/*---------------------------------------------------------------------------Активность----------------------------------------------------------------*/
 #profiles_show > section > div > div.profile-head > div.c-info > div.c-additionals {
  display: none;
 }
 
 
-/* Обо мне заголовок */
+/*----------------------------------------------------------------------Обо мне заголовок--------------------------------------------------------------*/
 .profile-content .about.block > div { display: none; }
 
-/*sadlaboka*/
+/*---------------------------------------------------------------------------sadlaboka-----------------------------------------------------------------*/
 .aliases {
   font-size: 0 !important;
   background: url(https://i.ibb.co/BV2q7wC/ezgif-3-2742168d39.webp);
@@ -313,7 +315,7 @@ a {
 }
 
 
-/* Блоки */
+/*------------------------------------------------------------------------------Блоки------------------------------------------------------------------*/
 .profile-content.profile-content.profile-content {
  display: flex;
  flex-direction: column;
@@ -324,7 +326,7 @@ a {
  order: 2;
  margin-top: 2px;
 }
-/* Обо мне */
+/*----------------------------------------------------------------------------Обо мне------------------------------------------------------------------*/
 .block.about {
   order: 1;
 }
@@ -346,7 +348,7 @@ order: 3;
 }
 
 
-/*Прогресс бар*/
+/*---------------------------------------------------------------------------Прогресс бар---------------------------------------------------------------*/
 .bar .first {
  animation: scalebar 1.5s ease-in;
  transform-origin: left;
@@ -375,7 +377,7 @@ order: 3;
   }
 }
 
-/*Поиск*/
+/*----------------------------------------------------------------------------------Поиск-------------------------------------------------------------*/
 /* Пульсация маркера поиска */
 .search-marker {
     display: inline-block;
@@ -416,7 +418,7 @@ order: 3;
         box-shadow: 0 0 12px rgba(var(--bright-color), 1), 0 0 30px rgba(var(--bright-color), 0.8);
     }
 }
-/*Кнопки под аватаром*/
+
 /*------------------------------------------------------------------Поле для комметария---------------------------------------------------------------*/
 /* Базовое состояние */
 .comment_body {
@@ -472,7 +474,7 @@ order: 3;
     background: transparent; /* Прозрачный фон */
     border: none; /* Убираем границу */
     padding: 6px; /* Уменьшаем паддинг */
-    font-size: 16px;
+    font-size: 12px;
     color: rgba(var(--white-color), 1);
     resize: none;
     width: 100%;
@@ -549,7 +551,7 @@ order: 3;
 
 
 
-/*** Для Общих, Жанровых, Авторов (название брать из заголовка ачивки до указания уровня: 'просмотренных аниме', 'Хоррор / Триллер', 'Макото Синкай') ***/
+/* Для Общих, Жанровых, Авторов */
 
 .p-profiles .b-achievement[data-hint^='300 просмотренных аниме'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='300 просмотренных аниме'] .inner .border {border-color: black !important}
@@ -623,6 +625,11 @@ order: 3;
   background: url(https://i.ibb.co/QKtsqB1/ezgif-5-64cdf8728a.webp);
 }
 
+.p-profiles .b-achievement[data-hint^='Безумие / Психологическое'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Безумие / Психологическое'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Безумие / Психологическое'] .inner:after {
+  background: url(https://i.ibb.co/MDZ9Bk5M/ezgif-228c209b4af243.webp);
+}
 
 
 /* Франшизы */
@@ -675,7 +682,7 @@ background-image: url(https://i.ibb.co/y5FkzxR/ezgif-5-6373b1c81e.webp);
 
 
 
-/*Постеры избранное*/
+/*-----------------------------------------------------------------Постеры избранное--------------------------------------------------------------------*/
 [href*="characters/184947-frieren"] {
   --show-default: 0;
   --custom-image: url("https://i.ibb.co/whgDbKs/ezgif-5-07b6fef1ac.webp");
@@ -719,4 +726,9 @@ background-image: url(https://i.ibb.co/y5FkzxR/ezgif-5-6373b1c81e.webp);
 [href*="characters/2910-obito-uchiha"] {
   --show-default: 0;
   --custom-image: url("https://i.ibb.co/wMmZZBj/ezgif-5-ecc85c1f4d.webp");
+}
+
+[href*="characters/13045-bruno-bucciarati"] {
+  --show-default: 0;
+  --custom-image: url("https://i.ibb.co/9kSQwrVR/ezgif-285d6c14833acd.webp");
 }
