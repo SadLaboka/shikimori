@@ -20,7 +20,7 @@ background-color: black;
 }
 @media (min-width: 1280px) {
 body:after {
-  background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781461880/ezgif-4c18dc226bcfa80a_croiuj.webp), url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462102/ezgif-5-b9198b050d_xfl7er.webp);
+  background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781461880/ezgif-4c18dc226bcfa80a_croiuj.webp), url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781507578/ezgif-1f5e93c2f774253b_pwlx3n.webp);
   background-size: contain, contain;
   background-position: left center, right center;
   background-color: black;
