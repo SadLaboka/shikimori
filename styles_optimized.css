@@ -357,14 +357,16 @@ body::-webkit-scrollbar-thumb:active {
 /*---------------------------------------------------------------------------sadlaboka-----------------------------------------------------------------*/
 .aliases {
   font-size: 0 !important;
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781510516/ezgif-3-2742168d39_wzwq1k.webp);
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781560382/ezgif-2b7144768c04a2ad_podvfl.webp);
   background-size: contain;
-  background-position: left center;
+  background-position: center;
   background-repeat: no-repeat;
   height: 72px;
 }
 
-
+.notice {
+  text-align: center;
+}
 /*------------------------------------------------------------------------------Блоки------------------------------------------------------------------*/
 .profile-content.profile-content.profile-content {
  display: flex;
