@@ -291,7 +291,105 @@ body::-webkit-scrollbar-thumb:active {
   }
 }
 
+/*--------------------------------------------------------------------------Top---------------------------------------------------------------------*/
+/* 1. Базовые стили контейнера */
+.solid {
+  position: relative;
+  border-radius: 20px; /* Внешнее скругление всего блока */
+  overflow: hidden;    /* Обрезает вращающийся градиент, чтобы он не вылезал */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 5px;        /* Толщина светящейся рамки */
+  background: rgb(20, 20, 20); /* Фон внутри блока */
+  z-index: 0;
+}
 
+/* 2. Вращающийся неоновый импульс */
+.solid::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(1, 4, 75, 1) 40deg,     
+    rgba(153, 0, 62, 1) 80deg,   
+    transparent 120deg,
+    transparent 180deg,
+    rgba(153, 0, 62, 1) 220deg,  
+    rgba(1, 4, 75, 1) 260deg,    
+    transparent 300deg
+  );
+  animation: solid-neon-spin 3s linear infinite;
+  z-index: -1; 
+  filter: blur(2px);
+}
+
+@keyframes solid-neon-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 3. Поднимаем сами картинки над градиентом */
+.solid > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* 4. Принудительно убираем скругление у ВСЕХ картинок и их оберток */
+.solid a,
+.solid .b-image,
+.solid img {
+  border-radius: 0 !important;
+}
+
+/* 5. Точечно скругляем только 4 угла блока */
+/* Значение 17px = 20px (радиус контейнера) - 3px (padding). 
+   Если изменишь padding у .solid, не забудь поменять и здесь! */
+
+/* Верхний левый угол (1-я картинка) */
+.solid > a:nth-of-type(1) {
+  border-top-left-radius: 15px !important;
+  overflow: hidden; /* Обрезает внутренности ссылки по скругленному углу */
+}
+.solid > a:nth-of-type(1) .b-image,
+.solid > a:nth-of-type(1) img {
+  border-top-left-radius: 15px !important;
+}
+
+/* Верхний правый угол (4-я картинка) */
+.solid > a:nth-of-type(4) {
+  border-top-right-radius: 15px !important;
+  overflow: hidden;
+}
+.solid > a:nth-of-type(4) .b-image,
+.solid > a:nth-of-type(4) img {
+  border-top-right-radius: 15px !important;
+}
+
+/* Нижний левый угол (17-я картинка) */
+.solid > a:nth-of-type(17) {
+  border-bottom-left-radius: 15px !important;
+  overflow: hidden;
+}
+.solid > a:nth-of-type(17) .b-image,
+.solid > a:nth-of-type(17) img {
+  border-bottom-left-radius: 15px !important;
+}
+
+/* Нижний правый угол (20-я картинка) */
+.solid > a:nth-of-type(20) {
+  border-bottom-right-radius: 15px !important;
+  overflow: hidden;
+}
+.solid > a:nth-of-type(20) .b-image,
+.solid > a:nth-of-type(20) img {
+  border-bottom-right-radius: 15px !important;
+}
 /*----------------------------------------------------------------------------sign in-----------------------------------------------------------------*/
 .l-top_menu-v2 .menu-icon.sign_in {
    overflow: visible;
