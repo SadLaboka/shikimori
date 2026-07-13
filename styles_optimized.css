@@ -72,6 +72,8 @@ a {
 
 /*----------------------------------------------------------------------scrollbar----------------------------------------------------------------------*/
 
+
+
 /* --- FIREFOX --- */
 @supports not selector(::-webkit-scrollbar) {
   html {
@@ -138,7 +140,6 @@ a {
  display: none;
 }
 
-
 /*-------------------------------------------------------------------nickname------------------------------------------------------------------------*/
 .l-top_menu-v2 .menu-dropdown>span span, .l-top_menu-v2 .menu-dropdown>span a {
  overflow: visible;
@@ -152,6 +153,7 @@ a {
  font-family: "DynaPuff", system-ui;
  font-weight: 700;
 }
+
 /*Анимация никнейма*/
 @keyframes nickname_animation
 {
@@ -447,6 +449,7 @@ a {
 .p-profiles .profile-head .c-brief header.head:hover .notice {
   opacity: 0; /* Плавно исчезает */
 }
+
 /*------------------------------------------------------------------------------Блоки------------------------------------------------------------------*/
 .profile-content.profile-content.profile-content {
  display: flex;
@@ -697,6 +700,12 @@ order: 3;
   background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-2-a2a0a28bec_slif4g.webp);
 }
 
+.p-profiles .b-achievement[data-hint^='500 просмотренных аниме'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='500 просмотренных аниме'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='500 просмотренных аниме'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-2-a2a0a28bec_slif4g.webp);
+}
+
 .p-profiles .b-achievement[data-hint^='Длиннотайтлы'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='Длиннотайтлы'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='Длиннотайтлы'] .inner:after {
@@ -863,7 +872,6 @@ order: 3;
 #profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="bleach"]::after { content: "Блич" !important; }
 #profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="bakuman"]::after { content: "Бакуман" !important; }
 #profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="quanzhi_fashi"]::after { content: "Маг на полную ставку" !important; }
-
 
 
 /*-----------------------------------------------------------------Постеры избранное--------------------------------------------------------------------*/
