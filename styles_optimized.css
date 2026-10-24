@@ -895,6 +895,116 @@ order: 3;
   --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462099/ezgif-21a5b52600bf16d5_bkcswo.webp");
 }
 
+/* Отложенная отрисовка избранного и содержимого достижений на компьютере.
+   Основные заголовки остаются снаружи. Начальные оценки высоты приблизительные;
+   auto запоминает фактическую высоту после первой отрисовки, не фиксируя её. */
+@supports (content-visibility: auto) and (contain-intrinsic-block-size: auto 184px) {
+  @media (min-width: 1024px) {
+    #profiles_show.p-profiles-show .profile-content .cc-favourites {
+      content-visibility: auto;
+      contain-intrinsic-block-size: auto 184px;
+      overflow-clip-margin: 32px;
+    }
+
+    #profiles_show.p-profiles-show .profile-content .achievements > .cc-2 {
+      content-visibility: auto;
+      contain-intrinsic-block-size: auto 700px;
+      overflow-clip-margin: 32px;
+    }
+  }
+}
+
+/* График активности: постоянная геометрия вместо анимации height и margin.
+   Видимая высота 20–95px; положение учитывает общую строку inline-block.
+   Задержки 34 столбцов и пауза при наведении наследуются из импортированной темы. */
+@supports (clip-path: inset(0 round 14px)) {
+  .p-profiles-show .activity .bar.vertical > .line:nth-child(-n + 34) {
+    animation-name: none !important;
+    background-color: transparent !important;
+    height: 95px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-right: 0;
+  }
+
+  .p-profiles-show .activity .bar.vertical > .line:nth-child(-n + 34) > .bar-container {
+    animation-duration: inherit;
+    animation-delay: inherit;
+    animation-timing-function: inherit;
+    animation-iteration-count: inherit;
+    animation-play-state: inherit;
+  }
+
+  .p-profiles-show .activity .bar.vertical > .line:nth-child(-n + 34) > .bar-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    animation-name: profile-activity-pulse;
+    animation-duration: inherit;
+    animation-delay: inherit;
+    animation-timing-function: inherit;
+    animation-iteration-count: inherit;
+    animation-play-state: inherit;
+  }
+}
+
+@keyframes profile-activity-pulse {
+  0% {
+    clip-path: inset(35px 0 40px round 14px);
+    background-color: rgba(var(--very-high-rating), var(--hundred));
+  }
+  50% {
+    clip-path: inset(0 round 14px);
+    background-color: rgba(var(--average-rating), var(--hundred));
+  }
+  100% {
+    clip-path: inset(35px 0 40px round 14px);
+    background-color: rgba(var(--small-rating), var(--hundred));
+  }
+}
+
+/* Шапка новых фильтров: текстовая ссылка вместо круглых кнопок темы */
+.b-collection-filters .c-filters-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-sizing: border-box;
+  height: auto;
+  min-height: 32px;
+  padding: 6px 12px;
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.b-collection-filters .c-filters-head > .misc-links {
+  position: static;
+  flex: 0 0 auto;
+  width: auto;
+  height: auto;
+  margin: 0 0 0 auto;
+  padding: 0;
+  line-height: inherit;
+}
+
+.b-collection-filters .c-filters-head > .misc-links > a {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  font-size: 12px !important;
+  line-height: inherit;
+  white-space: nowrap;
+}
+
+.b-collection-filters .c-filters-head > .misc-links > a::before,
+.b-collection-filters .c-filters-head > .misc-links > a::after {
+  content: none !important;
+  display: none !important;
+}
+
 /* Раскрывающиеся списки фильтров: общая палитра для компонента c-ms */
 .c-ms .c-ms-dropdown {
   background-color: rgb(var(--block-color)) !important;
