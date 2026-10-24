@@ -1,0 +1,4 @@
+interface:
+  display_name: "Shikimori CSS migration"
+  short_description: "Миграция CSS-импортов с визуальной проверкой"
+  default_prompt: "Используй $shikimori-css-migration для безопасной локальной миграции выбранного внешнего CSS-импорта Shikimori с проверкой Playwright."
