@@ -5,10 +5,52 @@
 @import url("https://raw.githubusercontent.com/ed-main/ed-main.github.io/master/cssfiles/main_code_2.css");
 @import url("https://raw.githubusercontent.com/ed-main/ed-main.github.io/master/cssfiles/main_code_3.css");
 @import url("https://raw.githubusercontent.com/ed-main/ed-main.github.io/master/cssfiles/main_code_4mob.css");
-@import url("https://raw.githubusercontent.com/ed-main/ed-main.github.io/master/cssfiles/q03_history_bookmarks.css");
+
 @import url("https://raw.githubusercontent.com/ed-main/ed-main.github.io/master/cssfiles/q05_animated_activity_graph.css");
 /* Замена стандартных постеров */
 @import url("https://css-club.web.app/css/custom_posters.min.css");
+
+/* BEGIN LOCAL HISTORY BOOKMARKS
+   Source: ed-main q03_history_bookmarks.css; seven rules, no optimization.
+*/
+.history-page span > a:before {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 18px;
+    margin-right: 10px;
+    width: 70px;
+    border-radius: 10px;
+}
+.history-page a[href ^= "/a"]:before {
+    content: 'Аниме ';
+    color: #59d279;
+    border: 2px solid #41825773;
+}
+.history-page a[href ^= "/m"]:before {
+    content: 'Манга ';
+    color: #e878c1;
+    border: 2px solid #a5538973;
+}
+.history-page a[href ^= "/r"]:before {
+    content: 'Ранобэ ';
+    color: #6bc2ec;
+    border: 2px solid #5288a273;
+}
+[data-locale="en"] .history-page a[href ^= "/a"]:before {
+    content: 'Anime ';
+}
+[data-locale="en"] .history-page a[href ^= "/m"]:before {
+    content: 'Manga ';
+}
+[data-locale="en"] .history-page a[href ^= "/r"]:before {
+    content: 'Ranobe ';
+}
+/* END LOCAL HISTORY BOOKMARKS */
+
+/* CASCADE COMPATIBILITY: restore the existing tooltip content priority after q03.
+   Expected poster declaration: content: "" (normal priority). Re-audit on poster updates. */
+.b-catalog_entry-tooltip > .entry-tooltip_container > a::before { content: ""; }
 
 /* BEGIN LOCAL PROFILE LAYOUT
    Source: CSS-club, https://css-club.web.app/css/profile-content-layout-v1.css
