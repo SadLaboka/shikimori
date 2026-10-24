@@ -15,6 +15,9 @@ tokens*.json
 shiki_profile*.html
 backups/
 .image-audit/
+.preview/
+node_modules/
+.pnpm-store/
 
 # Local editor and OS files
 .vscode/
