@@ -14,6 +14,7 @@ tokens*.json
 *.log
 shiki_profile*.html
 backups/
+.image-audit/
 
 # Local editor and OS files
 .vscode/
