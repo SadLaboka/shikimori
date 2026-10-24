@@ -895,6 +895,38 @@ order: 3;
   --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462099/ezgif-21a5b52600bf16d5_bkcswo.webp");
 }
 
+/* Раскрывающиеся списки фильтров: общая палитра для компонента c-ms */
+.c-ms .c-ms-dropdown {
+  background-color: rgb(var(--block-color)) !important;
+  color: rgb(var(--light-color)) !important;
+  border-color: rgba(var(--bright-color), 0.5) !important;
+  box-shadow: 0 4px 16px rgba(var(--shadows-color), 0.6);
+}
+
+.c-ms .c-ms-options {
+  background-color: transparent !important;
+  color: rgb(var(--light-color)) !important;
+}
+
+.c-ms .c-ms-option {
+  color: rgb(var(--light-color)) !important;
+}
+
+.c-ms .c-ms-option:hover,
+.c-ms .c-ms-option:focus-visible {
+  background-color: rgba(var(--bright-color), 0.25) !important;
+  color: rgb(var(--white-color)) !important;
+}
+
+.c-ms .c-ms-option-mark {
+  border-color: rgba(var(--light-color), 0.6) !important;
+}
+
+.c-ms .c-ms-control:focus-visible {
+  outline: 2px solid rgb(var(--bright-color));
+  outline-offset: 2px;
+}
+
 /* Принудительно скрываем стандартные всплывающие подсказки (Tipsy) на странице профиля, 
    чтобы они не дублировали текст из твоей выезжающей шторки */
 body#profiles_show .tipsy,
