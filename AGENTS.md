@@ -45,8 +45,14 @@ This repository contains custom CSS for a Shikimori user profile.
 - Перед соответствующей работой прочитай:
   [публикацию](docs/deployment.md), [производительность](docs/performance.md),
   [архитектуру](docs/architecture.md).
-- Разделение темы на `vendor/` и отдельные `css/`-модули пока только запланировано.
-  Не описывай эту миграцию как уже выполненную.
+- В `vendor/profile-content-layout-v1.css` сохранена первая исходная копия CSS-club;
+  её десять правил перенесены в локальный блок основного CSS. Отдельные `css/`-модули
+  ещё не выделены. План и ограничения — `docs/style-migration.md`.
+- `vendor/q03_history_bookmarks.css` — исходная копия семи локализованных правил
+  истории; импорт удалён. Сохранение приоритета tooltip требует отдельного
+  совместимостного объявления и проверки исходного `content: ""` постеров.
+  Аудит: `node tools/preview/preview.mjs --component history --check-history --widths 1440,390,360`.
+  Подробности и ограничения покрытия — `docs/q03-migration-plan.md`, `docs/preview.md`.
 
 ## Особенности Shikimori и CSS
 
