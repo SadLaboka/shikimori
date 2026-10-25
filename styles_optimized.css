@@ -479,14 +479,50 @@ a {
 }
 
 /*----------------------------------------------------------------------scrollbar----------------------------------------------------------------------*/
-/* Standard scrollbar styling is supported by Firefox and Chrome 121+. */
-@supports (scrollbar-width: thin) and (scrollbar-color: red blue) {
+/* Firefox: preserve its existing native scrollbar. */
+@supports not selector(::-webkit-scrollbar) {
   html {
     scrollbar-width: thin;
     scrollbar-color: rgb(30, 38, 185) rgb(153, 0, 62);
   }
   html:hover {
     scrollbar-color: rgb(1, 4, 75) rgb(153, 0, 62);
+  }
+}
+/* Chrome: explicit geometry and colors, including hover and dragging. */
+@supports selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+  :is(html, body)::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background: rgb(153, 0, 62);
+  }
+  :is(html, body)::-webkit-scrollbar-track {
+    display: block;
+    background: rgb(153, 0, 62);
+    border: 0;
+    margin: 0;
+  }
+  :is(html, body)::-webkit-scrollbar-thumb,
+  :is(html, body)::-webkit-scrollbar-thumb:hover,
+  :is(html, body)::-webkit-scrollbar-thumb:active {
+    background: rgb(1, 4, 75);
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    transition: none;
+  }
+  :is(html, body)::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+  :is(html, body)::-webkit-scrollbar-corner,
+  :is(html, body)::-webkit-resizer {
+    display: none;
   }
 }
 /*---------------------------------------------------------------------shiki logo---------------------------------------------------------------------*/
