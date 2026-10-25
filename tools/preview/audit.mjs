@@ -1,10 +1,10 @@
 import { createHash } from 'node:crypto';
-import { LAYOUT_SOURCE, HISTORY_SOURCE, HISTORY_COMPAT, ACTIVITY_SOURCE, USER_MARKER } from './css.mjs';
+import { LAYOUT_SOURCE, HISTORY_SOURCE, HISTORY_COMPAT, ACTIVITY_SOURCE, POSTERS_SOURCE, USER_MARKER } from './css.mjs';
 
 // Inspect the LIVE stylesheet. Text snapshots alone cannot prove that an old
 // imported copy stopped participating in the cascade.
-export async function auditRules(page, referenceCss, { source = LAYOUT_SOURCE, expectedCount = 10, compatibility = '', allowOverrides = false } = {}) {
-  const result = await page.evaluate(({ referenceCss, source, marker, expectedCount, compatibility, allowOverrides }) => {
+export async function auditRules(page, referenceCss, { source = LAYOUT_SOURCE, expectedCount = 10, compatibility = '', allowOverrides = false, posterReference = '' } = {}) {
+  const result = await page.evaluate(({ referenceCss, source, marker, expectedCount, compatibility, allowOverrides, posterReference }) => {
     const element = document.querySelector('style#custom_css');
     const text = element.textContent;
     const index = text.indexOf(marker);
@@ -70,7 +70,17 @@ export async function auditRules(page, referenceCss, { source = LAYOUT_SOURCE, e
       const label = '/* https://css-club.web.app/css/custom_posters.min.css */';
       const prefix = text.slice(0,index);
       const start = prefix.indexOf(label);
-      if (start < 0) posterContentExpected = false;
+      if (start < 0) {
+        // The poster prefix may disappear only after a complete verified migration.
+        const refPosters = posterReference ? parse(posterReference) : [];
+        const localPosters = user.filter(row => refPosters.some(ref => exact(row, ref)));
+        const integrity = refPosters.length === 10 && JSON.stringify(localPosters) === JSON.stringify(refPosters) &&
+          refPosters.every(ref => actual.filter(row=>exact(row,ref)).length === 1 &&
+            foundation.filter(row=>exact(row,ref)).length === 0 && outside.filter(row=>exact(row,ref)).length === 0);
+        const target = refPosters.filter(row=>row.selector?.split(',').map(s=>s.trim()).includes(compat[0].selector));
+        posterContentExpected = integrity && target.length === 1 && /content:\s*"";/.test(target[0].cssText) &&
+          !/content:[^;]*!important/.test(target[0].cssText);
+      }
       else {
         const tail = prefix.slice(start + label.length);
         const next = tail.search(/\/\*\s*https?:/);
@@ -92,7 +102,7 @@ export async function auditRules(page, referenceCss, { source = LAYOUT_SOURCE, e
           rule.userCopies === 1 && (allowOverrides || rule.selectorCopies === 1)),
       nonLayout, pseudos,
     };
-  }, { referenceCss, source, marker: USER_MARKER, expectedCount, compatibility, allowOverrides });
+  }, { referenceCss, source, marker: USER_MARKER, expectedCount, compatibility, allowOverrides, posterReference });
   const digest = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
   const { nonLayout, pseudos, ...audit } = result;
   return { ...audit, nonLayoutCascadeHash: digest(nonLayout),
@@ -100,8 +110,11 @@ export async function auditRules(page, referenceCss, { source = LAYOUT_SOURCE, e
 }
 
 export const auditLayout = (page, referenceCss) => auditRules(page, referenceCss);
-export const auditHistory = (page, referenceCss) => auditRules(page, referenceCss,
-  { source: HISTORY_SOURCE, expectedCount: 7, compatibility: HISTORY_COMPAT });
+export const auditHistory = (page, referenceCss, posterReference = '') => auditRules(page, referenceCss,
+  { source: HISTORY_SOURCE, expectedCount: 7, compatibility: HISTORY_COMPAT, posterReference });
 
 export const auditActivity = (page, referenceCss) => auditRules(page, referenceCss,
   { source: ACTIVITY_SOURCE, expectedCount: 40, allowOverrides: true });
+
+export const auditPosters = (page, referenceCss) => auditRules(page, referenceCss,
+  { source: POSTERS_SOURCE, expectedCount: 10, allowOverrides: true });

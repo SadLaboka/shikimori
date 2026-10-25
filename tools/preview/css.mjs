@@ -3,6 +3,7 @@ export const USER_MARKER = '/* User Custom Styles */';
 export const LAYOUT_SOURCE = 'https://css-club.web.app/css/profile-content-layout-v1.css';
 export const HISTORY_SOURCE = 'https://raw.githubusercontent.com/ed-main/ed-main.github.io/master/cssfiles/q03_history_bookmarks.css';
 export const ACTIVITY_SOURCE = 'https://raw.githubusercontent.com/ed-main/ed-main.github.io/master/cssfiles/q05_animated_activity_graph.css';
+export const POSTERS_SOURCE = 'https://css-club.web.app/css/custom_posters.min.css';
 export const HISTORY_COMPAT = '.b-catalog_entry-tooltip > .entry-tooltip_container > a::before { content: ""; }';
 
 export function planFoundation(localText, publishedText, foundation) {
@@ -11,6 +12,7 @@ export function planFoundation(localText, publishedText, foundation) {
   assertSameImports(published, published, foundation);
   if (JSON.stringify(local) === JSON.stringify(published)) return { foundation, migration: null };
   const approved = [
+    { source: POSTERS_SOURCE, begin: '/* BEGIN LOCAL CUSTOM POSTERS', end: '/* END LOCAL CUSTOM POSTERS */', snapshot: 'vendor/custom_posters.min.css' },
     { source: ACTIVITY_SOURCE, begin: '/* BEGIN LOCAL ACTIVITY GRAPH', end: '/* END LOCAL ACTIVITY GRAPH */', snapshot: 'vendor/q05_animated_activity_graph.css' },
     { source: LAYOUT_SOURCE, begin: '/* BEGIN LOCAL PROFILE LAYOUT', end: '/* END LOCAL PROFILE LAYOUT */', snapshot: 'vendor/profile-content-layout-v1.css' },
     { source: HISTORY_SOURCE, begin: '/* BEGIN LOCAL HISTORY BOOKMARKS', end: '/* END LOCAL HISTORY BOOKMARKS */', snapshot: 'vendor/q03_history_bookmarks.css' },
