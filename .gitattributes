@@ -6,3 +6,5 @@ vendor/edesign/main_code_4mob.css whitespace=-blank-at-eol
 css/base/*.css text eol=lf
 # The owned main1 copy retains the same upstream trailing spaces as its vendor snapshot.
 css/base/main_code_1.css whitespace=-blank-at-eol
+# Preserve the byte-identical main4 snapshot as well.
+css/base/main_code_4mob.css whitespace=-blank-at-eol
