@@ -7,7 +7,7 @@
 /* AUTO=sticky_menu */ @media screen and (min-width: 1025px) { .l-top_menu-v2 { position: sticky; top: 0; } .l-top_menu-v2 .active .submenu { max-height: calc(100vh - var(--top-menu-height)); overflow-y: auto; } }
 @import url('https://fonts.googleapis.com/css2?family=Rubik+Spray+Paint&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap');
-@import url("https://raw.githubusercontent.com/SadLaboka/shikimori/dc6db3f940645bd22d13a7c5a0ae18ca7137d683/css/base/main_code_1.css");
+@import url("https://raw.githubusercontent.com/SadLaboka/shikimori/9c8e3373f0d65490823e609f56472fc168a9b8a7/css/base/main_code_1.css");
 @import url("https://raw.githubusercontent.com/SadLaboka/shikimori/a96dc9d93e8ae8edb76912f8f3ca970a96241c8b/css/base/main_code_2.css");
 @import url("https://raw.githubusercontent.com/SadLaboka/shikimori/e64310020fa1daf487a55f4648391d9b003f49ae/css/base/main_code_3.css");
 @import url("https://raw.githubusercontent.com/SadLaboka/shikimori/8912ca67ab5e4915c6ba9ea065f9ee609481ccd3/css/base/main_code_4mob.css");
