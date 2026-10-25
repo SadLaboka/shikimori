@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import {DUPLICATE_BUTTON_BLOCK} from './main1-button-change.mjs';
+export const MAIN1_OPTIMIZATION=JSON.parse(readFileSync(new URL('../../css/main1-optimization.json',import.meta.url),'utf8'));
 export const E_DESIGN_PINS = JSON.parse(readFileSync(new URL('../../vendor/edesign-pins.json', import.meta.url), 'utf8'));
 export const OWNED_IMPORTS = JSON.parse(readFileSync(new URL('../../css/imports.json', import.meta.url), 'utf8'));
 // A deliberately limited model, not a replacement for Shikimori's sanitizer.
@@ -15,6 +17,20 @@ export function planFoundation(localText, publishedText, foundation) {
   const published = extractLocal(publishedText).imports;
   assertSameImports(published, published, foundation);
   if (JSON.stringify(local) === JSON.stringify(published)) return { foundation, migration: null };
+  if(local.length===published.length&&published.filter(url=>url===MAIN1_OPTIMIZATION.source).length===1&&
+      JSON.stringify(local)===JSON.stringify(published.map(url=>url===MAIN1_OPTIMIZATION.source?MAIN1_OPTIMIZATION.target:url))){
+    optimizedMain1Revision();
+    if(extractLocal(localText).user!==extractLocal(publishedText).user)
+      throw new Error('Main1 optimization cannot include other user CSS changes.');
+    const markers=[...foundation.matchAll(/\/\*\s*(https?:[^*]+?)\s*\*\//g)];
+    const matching=markers.filter(m=>m[1]===MAIN1_OPTIMIZATION.source);
+    if(matching.length!==1)throw new Error('Main1 optimization source marker must be unique.');
+    const marker=matching[0],index=markers.indexOf(marker),end=markers[index+1]?.index??foundation.length;
+    const block=foundation.slice(marker.index,end);
+    if(block.split(DUPLICATE_BUTTON_BLOCK).length!==2)throw new Error('Main1 optimization requires the exact duplicate block once.');
+    const replacement=block.replace(DUPLICATE_BUTTON_BLOCK,'').replace(marker[0],marker[0].replace(MAIN1_OPTIMIZATION.source,MAIN1_OPTIMIZATION.target));
+    return {foundation:foundation.slice(0,marker.index)+replacement+foundation.slice(end),migration:null,main1Optimization:MAIN1_OPTIMIZATION};
+  }
   // A source relocation is separate from pinning/removal and must be byte-verified.
   if (local.length === published.length) {
     const changes = local.flatMap((url,i)=>url===published[i]?[]:
@@ -187,5 +203,14 @@ export function ownedImportRevision(spec) {
   if(!match || match[2]!==spec.local || !upstream ||
       spec.snapshot!==upstream.snapshot || spec.sha256!==upstream.sha256)
     throw new Error('Owned import must name an approved byte-identical snapshot and exact repository commit/path.');
+  return match[1];
+}
+
+export function optimizedMain1Revision(spec=MAIN1_OPTIMIZATION){
+  const baseline=OWNED_IMPORTS.find(row=>row.local==='css/base/main_code_1.css');
+  ownedImportRevision(baseline);
+  const match=/^https:\/\/raw\.githubusercontent\.com\/SadLaboka\/shikimori\/([a-f0-9]{40})\/css\/base\/main_code_1\.css$/.exec(spec.target);
+  if(!match||spec.source!==baseline.target||spec.sha256!=='34dd4651c3514fba98e0be4b7475591b1afd1ce6f636ddeccf6cffcddec80c66')
+    throw new Error('Unapproved optimized main1 revision.');
   return match[1];
 }

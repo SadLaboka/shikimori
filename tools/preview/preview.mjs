@@ -13,6 +13,9 @@ import { checkHistoryStates } from './history-states.mjs';
 import { checkActivityStates } from './activity-states.mjs';
 import { checkPosterStates } from './poster-states.mjs';
 import { CATALOG_URL, installCatalogTheme, ensureCatalogFilters, checkFilterStates, isCatalogPagination, isCatalogAdRequest } from './filter-states.mjs';
+import {MAIN1_SPEC,DUPLICATE_BUTTON_BLOCK,verifyMain1ButtonCandidate,applyMain1ButtonCandidate,verifyMain1ButtonCssomDelta} from './main1-button-pilot.mjs';
+import {checkButtonStates} from './button-states.mjs';
+import {MAIN1_OPTIMIZATION,optimizedMain1Revision} from './css.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const { values } = parseArgs({ options: {
@@ -25,6 +28,7 @@ const { values } = parseArgs({ options: {
   component: { type: 'string', default: 'profile' },
   'check-history': { type: 'boolean', default: false },
   'check-filters': { type: 'boolean', default: false },
+  'main1-button-candidate': { type: 'string' },
   'baseline-css': { type: 'string' }, 'baseline-compiled': { type: 'string' },
 } });
 if (!['profile','history','catalog'].includes(values.component)) throw new Error('Component must be profile, history or catalog.');
@@ -36,6 +40,9 @@ if (values['check-activity'] && values.component!=='profile') throw new Error('-
 if (values['check-history'] && !historyMode) throw new Error('--check-history requires --component history.');
 if (values['check-layout'] && values.component!=='profile') throw new Error('--check-layout requires the real profile component.');
 if (values['check-filters'] && !catalogMode) throw new Error('--check-filters requires --component catalog.');
+const buttonPilot=Boolean(values['main1-button-candidate']);
+if(buttonPilot&&(values.component!=='profile'||values['local-imports']||values['baseline-css']||values['baseline-compiled']))
+  throw new Error('--main1-button-candidate requires the live profile baseline and remote source verification.');
 if (Boolean(values['baseline-css']) !== Boolean(values['baseline-compiled'])) {
   throw new Error('Historical replay requires both --baseline-css and --baseline-compiled.');
 }
@@ -45,6 +52,9 @@ if (!widths.length || widths.some(w => !Number.isInteger(w) || w < 320 || w > 38
 }
 const localPath = path.resolve(root, values.css ?? 'styles_optimized.css');
 const local = await readFile(localPath, 'utf8');
+const buttonCandidatePath=buttonPilot?path.resolve(root,values['main1-button-candidate']):null;
+if(buttonPilot&&(!buttonCandidatePath.startsWith(root)||path.extname(buttonCandidatePath)!=='.css'))
+  throw new Error('Main1 candidate must be a workspace CSS file.');
 const referenceLayout = await readFile(path.join(root, 'vendor/profile-content-layout-v1.css'), 'utf8');
 const referenceHistory = await readFile(path.join(root, 'vendor/q03_history_bookmarks.css'), 'utf8');
 const referenceActivity = await readFile(path.join(root, 'vendor/q05_animated_activity_graph.css'), 'utf8');
@@ -372,9 +382,59 @@ try {
       parsedRules:rules.length,urlVerification,verified:true,remoteVerified:!values['local-imports']};
   }));
   report.remoteSourcesVerified=report.ownedImports.every(row=>row.remoteVerified);
-  const replacement = joinCompiled(planned.foundation, prepareUser(local));
+  const optimizedMain1=extractLocal(local).imports.includes(MAIN1_OPTIMIZATION.target);
+  if(optimizedMain1){
+    if(values['local-imports']||buttonPilot)throw new Error('Optimized main1 requires remote verification, without a local pilot.');
+    const revision=optimizedMain1Revision();
+    const snapshot=await readFile(path.join(root,MAIN1_SPEC.snapshot));
+    const working=await readFile(path.join(root,MAIN1_SPEC.local));
+    verifyMain1ButtonCandidate(snapshot,working);
+    const fetched=await context.request.get(MAIN1_OPTIMIZATION.target);
+    if(!fetched.ok())throw new Error(`Optimized main1 GET failed: HTTP ${fetched.status()}`);
+    const candidate=await fetched.body();
+    verifyMain1ButtonCandidate(snapshot,candidate);
+    if(hash(candidate)!==MAIN1_OPTIMIZATION.sha256)throw new Error('Optimized main1 remote hash differs.');
+    const source=publishedImports.includes(MAIN1_OPTIMIZATION.target)?MAIN1_OPTIMIZATION.target:MAIN1_OPTIMIZATION.source;
+    const markers=[...foundation.matchAll(/\/\*\s*(https?:[^*]+?)\s*\*\//g)];
+    const matching=markers.filter(m=>m[1]===source);
+    if(matching.length!==1)throw new Error('Optimized main1 requires a unique compiled source marker.');
+    const index=markers.indexOf(matching[0]);
+    const block=foundation.slice(markers[index].index,markers[index+1]?.index??foundation.length);
+    let rules=await signature(page,snapshot.toString('utf8'));
+    let upstream=E_DESIGN_PINS.find(pin=>pin.target===MAIN1_SPEC.source);
+    const removed=(await signature(page,DUPLICATE_BUTTON_BLOCK))[0];
+    const removedIndex=rules.indexOf(removed);
+    if(removedIndex<0||rules.filter(rule=>rule===removed).length!==1)throw new Error('Main1 removed rule is ambiguous.');
+    if(source===MAIN1_OPTIMIZATION.target){
+      rules=rules.filter((_,i)=>i!==removedIndex);
+      upstream={...upstream,parsedRules:upstream.parsedRules-1,compiledUrlRewrites:upstream.compiledUrlRewrites.map(entry=>({...entry,rule:entry.rule>removedIndex?entry.rule-1:entry.rule}))};
+    }else{
+      const previous=await context.request.get(MAIN1_OPTIMIZATION.source);
+      if(!previous.ok())throw new Error('Main1 previous remote source unavailable.');
+      assertVersionPinBytes(MAIN1_SPEC,snapshot,await previous.body());
+    }
+    const urlVerification=assertVersionPinRules(upstream,rules,await signature(page,block));
+    report.main1Optimization={...MAIN1_OPTIMIZATION,revision,remoteVerified:true,urlVerification,
+      alreadyPublished:source===MAIN1_OPTIMIZATION.target};
+    report.publicationReady=false; // Real component coverage remains incomplete.
+  }
+  let candidateFoundation=planned.foundation;
+  if(buttonPilot){
+    if(local!==published.css||planned.migration)throw new Error('Main1 pilot cannot be combined with other CSS/import changes.');
+    const snapshot=await readFile(path.join(root,MAIN1_SPEC.snapshot));
+    const candidate=await readFile(buttonCandidatePath);
+    report.buttonPilot=verifyMain1ButtonCandidate(snapshot,candidate);
+    candidateFoundation=applyMain1ButtonCandidate(candidateFoundation);
+    report.sourceMode='local-main1-button-pilot';
+    report.publicationReady=false;
+  }
+  const replacement = joinCompiled(candidateFoundation, prepareUser(local));
   report.candidateCompiledHash = hash(replacement);
   report.candidateCssomMatchesPublished = JSON.stringify(await signature(page, original)) === JSON.stringify(await signature(page, replacement));
+  if(buttonPilot)Object.assign(report.buttonPilot,verifyMain1ButtonCssomDelta(
+    await signature(page,original),await signature(page,replacement),await signature(page,DUPLICATE_BUTTON_BLOCK)));
+  if(optimizedMain1&&!report.main1Optimization.alreadyPublished)Object.assign(report.main1Optimization,verifyMain1ButtonCssomDelta(
+    await signature(page,original),await signature(page,replacement),await signature(page,DUPLICATE_BUTTON_BLOCK)));
   report.candidateImports = extractLocal(local).imports;
   await writeFile(path.join(output, 'published-compiled.css'), original);
   await writeFile(path.join(output, 'candidate-compiled.css'), replacement);
@@ -403,7 +463,7 @@ try {
     const before = await capture(page, width, 'before', original);
     await page.locator('style#custom_css').evaluate((style, text) => { style.textContent = text; }, replacement);
     const applied = await page.locator('style#custom_css').textContent();
-    if (splitCompiled(applied).foundation !== planned.foundation || applied !== replacement) {
+    if (splitCompiled(applied).foundation !== candidateFoundation || applied !== replacement) {
       throw new Error('Foundation preservation or replacement integrity failed.');
     }
     const after = await capture(page, width, 'after', replacement);
@@ -443,6 +503,7 @@ try {
       widths: widths.filter(w=>[1440,390,360].includes(w)), output});
   }
   if(values['check-filters']) report.filterStates=await checkFilterStates({page,baseline:original,candidate:replacement,widths,output});
+  if(buttonPilot||optimizedMain1)report.buttonStates=await checkButtonStates({page,baseline:original,candidate:replacement,widths,output});
   report.checks = {
     ownedImportsVerified: report.ownedImports.length===activeOwned.length && report.ownedImports.every(row=>row.verified),
     versionPinsVerified: report.versionPins.length === activePins.length && report.versionPins.every(pin=>pin.verified),
@@ -466,6 +527,18 @@ try {
   };
   report.verdict = Object.values(report.checks).every(Boolean) ? (values['local-imports'] ? 'LOCAL PASS' : 'PASS') : 'FAIL';
   if ((catalogMode || values['check-layout'] || values['check-history'] || values['check-activity'] || values['check-filters'] || posterMode) && report.verdict === 'FAIL') process.exitCode = 1;
+  if(buttonPilot||optimizedMain1){
+    report.strictMigrationVerdict=report.verdict;
+    const expectedDelta=new Set(['exactPosterCascade','unchangedNonLayoutCascade']);
+    report.pilotChecks={onlyApprovedRemoval:buttonPilot?report.buttonPilot.onlyApprovedRemoval:
+      report.main1Optimization.alreadyPublished?report.candidateCssomMatchesPublished:report.main1Optimization.onlyApprovedRemoval,
+      otherChecksPassed:Object.entries(report.checks).every(([key,value])=>value||expectedDelta.has(key)),
+      buttonStatesEquivalent:report.buttonStates.valid,
+      realButtonCoverage:report.buttonStates.realCoverageComplete};
+    const technical=report.pilotChecks.onlyApprovedRemoval&&report.pilotChecks.otherChecksPassed&&report.pilotChecks.buttonStatesEquivalent;
+    report.verdict=!technical?'FAIL':report.pilotChecks.realButtonCoverage?'LOCAL PILOT PASS':'INCOMPLETE';
+    process.exitCode=!technical?1:report.pilotChecks.realButtonCoverage?0:2;
+  }
   console.log(`${values.component} audit: ${report.verdict}`);
   await page.locator('style#custom_css').evaluate((style, text) => { style.textContent = text; }, liveOriginal);
   await context.close();
@@ -480,11 +553,14 @@ try {
   const html = `<!doctype html><meta charset="utf-8"><title>Shikimori local CSS preview</title>
 <style>body{font:16px system-ui;margin:24px;background:#171717;color:#ddd}a{color:#9bf}.pair{display:flex;gap:12px;align-items:flex-start}.pair figure{margin:0;flex:1;min-width:0}img{width:100%;height:auto}pre{white-space:pre-wrap}</style>
 <h1>Локальный предпросмотр CSS</h1>${values['local-imports'] ? '<p><strong>Локальная копия модуля и Git-коммит проверены. Удалённый URL не проверен; этот результат не подтверждает готовность публикации.</strong></p>' : ''}<p>Стиль на сайте не изменён этим прогоном. ${report.migration ? `Только проверенный блок ${report.migration.source === POSTERS_SOURCE ? 'механизма постеров' : report.migration.source === ACTIVITY_SOURCE ? 'графика активности' : report.migration.source === HISTORY_SOURCE ? 'подписей истории' : 'раскладки'} перенесён из импорта в локальную часть; остальные импорты сохранены.` : 'Импортированная основа сохранена.'} Слева — опубликованный CSS, справа — локальная замена.</p>
+${buttonPilot ? '<p><strong>Локальный пилот: из основы убран только проверенный дубль кнопки main1. Новый удалённый источник не подключён. Это не готовность публикации.</strong></p>' : ''}
+${report.main1Optimization ? '<p><strong>Оптимизированный main1: удалённый источник и точное удаление дубля проверены. Покрытие реального компонента указано отдельно; INCOMPLETE не означает общий PASS.</strong></p>' : ''}
 ${catalogMode ? '<p>Настоящий анонимный каталог: опубликованная тема профиля и кандидат временно заменяют его реальный custom_css slot. Настройки аккаунта не меняются.</p>' : ''}
 <p>CSS-анимации остановлены; GIF/WebP продолжают менять кадры. Pixel diff не является автоматическим вердиктом.</p>
 <p>Совпадение модели обработки с опубликованным CSSOM: ${report.baselineCssomMatches ?? false}. <a href="report.json">Вычисленные стили и полный отчёт</a>.</p>
 <p>Аудит ${catalogMode ? 'каталога' : historyMode ? 'истории' : 'раскладки'}: <strong>${report.verdict ?? 'ERROR'}</strong>. ${report.historicalReplay ? 'Повторяется сохранённый CSS до публикации на текущем DOM.' : 'База сравнения — текущий опубликованный CSS.'}</p>
 ${report.filterStates ? `<p>Фильтры реального каталога: ${report.filterStates.cases.length} проверок; <a href="filters.html">состояния и снимки</a>.</p>` : ''}
+${report.buttonStates ? `<p>Кнопки: реальных ${report.buttonStates.realButtons}, примеров ${report.buttonStates.fixtures.length}. <a href="buttons.html">Покрытие и снимки</a>. Строгий миграционный вердикт: ${report.strictMigrationVerdict}.</p><pre>${escape(JSON.stringify(report.pilotChecks,null,2))}</pre>` : ''}
 ${report.historyStates ? `<p>Состояния истории: ${report.historyStates.cases.length} сравнений реального DOM и ${report.historyStates.fixtures.length} тестовых примеров; изменённых узлов: ${report.historyStates.changed}. Реальных записей ранобэ: ${report.historyStates.coverage.ranobe}.</p>` : ''}
 ${report.activityStates ? `<p>График: ${report.activityStates.cases.length} сравнений фаз и состояний; изменённых узлов: ${report.activityStates.changed}. <a href="activity.html">Снимки графика и состояния</a>.</p>` : ''}
 ${report.posterStates ? `<p>Постеры: ${report.posterStates.cases.length} проверок; <a href="posters.html">страницы, состояния и снимки</a>.</p>` : ''}
