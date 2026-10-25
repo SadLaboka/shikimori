@@ -1,7 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import { chromium } from 'playwright';
 import { PNG } from 'pngjs';
-import pixelmatch from 'pixelmatch';
+import { comparePng } from './png-diff.mjs';
+import { createTimings } from './timing.mjs';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
@@ -19,6 +20,8 @@ import {MAIN1_OPTIMIZATION,optimizedMain1Revision} from './css.mjs';
 import {MAIN3_SPEC,RADIUS_BEFORE,RADIUS_AFTER,verifyRadiusCandidate,applyRadiusCandidate,verifyRadiusDelta,sampleRadiusMargins,MAIN3_RELEASE,planRadiusRelease,radiusReleaseRevision} from './main3-radius.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
+const timing = createTimings();
+const getSource = (context, url) => timing.measure('import-get', () => context.request.get(url));
 const { values } = parseArgs({ options: {
   css: { type: 'string' }, widths: { type: 'string', default: '1440,390,360' },
   headed: { type: 'boolean', default: false },
@@ -116,7 +119,7 @@ const report = {
 
 // Compare parsed rules, not a whitespace-stripped string that could hide changes in content:"...".
 async function signature(page, text) {
-  return page.evaluate(css => {
+  return timing.measure('cssom', () => page.evaluate(css => {
     const style = document.createElement('style');
     style.media = 'not all';
     style.textContent = css;
@@ -124,7 +127,7 @@ async function signature(page, text) {
     try {
       return [...style.sheet.cssRules].map(r => r.cssText.replace(/https?:\/\//g, '//'));
     } finally { style.remove(); }
-  }, text);
+  }, text));
 }
 
 async function settle(page) {
@@ -226,30 +229,32 @@ async function layoutState(page) {
 
 async function capture(page, width, phase, css) {
   if(catalogMode) await ensureCatalogFilters(page);
-  const assets = await warmup(page);
+  const assets = await timing.measure('warmup', () => warmup(page));
   if(catalogMode){
     await installCatalogTheme(page,css);
     await ensureCatalogFilters(page);
   }
   await page.evaluate(() => scrollTo(0, 0));
   await settle(page);
-  const state = await computed(page);
+  const state = await timing.measure('computed', () => computed(page));
   if(radiusMode){
     const margins=await page.locator('.l-page').evaluate(sampleRadiusMargins);
     Object.assign(state.elements.page.style,margins.computed);
     state.rawResolvedPageMargins=margins.resolved;
   }
   if(catalogMode && Object.values(state.elements).some(el=>el.missing))throw new Error('Required catalogue measurement target is missing.');
-  const component = await layoutState(page);
+  const component = await timing.measure('component-styles', () => layoutState(page));
+  const auditsStarted = performance.now();
   const layoutAudit = await auditLayout(page, referenceLayout);
   const historyAudit = await auditHistory(page, referenceHistory, referencePosters);
   const activityAudit = await auditActivity(page, referenceActivity);
   const posterAudit = await auditPosters(page, referencePosters);
+  auditMs += performance.now() - auditsStarted;
   if (historyMode && await page.locator('.history-page span > a').count() === 0) throw new Error('History component has no real targets.');
   if (catalogMode && (!await page.locator('.l-content .b-catalog_entry').count() || !await page.locator('.c-ms-control').first().isVisible())) throw new Error('Catalog component has no visible real targets.');
   // Already paused by settle(). 'disabled' would finish finite effects and fire
   // animationend, changing the page between the before/after measurements.
-  await page.screenshot({ path: path.join(output, `${width}-${phase}-top.png`), animations: 'allow' });
+  await timing.measure('screenshots', () => page.screenshot({ path: path.join(output, `${width}-${phase}-top.png`), animations: 'allow' }));
   const detailSelector=catalogMode ? '.l-content' : historyMode ? '.history-page' : '.cc-favourites';
   await page.locator(detailSelector).first().evaluate(el => el.scrollIntoView({ block: 'start', behavior: 'instant' }));
   // Align the section heading near the top, rather than relying on its old page Y coordinate.
@@ -258,39 +263,29 @@ async function capture(page, width, phase, css) {
     scrollTo(0, element.getBoundingClientRect().top + scrollY - 110);
   }, detailSelector);
   await settle(page);
-  await page.screenshot({ path: path.join(output, `${width}-${phase}-details.png`), animations: 'allow' });
+  await timing.measure('screenshots', () => page.screenshot({ path: path.join(output, `${width}-${phase}-details.png`), animations: 'allow' }));
   const layout = page.locator(catalogMode ? '.b-collection-filters' : historyMode ? '.history-page' : '.profile-content > .cc-2').first();
   await layout.evaluate(el => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
   await settle(page);
-  if (historyMode) await page.screenshot({ path: path.join(output, `${width}-${phase}-component.png`), animations: 'allow' });
-  else await layout.screenshot({ path: path.join(output, `${width}-${phase}-component.png`), animations: 'allow' });
+  if (historyMode) await timing.measure('screenshots', () => page.screenshot({ path: path.join(output, `${width}-${phase}-component.png`), animations: 'allow' }));
+  else await timing.measure('screenshots', () => layout.screenshot({ path: path.join(output, `${width}-${phase}-component.png`), animations: 'allow' }));
   return { state, assets, component, layoutAudit, historyAudit, activityAudit, posterAudit };
 }
 
 async function diff(width, section) {
+  return timing.measure('png-diff', async () => {
   const before = PNG.sync.read(await readFile(path.join(output, `${width}-before-${section}.png`)));
   const after = PNG.sync.read(await readFile(path.join(output, `${width}-after-${section}.png`)));
   // A changed component size is a regression signal, not a reason to skip the
   // remaining viewports. Pad both images for a diagnostic comparison.
-  const canvas = { width: Math.max(before.width, after.width), height: Math.max(before.height, after.height) };
-  const padded = input => {
-    const png = new PNG(canvas);
-    png.data.fill(255);
-    for (let y = 0; y < input.height; y++) {
-      input.data.copy(png.data, y * canvas.width * 4, y * input.width * 4, (y + 1) * input.width * 4);
-    }
-    return png.data;
-  };
-  const result = new PNG(canvas);
-  const pixels = pixelmatch(padded(before), padded(after), result.data, canvas.width, canvas.height, { threshold: 0.1 });
+  const { result, ...comparison } = comparePng(before, after);
   await writeFile(path.join(output, `${width}-diff-${section}.png`), PNG.sync.write(result));
-  return { pixels, ratio: pixels / (canvas.width * canvas.height),
-    beforeSize: { width: before.width, height: before.height },
-    afterSize: { width: after.width, height: after.height },
-    sizeChanged: before.width !== after.width || before.height !== after.height };
+  return comparison;
+  });
 }
 
-const browser = await chromium.launch({ headless: !values.headed });
+let auditMs = 0;
+const browser = await timing.measure('browser-launch', () => chromium.launch({ headless: !values.headed }));
 report.browserVersion = browser.version();
 try {
   // Separate, empty context. No default user profile, cookies, auth headers or credential files.
@@ -314,7 +309,7 @@ try {
   });
   await context.routeWebSocket('**/*', socket => socket.close());
   // Public read only: obtain the raw published source for import and processing validation.
-  const response = await context.request.get(STYLE);
+  const response = await timing.measure('public-style-get', () => context.request.get(STYLE));
   if (!response.ok()) throw new Error(`Public style GET failed: HTTP ${response.status()}`);
   const published = await response.json();
   if (published.id !== 1343722 || published.owner_id !== 1408017 || typeof published.css !== 'string') {
@@ -329,7 +324,7 @@ try {
   report.localEqualsPublishedSource = local === publishedSource;
   const page = await context.newPage();
   page.setDefaultTimeout(20000);
-  await page.goto(SOURCE_PAGE, { waitUntil: 'domcontentloaded' });
+  await timing.measure('navigation', () => page.goto(SOURCE_PAGE, { waitUntil: 'domcontentloaded' }));
   await page.locator('style#custom_css').waitFor({ state: 'attached' });
   if (new URL(page.url()).pathname !== new URL(SOURCE_PAGE).pathname) throw new Error('Component navigation was redirected.');
   const liveOriginal = await page.locator('style#custom_css').textContent();
@@ -364,7 +359,7 @@ try {
     if (index < 0) throw new Error('Pinned source compiled marker is missing.');
     const originalBlock = foundation.slice(markers[index].index, markers[index+1]?.index ?? foundation.length);
     const snapshot = await readFile(path.join(root,pin.snapshot));
-    const fetched = await context.request.get(pin.target);
+    const fetched = await getSource(context, pin.target);
     if (!fetched.ok()) throw new Error(`Pinned source GET failed: HTTP ${fetched.status()}`);
     assertVersionPinBytes(pin,snapshot,await fetched.body());
     const rules = await signature(page,snapshot.toString('utf8'));
@@ -389,7 +384,7 @@ try {
         {cwd:root,maxBuffer:2*1024*1024,stdio:['ignore','pipe','ignore']});}
       catch{throw new Error('Owned module is unavailable at the declared local commit/path.');}
     }else{
-      const response=await context.request.get(spec.target);
+      const response=await getSource(context, spec.target);
       if(!response.ok())throw new Error(`Owned module remote GET failed: HTTP ${response.status()}; no local fallback.`);
       candidateBytes=await response.body();
     }
@@ -408,7 +403,7 @@ try {
     const snapshot=await readFile(path.join(root,MAIN1_SPEC.snapshot));
     const working=await readFile(path.join(root,MAIN1_SPEC.local));
     verifyMain1ButtonCandidate(snapshot,working);
-    const fetched=await context.request.get(MAIN1_OPTIMIZATION.target);
+    const fetched=await getSource(context, MAIN1_OPTIMIZATION.target);
     if(!fetched.ok())throw new Error(`Optimized main1 GET failed: HTTP ${fetched.status()}`);
     const candidate=await fetched.body();
     verifyMain1ButtonCandidate(snapshot,candidate);
@@ -428,7 +423,7 @@ try {
       rules=rules.filter((_,i)=>i!==removedIndex);
       upstream={...upstream,parsedRules:upstream.parsedRules-1,compiledUrlRewrites:upstream.compiledUrlRewrites.map(entry=>({...entry,rule:entry.rule>removedIndex?entry.rule-1:entry.rule}))};
     }else{
-      const previous=await context.request.get(MAIN1_OPTIMIZATION.source);
+      const previous=await getSource(context, MAIN1_OPTIMIZATION.source);
       if(!previous.ok())throw new Error('Main1 previous remote source unavailable.');
       assertVersionPinBytes(MAIN1_SPEC,snapshot,await previous.body());
     }
@@ -443,7 +438,7 @@ try {
     const snapshot=await readFile(path.join(root,MAIN3_SPEC.snapshot));
     const candidate=await readFile(path.join(root,MAIN3_SPEC.local));
     verifyRadiusCandidate(snapshot,candidate);
-    const response=await context.request.get(MAIN3_RELEASE.target);
+    const response=await getSource(context, MAIN3_RELEASE.target);
     if(!response.ok())throw new Error(`Main3 release GET failed: HTTP ${response.status()}`);
     const remote=await response.body();verifyRadiusCandidate(snapshot,remote);
     const alreadyPublished=publishedImports.includes(MAIN3_RELEASE.target);
@@ -455,7 +450,7 @@ try {
     const upstream=E_DESIGN_PINS.find(pin=>pin.target===MAIN3_SPEC.source);
     assertVersionPinRules(upstream,await signature(page,(alreadyPublished?remote:snapshot).toString('utf8')),await signature(page,block));
     if(!alreadyPublished){
-      const previous=await context.request.get(MAIN3_RELEASE.source);
+      const previous=await getSource(context, MAIN3_RELEASE.source);
       if(!previous.ok())throw new Error('Main3 previous source unavailable.');
       assertVersionPinBytes(MAIN3_SPEC,snapshot,await previous.body());
     }
@@ -500,7 +495,7 @@ try {
     if(catalogMode){
       // A fresh catalogue document avoids carrying its JS responsive-menu state
       // from the previous viewport into the baseline measurement.
-      const response=await page.goto(PAGE,{waitUntil:'load'});
+      const response=await timing.measure('navigation', () => page.goto(PAGE,{waitUntil:'load'}));
       if(!response?.ok())throw new Error(`Catalog GET failed: HTTP ${response?.status()}`);
       if(new URL(page.url()).pathname!==new URL(PAGE).pathname)throw new Error('Catalog navigation was redirected.');
       await page.locator('.c-ms-control').first().waitFor({state:'attached'});
@@ -522,7 +517,7 @@ try {
     if(radiusMode&&catalogMode){
       // A/A control reproduces stale outer auto margins after in-place reparse.
       // Give both phases the same fresh-document lifecycle; keep strict geometry.
-      const response=await page.goto(PAGE,{waitUntil:'load'});
+      const response=await timing.measure('navigation', () => page.goto(PAGE,{waitUntil:'load'}));
       if(!response?.ok()||new URL(page.url()).pathname!==new URL(PAGE).pathname)throw new Error('Candidate catalogue reload failed.');
       await page.locator('.c-ms-control').first().waitFor({state:'attached'});
       await installCatalogTheme(page,replacement);
@@ -624,6 +619,8 @@ try {
   process.exitCode = 1;
 } finally {
   await browser.close();
+  report.timings = { ...timing.snapshot(), captureAuditsMs: Math.round(auditMs) };
+  console.log(`Timing (ms): ${JSON.stringify(report.timings)}`);
   await writeFile(path.join(output, 'report.json'), JSON.stringify(report, null, 2));
   const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const html = `<!doctype html><meta charset="utf-8"><title>Shikimori local CSS preview</title>
