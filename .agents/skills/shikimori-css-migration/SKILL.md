@@ -49,8 +49,9 @@ description: "Перенос внешних CSS @import Shikimori и его по
 
 ## Покрытие и отчёт
 
-CLI: `--component profile|history`, `--css`, `--widths`; replay — см. preview.md.
+CLI: `--component profile|history|catalog`, `--css`, `--widths`; replay — см. preview.md.
 Профиль: `--check-layout`, `--check-activity`, `--check-posters`; история: `--component history --check-history`.
+При затрагивании каталога/фильтров: `--component catalog --check-filters`.
 `--url` отсутствует. За запуск разрешён полный перенос одного известного импорта:
 раскладка, q03, q05 или постеры. Для нового компонента сначала обеспечь аудит; прежний PASS
 его не покрывает. Фиксация версий — отдельный путь по `vendor/edesign-pins.json`,
