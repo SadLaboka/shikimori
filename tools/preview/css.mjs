@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 export const E_DESIGN_PINS = JSON.parse(readFileSync(new URL('../../vendor/edesign-pins.json', import.meta.url), 'utf8'));
+export const OWNED_IMPORTS = JSON.parse(readFileSync(new URL('../../css/imports.json', import.meta.url), 'utf8'));
 // A deliberately limited model, not a replacement for Shikimori's sanitizer.
 export const USER_MARKER = '/* User Custom Styles */';
 export const LAYOUT_SOURCE = 'https://css-club.web.app/css/profile-content-layout-v1.css';
@@ -14,6 +15,25 @@ export function planFoundation(localText, publishedText, foundation) {
   const published = extractLocal(publishedText).imports;
   assertSameImports(published, published, foundation);
   if (JSON.stringify(local) === JSON.stringify(published)) return { foundation, migration: null };
+  // A source relocation is separate from pinning/removal and must be byte-verified.
+  if (local.length === published.length) {
+    const changes = local.flatMap((url,i)=>url===published[i]?[]:
+      [{ spec: OWNED_IMPORTS.find(row=>row.source===published[i]&&row.target===url) }]);
+    if(changes.length && changes.every(row=>row.spec)) {
+      let next=foundation;
+      const ownedImports=changes.map(({spec})=>{
+        ownedImportRevision(spec);
+        const markers=[...foundation.matchAll(/\/\*\s*(https?:[^*]+?)\s*\*\//g)];
+        const index=markers.findIndex(m=>m[1]===spec.source);
+        if(index<0 || published.filter(url=>url===spec.source).length!==1)
+          throw new Error('Owned source marker is missing or duplicated.');
+        const marker=markers[index];
+        next=next.replace(marker[0],marker[0].replace(spec.source,spec.target));
+        return {...spec,originalBlock:foundation.slice(marker.index,markers[index+1]?.index??foundation.length)};
+      });
+      return {foundation:next,migration:null,ownedImports};
+    }
+  }
   // Version pinning preserves every CSS byte in the compiled foundation.
   // Only approved URL labels may change; source verification is mandatory in preview.mjs.
   if (local.length === published.length) {
@@ -159,4 +179,13 @@ export function assertVersionPinRules(spec, sourceRules, compiledRules) {
   if (JSON.stringify(expected) !== JSON.stringify(compiledRules))
     throw new Error('Pinned snapshot differs from live compiled source outside approved URL rewrites.');
   return { rewrittenRules: entries.length, rewrittenUrls };
+}
+
+export function ownedImportRevision(spec) {
+  const match = /^https:\/\/raw\.githubusercontent\.com\/SadLaboka\/shikimori\/([a-f0-9]{40})\/(css\/base\/[a-z0-9_-]+\.css)$/.exec(spec.target);
+  const upstream = E_DESIGN_PINS.find(pin=>pin.target===spec.source);
+  if(!match || match[2]!==spec.local || !upstream ||
+      spec.snapshot!==upstream.snapshot || spec.sha256!==upstream.sha256)
+    throw new Error('Owned import must name an approved byte-identical snapshot and exact repository commit/path.');
+  return match[1];
 }

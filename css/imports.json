@@ -1,0 +1,9 @@
+[
+  {
+    "source": "https://raw.githubusercontent.com/ed-main/ed-main.github.io/d54e91b58c7c16def6f73e7289e29f895a984195/cssfiles/main_code_3.css",
+    "target": "https://raw.githubusercontent.com/SadLaboka/shikimori/e64310020fa1daf487a55f4648391d9b003f49ae/css/base/main_code_3.css",
+    "local": "css/base/main_code_3.css",
+    "snapshot": "vendor/edesign/main_code_3.css",
+    "sha256": "2074e255cdd771b188dd901be7e8fcfbc74f30054d50e1e179bd74373d968556"
+  }
+]

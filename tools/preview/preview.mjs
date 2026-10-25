@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { chromium } from 'playwright';
 import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
@@ -6,7 +7,7 @@ import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { splitCompiled, extractLocal, planFoundation, prepareUser, joinCompiled, HISTORY_SOURCE, ACTIVITY_SOURCE, POSTERS_SOURCE, E_DESIGN_PINS, assertVersionPinBytes, assertVersionPinRules } from './css.mjs';
+import { splitCompiled, extractLocal, planFoundation, prepareUser, joinCompiled, HISTORY_SOURCE, ACTIVITY_SOURCE, POSTERS_SOURCE, E_DESIGN_PINS, assertVersionPinBytes, assertVersionPinRules, OWNED_IMPORTS, ownedImportRevision } from './css.mjs';
 import { auditLayout, auditHistory, auditActivity, auditPosters } from './audit.mjs';
 import { checkHistoryStates } from './history-states.mjs';
 import { checkActivityStates } from './activity-states.mjs';
@@ -16,6 +17,7 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 const { values } = parseArgs({ options: {
   css: { type: 'string' }, widths: { type: 'string', default: '1440,390,360' },
   headed: { type: 'boolean', default: false },
+  'local-imports': { type: 'boolean', default: false },
   'check-posters': { type: 'boolean', default: false },
   'check-activity': { type: 'boolean', default: false },
   'check-layout': { type: 'boolean', default: false },
@@ -64,7 +66,10 @@ const selectors = historyMode ? {
   lifetime: '.profile-content .lifetime', graph26: '.activity .graph.x26', graph34: '.activity .graph.x34',
 };
 const freeze = `*,*::before,*::after{animation-play-state:paused!important;transition:none!important;caret-color:transparent!important}`;
+const activeOwned = OWNED_IMPORTS.filter(spec=>extractLocal(local).imports.includes(spec.target));
+if(values['local-imports'] && !activeOwned.length) throw new Error('--local-imports requires an approved owned-module candidate.');
 const report = {
+  sourceMode: values['local-imports'] ? 'local-owned-imports' : 'remote-imports',
   profile: PAGE, component: values.component, created: new Date().toISOString(), localHash: hash(local),
   mode: 'replace-user-section-in-existing-style-element', engine: 'chromium',
   warnings: [
@@ -314,6 +319,34 @@ try {
     return { source:pin.source,target:pin.target,snapshot:pin.snapshot,sha256:pin.sha256,
       parsedRules:rules.length,urlVerification,verified:true };
   }));
+  report.ownedImports = await Promise.all(activeOwned.map(async spec=>{
+    const revision=ownedImportRevision(spec);
+    const currentSource=publishedImports.includes(spec.target)?spec.target:spec.source;
+    const markers=[...foundation.matchAll(/\/\*\s*(https?:[^*]+?)\s*\*\//g)];
+    const index=markers.findIndex(m=>m[1]===currentSource);
+    if(index<0)throw new Error('Owned module compiled source is missing.');
+    const block=foundation.slice(markers[index].index,markers[index+1]?.index??foundation.length);
+    const snapshot=await readFile(path.join(root,spec.snapshot));
+    const working=await readFile(path.join(root,spec.local));
+    assertVersionPinBytes(spec,snapshot,working);
+    let candidateBytes;
+    if(values['local-imports']) {
+      try{candidateBytes=execFileSync('git',['show',`${revision}:${spec.local}`],
+        {cwd:root,maxBuffer:2*1024*1024,stdio:['ignore','pipe','ignore']});}
+      catch{throw new Error('Owned module is unavailable at the declared local commit/path.');}
+    }else{
+      const response=await context.request.get(spec.target);
+      if(!response.ok())throw new Error(`Owned module remote GET failed: HTTP ${response.status()}; no local fallback.`);
+      candidateBytes=await response.body();
+    }
+    assertVersionPinBytes(spec,snapshot,candidateBytes);
+    const rules=await signature(page,candidateBytes.toString('utf8'));
+    const upstream=E_DESIGN_PINS.find(pin=>pin.target===spec.source);
+    const urlVerification=assertVersionPinRules(upstream,rules,await signature(page,block));
+    return {source:spec.source,target:spec.target,local:spec.local,revision,sha256:spec.sha256,
+      parsedRules:rules.length,urlVerification,verified:true,remoteVerified:!values['local-imports']};
+  }));
+  report.remoteSourcesVerified=report.ownedImports.every(row=>row.remoteVerified);
   const replacement = joinCompiled(planned.foundation, prepareUser(local));
   report.candidateCompiledHash = hash(replacement);
   report.candidateCssomMatchesPublished = JSON.stringify(await signature(page, original)) === JSON.stringify(await signature(page, replacement));
@@ -374,6 +407,7 @@ try {
       widths: widths.filter(w=>[1440,390,360].includes(w)), output});
   }
   report.checks = {
+    ownedImportsVerified: report.ownedImports.length===activeOwned.length && report.ownedImports.every(row=>row.verified),
     versionPinsVerified: report.versionPins.length === activePins.length && report.versionPins.every(pin=>pin.verified),
     singleLocalPosterCopy: !postersMigrated || report.widths.every(r=>r.after.posterAudit.valid),
     exactPosterCascade: !postersMigrated || report.candidateCssomMatchesPublished,
@@ -392,7 +426,7 @@ try {
     unchangedMeasuredElements: report.widths.every(r => r.changedElements.length === 0 && r.componentChanges.length === 0),
     historyStatesVerified: !values['check-history'] || report.historyStates?.valid === true,
   };
-  report.verdict = Object.values(report.checks).every(Boolean) ? 'PASS' : 'FAIL';
+  report.verdict = Object.values(report.checks).every(Boolean) ? (values['local-imports'] ? 'LOCAL PASS' : 'PASS') : 'FAIL';
   if ((values['check-layout'] || values['check-history'] || values['check-activity'] || posterMode) && report.verdict === 'FAIL') process.exitCode = 1;
   console.log(`${values.component} audit: ${report.verdict}`);
   await page.locator('style#custom_css').evaluate((style, text) => { style.textContent = text; }, liveOriginal);
@@ -407,7 +441,7 @@ try {
   const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const html = `<!doctype html><meta charset="utf-8"><title>Shikimori local CSS preview</title>
 <style>body{font:16px system-ui;margin:24px;background:#171717;color:#ddd}a{color:#9bf}.pair{display:flex;gap:12px;align-items:flex-start}.pair figure{margin:0;flex:1;min-width:0}img{width:100%;height:auto}pre{white-space:pre-wrap}</style>
-<h1>Локальный предпросмотр CSS</h1><p>Стиль на сайте не изменён этим прогоном. ${report.migration ? `Только проверенный блок ${report.migration.source === POSTERS_SOURCE ? 'механизма постеров' : report.migration.source === ACTIVITY_SOURCE ? 'графика активности' : report.migration.source === HISTORY_SOURCE ? 'подписей истории' : 'раскладки'} перенесён из импорта в локальную часть; остальные импорты сохранены.` : 'Импортированная основа сохранена.'} Слева — опубликованный CSS, справа — локальная замена.</p>
+<h1>Локальный предпросмотр CSS</h1>${values['local-imports'] ? '<p><strong>Локальная копия модуля и Git-коммит проверены. Удалённый URL не проверен; этот результат не подтверждает готовность публикации.</strong></p>' : ''}<p>Стиль на сайте не изменён этим прогоном. ${report.migration ? `Только проверенный блок ${report.migration.source === POSTERS_SOURCE ? 'механизма постеров' : report.migration.source === ACTIVITY_SOURCE ? 'графика активности' : report.migration.source === HISTORY_SOURCE ? 'подписей истории' : 'раскладки'} перенесён из импорта в локальную часть; остальные импорты сохранены.` : 'Импортированная основа сохранена.'} Слева — опубликованный CSS, справа — локальная замена.</p>
 <p>CSS-анимации остановлены; GIF/WebP продолжают менять кадры. Pixel diff не является автоматическим вердиктом.</p>
 <p>Совпадение модели обработки с опубликованным CSSOM: ${report.baselineCssomMatches ?? false}. <a href="report.json">Вычисленные стили и полный отчёт</a>.</p>
 <p>Аудит ${historyMode ? 'истории' : 'раскладки'}: <strong>${report.verdict ?? 'ERROR'}</strong>. ${report.historicalReplay ? 'Повторяется сохранённый CSS до публикации на текущем DOM.' : 'База сравнения — текущий опубликованный CSS.'}</p>
