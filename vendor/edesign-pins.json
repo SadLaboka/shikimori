@@ -1,5 +1,46 @@
 [
   {
+    "source": "https://raw.githubusercontent.com/ed-main/ed-main.github.io/master/cssfiles/main_code_1.css",
+    "target": "https://raw.githubusercontent.com/ed-main/ed-main.github.io/d54e91b58c7c16def6f73e7289e29f895a984195/cssfiles/main_code_1.css",
+    "snapshot": "vendor/edesign/main_code_1.css",
+    "sha256": "6418d0256c575f1244c0b0b42cb5c3cecd43b9de3cd4d2af87a84f948cb84e83",
+    "parsedRules": 487,
+    "compiledUrlRewrites": [
+      {
+        "rule": 6,
+        "sourceRuleSha256": "201691e0abd996b321a99ebe261fb1a9f9381cd00e8da265201dbdeb170549f6",
+        "urls": [
+          {
+            "from": "/x/maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2?v=4.7.0",
+            "to": "//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2?v=4.7.0",
+            "occurrences": 1
+          },
+          {
+            "from": "/x/maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff?v=4.7.0",
+            "to": "//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff?v=4.7.0",
+            "occurrences": 1
+          },
+          {
+            "from": "/x/maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.ttf?v=4.7.0",
+            "to": "//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.ttf?v=4.7.0",
+            "occurrences": 1
+          }
+        ]
+      },
+      {
+        "rule": 244,
+        "sourceRuleSha256": "c028ee023d2703f11cb5c6204a9c238762a478fd83d7a9e81c51559f551f1883",
+        "urls": [
+          {
+            "from": "//encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTG-2yy4R8Xi5mO1N_ZurIpznxCgpOuDzpRZGu-K9dUBwrClokYAg",
+            "to": "//camo-v3.shikimori.io/dcd8fee0840bd39357b50bc97deebe8557a211b8?url=https%3A%2F%2Fencrypted-tbn0.gstatic.com%2Fimages%3Fq%3Dtbn%3AANd9GcTG-2yy4R8Xi5mO1N_ZurIpznxCgpOuDzpRZGu-K9dUBwrClokYAg",
+            "occurrences": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
     "source": "https://raw.githubusercontent.com/ed-main/ed-main.github.io/master/cssfiles/main_code_2.css",
     "target": "https://raw.githubusercontent.com/ed-main/ed-main.github.io/d54e91b58c7c16def6f73e7289e29f895a984195/cssfiles/main_code_2.css",
     "snapshot": "vendor/edesign/main_code_2.css",
@@ -10,5 +51,69 @@
     "target": "https://raw.githubusercontent.com/ed-main/ed-main.github.io/d54e91b58c7c16def6f73e7289e29f895a984195/cssfiles/main_code_3.css",
     "snapshot": "vendor/edesign/main_code_3.css",
     "sha256": "2074e255cdd771b188dd901be7e8fcfbc74f30054d50e1e179bd74373d968556"
+  },
+  {
+    "source": "https://raw.githubusercontent.com/ed-main/ed-main.github.io/master/cssfiles/main_code_4mob.css",
+    "target": "https://raw.githubusercontent.com/ed-main/ed-main.github.io/d54e91b58c7c16def6f73e7289e29f895a984195/cssfiles/main_code_4mob.css",
+    "snapshot": "vendor/edesign/main_code_4mob.css",
+    "sha256": "dcbd66b37e8580c4f47eead04f696e4f24801996cdb3ee41ef97839d20654e1d",
+    "parsedRules": 227,
+    "compiledUrlRewrites": [
+      {
+        "rule": 139,
+        "sourceRuleSha256": "199acd3b04916b59f31f2e0468b1351ae95dd35a92ee36a371e493e0bd8e4e33",
+        "urls": [
+          {
+            "from": "//moe.shikimori.one/system/user_images/original/208335/1426717.jpg",
+            "to": "//camo-v3.shikimori.io/57adbc2e3662836836c8aa9a94b200c7cdc23d0f?url=https%3A%2F%2Fmoe.shikimori.one%2Fsystem%2Fuser_images%2Foriginal%2F208335%2F1426717.jpg",
+            "occurrences": 1
+          }
+        ]
+      },
+      {
+        "rule": 163,
+        "sourceRuleSha256": "7e6b078b79d5797f5f347ced007172b231ec6a4d0a3c73f1f444d37e5ab3eaf6",
+        "urls": [
+          {
+            "from": "//moe.shikimori.one/system/user_images/original/208335/1426717.jpg",
+            "to": "//camo-v3.shikimori.io/57adbc2e3662836836c8aa9a94b200c7cdc23d0f?url=https%3A%2F%2Fmoe.shikimori.one%2Fsystem%2Fuser_images%2Foriginal%2F208335%2F1426717.jpg",
+            "occurrences": 1
+          }
+        ]
+      },
+      {
+        "rule": 173,
+        "sourceRuleSha256": "17b9e7951b69b52fa988ec0a345487037d14302ff42c2291b16002405f3d669e",
+        "urls": [
+          {
+            "from": "/x/dere.shikimori.one/system/images/original/113449.gif?1614959521",
+            "to": "//dere.shikimori.one/system/images/original/113449.gif?1614959521",
+            "occurrences": 1
+          }
+        ]
+      },
+      {
+        "rule": 174,
+        "sourceRuleSha256": "b08620618c39c3923a501c7340bdf126b4589ed6261b93edf88a78df0c37c49b",
+        "urls": [
+          {
+            "from": "/x/dere.shikimori.one/system/images/original/111569.gif?1610135594",
+            "to": "//dere.shikimori.one/system/images/original/111569.gif?1610135594",
+            "occurrences": 1
+          }
+        ]
+      },
+      {
+        "rule": 180,
+        "sourceRuleSha256": "51e0270d87a4dbe38027915e636bbfe1c12b534f82fc7990e8acd3dd6487fed2",
+        "urls": [
+          {
+            "from": "/x/i.ibb.co/tD9K2Lq/Dno-fon.jpg",
+            "to": "//i.ibb.co/tD9K2Lq/Dno-fon.jpg",
+            "occurrences": 1
+          }
+        ]
+      }
+    ]
   }
 ]

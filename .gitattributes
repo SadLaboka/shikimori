@@ -1,2 +1,5 @@
 # Preserve byte hashes of pinned upstream snapshots across Windows checkouts.
 vendor/edesign/*.css text eol=lf
+# Keep upstream trailing spaces in these byte-verified snapshots; local code stays checked.
+vendor/edesign/main_code_1.css whitespace=-blank-at-eol
+vendor/edesign/main_code_4mob.css whitespace=-blank-at-eol
