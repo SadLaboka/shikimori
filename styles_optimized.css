@@ -1,3 +1,9 @@
+/* BEGIN LOCAL CUSTOM POSTERS
+   Source: CSS-club custom_posters.min.css; verbatim, original cascade position.
+*/
+.b-catalog_entry>.cover .image-cutter{background:var(--custom-image,none) var(--custom-settings,center top / cover);border-radius:var(--custom-images-radius,.01px)}.b-catalog_entry-tooltip>.entry-tooltip_container>a::before,.b-collection-topic>.inner .collection-row .cover .image-cutter::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;background:var(--custom-image,none) var(--custom-settings,center top / cover);border-radius:var(--custom-images-radius,.01px)}.b-catalog_entry-tooltip>.entry-tooltip_container>a img,.b-catalog_entry>.cover .image-cutter img{opacity:var(--show-default, 1);aspect-ratio:var(--custom-image-ratio,auto)}.b-catalog_entry-tooltip>.entry-tooltip_container>a{position:relative;align-self:start;flex-shrink:0;width:160px}.b-catalog_entry-tooltip>.entry-tooltip_container>a img{vertical-align:top}.b-collection-topic>.inner .collection-row .cover .image-cutter{background:0 0}.b-collection-topic>.inner .collection-row .cover .image-cutter img{position:static}.b-collection-topic>.inner .collection-row.is-censored .cover .image-cutter::before,.b-collection-topic>.inner .collection-row.is-spoilers .cover .image-cutter::before{filter:var(--custom-images-filter-censored, blur(7px) grayscale(15%));transition:filter var(--custom-images-filter-transition, .5s)}.b-collection-topic>.inner .collection-row.is-spoilers .cover .image-cutter::before{filter:var(--custom-images-filter-spoilers, var(--custom-images-filter-censored, blur(10px) grayscale(.75)))}.b-collection-topic>.inner .collection-row.is-censored .cover:hover .image-cutter::before,.b-collection-topic>.inner .collection-row.is-spoilers .cover:hover .image-cutter::before{filter:var(--custom-images-filter-disabled, blur(0) grayscale(0))}
+/* END LOCAL CUSTOM POSTERS */
+
 /* AUTO=sticky_menu */ @media screen and (min-width: 1025px) { .l-top_menu-v2 { position: sticky; top: 0; } .l-top_menu-v2 .active .submenu { max-height: calc(100vh - var(--top-menu-height)); overflow-y: auto; } }
 @import url('https://fonts.googleapis.com/css2?family=Rubik+Spray+Paint&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap');
@@ -7,8 +13,6 @@
 @import url("https://raw.githubusercontent.com/ed-main/ed-main.github.io/master/cssfiles/main_code_4mob.css");
 
 
-/* Замена стандартных постеров */
-@import url("https://css-club.web.app/css/custom_posters.min.css");
 
 /* BEGIN LOCAL ACTIVITY GRAPH
    Source: ed-main q05_animated_activity_graph.css; verbatim, no optimization.

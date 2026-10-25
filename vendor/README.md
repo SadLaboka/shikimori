@@ -26,3 +26,10 @@ SHA256: `5402a3ef7af175e6931970fa02ffecfbcd64aa91f4d1fc334fd8795639eb0d07`.
 Снимок включает префиксные объявления и четыре определения keyframes;
 неподдерживаемые Chromium конструкции не удаляются. Это источник для сверки,
 а не второй подключаемый лист. Отчёт: `docs/q05-migration.md`.
+
+`custom_posters.min.css` — неизменённый исходник CSS-club от 25 октября 2026 года:
+https://css-club.web.app/css/custom_posters.min.css.
+SHA256: `c8925ac43965cf9931ec6bddea528fef2ea57b98880431ba261ec5522cc5212b`.
+Десять правил используются в `BEGIN/END LOCAL CUSTOM POSTERS`, без новой лицензии
+на сторонний код. Снимок служит для сверки, не подключается второй копией.
+Перенос и ограничения проверки — `docs/posters-migration.md`.
