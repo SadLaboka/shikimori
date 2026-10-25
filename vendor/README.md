@@ -19,3 +19,10 @@ SHA256: `197685dbb20d096a80fd00aff87bada58dbeaccba303f5c0b6d782ceb6bc4666`.
 Семь правил перенесены без оптимизации в `BEGIN/END LOCAL HISTORY BOOKMARKS`.
 Отдельное совместимостное объявление после блока сохраняет прежний приоритет
 `content` постера подсказки; оно не выдаётся за часть исходника ed-main.
+
+`q05_animated_activity_graph.css` — полный исходник ed-main от 25 октября 2026 года:
+https://raw.githubusercontent.com/ed-main/ed-main.github.io/master/cssfiles/q05_animated_activity_graph.css.
+SHA256: `5402a3ef7af175e6931970fa02ffecfbcd64aa91f4d1fc334fd8795639eb0d07`.
+Снимок включает префиксные объявления и четыре определения keyframes;
+неподдерживаемые Chromium конструкции не удаляются. Это источник для сверки,
+а не второй подключаемый лист. Отчёт: `docs/q05-migration.md`.
