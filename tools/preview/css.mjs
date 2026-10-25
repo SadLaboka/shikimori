@@ -107,3 +107,56 @@ export function assertVersionPinBytes(spec, snapshot, fetched) {
     throw new Error('Pinned source or vendor byte hash differs; refusing unverified source.');
   }
 }
+
+// Explicit observed compiler rewrites only. Never discard or normalize arbitrary URLs.
+export function assertVersionPinRules(spec, sourceRules, compiledRules) {
+  const hash = text => createHash('sha256').update(text).digest('hex');
+  const expected = [...sourceRules];
+  const entries = spec.compiledUrlRewrites ?? [];
+  const seen = new Set();
+  let rewrittenUrls = 0;
+  for (const entry of entries) {
+    if (!Number.isInteger(entry.rule) || entry.rule < 0 || entry.rule >= expected.length ||
+        seen.has(entry.rule) || hash(expected[entry.rule]) !== entry.sourceRuleSha256)
+      throw new Error('Observed URL rewrite rule fingerprint changed.');
+    seen.add(entry.rule);
+    if (!entry.urls?.length) throw new Error('Empty URL rewrite entry.');
+    const fromUrls = new Set();
+    for (const pair of entry.urls) {
+      if (fromUrls.has(pair.from) || !Number.isInteger(pair.occurrences) || pair.occurrences < 1)
+        throw new Error('Ambiguous URL rewrite count.');
+      fromUrls.add(pair.from);
+      const legacy = pair.from.startsWith('/x/');
+      const direct = legacy ? '//' + pair.from.slice(3) : pair.from;
+      if (!direct.startsWith('//')) throw new Error('Unsupported source URL rewrite.');
+      const resource = 'https:' + direct;
+      const parsedResource = new URL(resource);
+      if (parsedResource.href !== resource || parsedResource.username || parsedResource.password)
+        throw new Error('Non-canonical source URL.');
+      if (!(legacy && pair.to === direct)) {
+        const proxy = new URL('https:' + pair.to);
+        if (!pair.to.startsWith('//camo-v3.shikimori.io/') ||
+            proxy.origin !== 'https://camo-v3.shikimori.io' || !/^\/[a-f0-9]{40}$/.test(proxy.pathname) ||
+            proxy.hash || [...proxy.searchParams.keys()].length !== 1 ||
+            proxy.searchParams.get('url') !== resource)
+          throw new Error('Compiler URL rewrite changes the original resource.');
+      }
+    }
+    const counts = new Map(entry.urls.map(pair => [pair.from,0]));
+    expected[entry.rule] = expected[entry.rule].replace(/url\("((?:\\.|[^"\\])*)"\)/g, (token,url) => {
+      const pair = entry.urls.find(pair=>pair.from===url);
+      if (!pair) return token;
+      counts.set(url,counts.get(url)+1);
+      return 'url("' + pair.to + '")';
+    });
+    for (const pair of entry.urls) {
+      if (counts.get(pair.from) !== pair.occurrences) throw new Error('Observed URL occurrence count changed.');
+      rewrittenUrls += pair.occurrences;
+    }
+  }
+  if (spec.parsedRules !== undefined && sourceRules.length !== spec.parsedRules)
+    throw new Error('Pinned source parsed rule count changed.');
+  if (JSON.stringify(expected) !== JSON.stringify(compiledRules))
+    throw new Error('Pinned snapshot differs from live compiled source outside approved URL rewrites.');
+  return { rewrittenRules: entries.length, rewrittenUrls };
+}

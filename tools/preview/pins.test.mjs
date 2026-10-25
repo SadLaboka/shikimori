@@ -11,7 +11,7 @@ const foundation=pins.map((p,i)=>`/* ${p.source} */.sentinel${i}{color:red}\n`).
 
 test('version pin allowlist keeps import order and all compiled CSS bytes except approved source labels',()=>{
   const plan=planFoundation(pinned,source,foundation);
-  assert.equal(plan.versionPins.length,2);
+  assert.equal(plan.versionPins.length,pins.length);
   assert.equal(plan.migration,null);
   let expected=foundation;for(const p of pins)expected=expected.replace(`/* ${p.source} */`,`/* ${p.target} */`);
   assert.equal(plan.foundation,expected);
@@ -32,7 +32,7 @@ test('pinned snapshots require exact remote and local SHA256; even visually iner
   }
 });
 
-test('approved URL pinning preserves full CSSOM, media and pseudo rules of both actual snapshots',async()=>{
+test('approved URL pinning preserves full CSSOM, media and pseudo rules of all actual snapshots',async()=>{
   const blocks=await Promise.all(pins.map(async p=>`/* ${p.source} */${await readFile(new URL('../../'+p.snapshot,import.meta.url),'utf8')}\n`));
   const prefix=blocks.join('');
   const user='@media(min-width:1025px){.l-top_menu-v2{position:sticky}} .custom::before{content:"unchanged"}';

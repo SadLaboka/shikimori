@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { splitCompiled, extractLocal, planFoundation, prepareUser, joinCompiled, HISTORY_SOURCE, ACTIVITY_SOURCE, POSTERS_SOURCE, E_DESIGN_PINS, assertVersionPinBytes } from './css.mjs';
+import { splitCompiled, extractLocal, planFoundation, prepareUser, joinCompiled, HISTORY_SOURCE, ACTIVITY_SOURCE, POSTERS_SOURCE, E_DESIGN_PINS, assertVersionPinBytes, assertVersionPinRules } from './css.mjs';
 import { auditLayout, auditHistory, auditActivity, auditPosters } from './audit.mjs';
 import { checkHistoryStates } from './history-states.mjs';
 import { checkActivityStates } from './activity-states.mjs';
@@ -310,10 +310,9 @@ try {
     if (!fetched.ok()) throw new Error(`Pinned source GET failed: HTTP ${fetched.status()}`);
     assertVersionPinBytes(pin,snapshot,await fetched.body());
     const rules = await signature(page,snapshot.toString('utf8'));
-    if (JSON.stringify(rules) !== JSON.stringify(await signature(page,originalBlock)))
-      throw new Error('Pinned snapshot differs from live compiled source; refusing pin.');
+    const urlVerification = assertVersionPinRules(pin,rules,await signature(page,originalBlock));
     return { source:pin.source,target:pin.target,snapshot:pin.snapshot,sha256:pin.sha256,
-      parsedRules:rules.length,verified:true };
+      parsedRules:rules.length,urlVerification,verified:true };
   }));
   const replacement = joinCompiled(planned.foundation, prepareUser(local));
   report.candidateCompiledHash = hash(replacement);
