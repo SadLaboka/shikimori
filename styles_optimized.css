@@ -628,26 +628,20 @@ a {
 }
 
 @keyframes animation_border_left {
-  0% {
+  0%, 100% {
     background-position: 0% 0;
   }
   50% {
     background-position: 50% 0;
-  }
-  100% {
-    background-position: 0% 0;
   }
 }
 
 @keyframes animation_border_right {
-  0% {
+  0%, 100% {
     background-position: 100% 0;
   }
   50% {
     background-position: 50% 0;
-  }
-  100% {
-    background-position: 100% 0;
   }
 }
 
@@ -970,7 +964,7 @@ order: 3;
 
 /* Анимация для рамки в состоянии фокуса */
 @keyframes glow-animation {
-    0% {
+    0%, 100% {
         box-shadow: 
             0 0 10px 4px rgba(189, 15, 86, 0.6),
             0 0 20px 8px rgba(189, 15, 86, 0.3);
@@ -979,11 +973,6 @@ order: 3;
         box-shadow: 
             0 0 15px 6px rgba(189, 15, 86, 0.8),
             0 0 30px 12px rgba(189, 15, 86, 0.5);
-    }
-    100% {
-        box-shadow: 
-            0 0 10px 4px rgba(189, 15, 86, 0.6),
-            0 0 20px 8px rgba(189, 15, 86, 0.3);
     }
 }
 
