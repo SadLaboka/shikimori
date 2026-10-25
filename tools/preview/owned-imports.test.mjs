@@ -12,7 +12,7 @@ test(`${spec.local}: owned-source relocation only changes an approved URL label 
   const prefix=`/* https://example.test/before.css */a{color:red}/* ${spec.source} */b{color:blue}/* https://example.test/after.css */c{color:green}`;
   const result=planFoundation(local,source,prefix);
   assert.equal(result.foundation,prefix.replace(spec.source,spec.target));assert.equal(result.ownedImports.length,1);
-  for(const candidate of [local.replace('SadLaboka/shikimori','Other/repo'),local.replace(spec.target.split('/').at(-1),'main_code_4mob.css'),local.replace(ownedImportRevision(spec),'a'.repeat(40)),local.replace(`@import "${spec.target}";`,'')])
+  for(const candidate of [local.replace('SadLaboka/shikimori','Other/repo'),local.replace(spec.target.split('/').at(-1),'unapproved.css'),local.replace(ownedImportRevision(spec),'a'.repeat(40)),local.replace(`@import "${spec.target}";`,'')])
     assert.throws(()=>planFoundation(candidate,source,prefix));
 });
 

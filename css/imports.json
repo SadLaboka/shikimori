@@ -19,5 +19,12 @@
     "local": "css/base/main_code_1.css",
     "snapshot": "vendor/edesign/main_code_1.css",
     "sha256": "6418d0256c575f1244c0b0b42cb5c3cecd43b9de3cd4d2af87a84f948cb84e83"
+  },
+  {
+    "source": "https://raw.githubusercontent.com/ed-main/ed-main.github.io/d54e91b58c7c16def6f73e7289e29f895a984195/cssfiles/main_code_4mob.css",
+    "target": "https://raw.githubusercontent.com/SadLaboka/shikimori/8912ca67ab5e4915c6ba9ea065f9ee609481ccd3/css/base/main_code_4mob.css",
+    "local": "css/base/main_code_4mob.css",
+    "snapshot": "vendor/edesign/main_code_4mob.css",
+    "sha256": "dcbd66b37e8580c4f47eead04f696e4f24801996cdb3ee41ef97839d20654e1d"
   }
 ]
