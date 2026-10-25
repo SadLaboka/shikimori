@@ -20,3 +20,8 @@ SHA256 начального файла:
 `vendor/edesign/main_code_2.css`, тот же автор E-design / ed-main и upstream-коммит.
 SHA256: `da2a492ad16b7f018852b2307508a61b297bc80a191a6f22b31fdd6ac2950f18`.
 Подготовка и проверки: [main2](../docs/owned-main2-migration.md).
+
+`base/main_code_1.css` — побайтная рабочая копия `vendor/edesign/main_code_1.css`
+того же E-design / ed-main и upstream-коммита, без изменения ресурсов.
+SHA256: `6418d0256c575f1244c0b0b42cb5c3cecd43b9de3cd4d2af87a84f948cb84e83`.
+Подготовка и особенности серверных URL: [main1](../docs/owned-main1-migration.md).
