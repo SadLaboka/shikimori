@@ -291,6 +291,16 @@ node tools/preview/preview.mjs --css .preview/owned-import-work/candidate.css --
 не совмещается с фиксацией версии или удалением других импортов за один запуск.
 План, результаты и ограничения — [owned-import-pilot.md](owned-import-pilot.md).
 
+## Точечный пилот радиуса main3
+
+Пилот раннего радиуса main3: `--main3-radius-candidate <workspace.css>` работает
+с `profile|history|catalog`, разрешает только удаление конкретного объявления и
+требует прежнего опубликованного CSS. Подробности, рабочие команды и исправление
+измерений auto-margin: [main3-radius-optimization.md](main3-radius-optimization.md).
+После подключения URL из `css/main3-optimization.json` обычный запуск проверяет
+эту точную версию без флага пилота; проверка байтов, remote SHA и реального
+скомпилированного блока сохраняется. Другие изменения основы не разрешены.
+
 ## Точечный пилот оптимизации main1
 
 `--main1-button-candidate <workspace.css>` разрешает только точное удаление
