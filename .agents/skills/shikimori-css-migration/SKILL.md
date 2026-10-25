@@ -50,9 +50,9 @@ description: "Перенос внешних CSS @import Shikimori и его по
 ## Покрытие и отчёт
 
 CLI: `--component profile|history`, `--css`, `--widths`; replay — см. preview.md.
-Профиль: `--check-layout`, `--check-activity`; история: `--component history --check-history`.
+Профиль: `--check-layout`, `--check-activity`, `--check-posters`; история: `--component history --check-history`.
 `--url` отсутствует. За запуск разрешён полный перенос одного известного импорта:
-раскладка, q03 или q05. Для нового компонента сначала обеспечь аудит; прежний PASS
+раскладка, q03, q05 или постеры. Для нового компонента сначала обеспечь аудит; прежний PASS
 его не покрывает.
 
 Отчёт: изменения, результаты, исправления, пропуски, риски обновления основы;
