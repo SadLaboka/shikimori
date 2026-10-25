@@ -25,3 +25,8 @@ SHA256: `da2a492ad16b7f018852b2307508a61b297bc80a191a6f22b31fdd6ac2950f18`.
 того же E-design / ed-main и upstream-коммита, без изменения ресурсов.
 SHA256: `6418d0256c575f1244c0b0b42cb5c3cecd43b9de3cd4d2af87a84f948cb84e83`.
 Подготовка и особенности серверных URL: [main1](../docs/owned-main1-migration.md).
+
+`base/main_code_4mob.css` — побайтная копия `vendor/edesign/main_code_4mob.css`
+того же автора и upstream-коммита; адаптивные правила не исправлялись.
+SHA256: `dcbd66b37e8580c4f47eead04f696e4f24801996cdb3ee41ef97839d20654e1d`.
+Подготовка и проверки: [main4](../docs/owned-main4-migration.md).
