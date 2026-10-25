@@ -537,6 +537,106 @@ a {
 }
 
 
+
+/* Firefox: box-reflect отсутствует. Копии текста не участвуют в раскладке.
+   Маска переворачивается вместе с текстом: отражение затухает вниз.
+   У произвольных имён нет текстового атрибута на span; имя задано только
+   для подтверждённого аватара SadLaboka, а не для всех профилей. */
+@supports (-moz-appearance: none) and (not (-webkit-box-reflect: below)) {
+  .l-top_menu-v2 .logo-container,
+  .l-top_menu-v2 .menu-icon.sign_in,
+  .l-top_menu-v2 .menu-dropdown > span span {
+    position: relative;
+  }
+
+  .l-top_menu-v2 .logo-container::after {
+    content: "shikimori" / "";
+    left: 29px; /* padding 5px + margin-left оригинала 24px */
+    top: calc(50% + .35em + 1px);
+    font: 700 24px/.7 "DynaPuff", system-ui;
+    animation: nickname_animation 6s linear infinite;
+  }
+
+  @media (min-width: 1024px) {
+  .l-top_menu-v2 .menu-icon.sign_in::before {
+    content: attr(data-text) / "";
+    position: absolute;
+    display: block;
+    width: max-content;
+    height: .7em;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    transform: scaleY(-1);
+    mask-image: linear-gradient(transparent, #0008);
+    left: 15px; /* padding оригинальной кнопки */
+    top: calc(50% + .35em + 1px);
+    font: 500 18px/.7 "Rubik Spray Paint", system-ui;
+  }
+  }
+
+  .l-top_menu-v2 .menu-dropdown > span span::after {
+    content: var(--header-reflection-text, none) / "";
+    left: 0;
+    top: calc(100% + 1px);
+    font: inherit;
+  }
+
+  .l-top_menu-v2 .logo-container::after,
+  .l-top_menu-v2 .menu-dropdown > span span::after {
+    position: absolute;
+    display: block;
+    width: max-content;
+    height: .7em;
+    line-height: .7;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    transform: scaleY(-1);
+    mask-image: linear-gradient(transparent, #0008);
+  }
+
+  .l-top_menu-v2 .menu-dropdown.main > .icon-avatar:has(> img[alt="SadLaboka"]) > span,
+  .l-top_menu-v2 .menu-dropdown.profile > span > a:has(> img[alt="SadLaboka"]) > .nickname {
+    --header-reflection-text: "SadLaboka";
+  }
+
+  /* Русские подписи разделов; в других локалях не подменяем текст. */
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-home > span { --header-reflection-text: "Главная"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-tierlists > span { --header-reflection-text: "Тирлисты"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-top > span { --header-reflection-text: "Топ"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-recommendations > span { --header-reflection-text: "Рекомендации"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-contests > span { --header-reflection-text: "Турниры"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-current_contest > span { --header-reflection-text: "Текущий турнир"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-info > span { --header-reflection-text: "О сайте"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-socials > span { --header-reflection-text: "Мы в соц. сетях"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-moderation > span { --header-reflection-text: "Модерация"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-anime_list > span { --header-reflection-text: "Список аниме"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-manga_list > span { --header-reflection-text: "Список манги"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-mail > span { --header-reflection-text: "Почта"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-achievements > span { --header-reflection-text: "Достижения"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-settings > span { --header-reflection-text: "Настройки"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-site_rules > span { --header-reflection-text: "Правила сайта"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-faq > span { --header-reflection-text: "FAQ"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-characters > span { --header-reflection-text: "Персонажи"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-people > span { --header-reflection-text: "Люди"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-play > span { --header-reflection-text: "Аниме онлайн"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-other > span { --header-reflection-text: "Прочее"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-main_menu > span { --header-reflection-text: "Основное меню"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-search > span { --header-reflection-text: "Поиск"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-profile > span { --header-reflection-text: "Профиль"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-anime > span { --header-reflection-text: "Аниме"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-manga > span { --header-reflection-text: "Манга"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-ranobe > span { --header-reflection-text: "Ранобэ"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-forum > span { --header-reflection-text: "Форум"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-clubs > span { --header-reflection-text: "Клубы"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-collections > span { --header-reflection-text: "Коллекции"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-critiques > span { --header-reflection-text: "Рецензии"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-articles > span { --header-reflection-text: "Статьи"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-users > span { --header-reflection-text: "Пользователи"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-calendar > span { --header-reflection-text: "Календарь"; }
+}
+
 /*---------------------------------------------------------------------status------------------------------------------------------------------------*/
 .p-profiles .profile-head .c-brief header.head .misc {
  display: none;
