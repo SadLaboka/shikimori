@@ -53,6 +53,11 @@ This repository contains custom CSS for a Shikimori user profile.
   совместимостного объявления и проверки исходного `content: ""` постеров.
   Аудит: `node tools/preview/preview.mjs --component history --check-history --widths 1440,390,360`.
   Подробности и ограничения покрытия — `docs/q03-migration-plan.md`, `docs/preview.md`.
+- `vendor/q05_animated_activity_graph.css` — полный снимок основы графика ed-main.
+  Правила перенесены в `BEGIN/END LOCAL ACTIVITY GRAPH`; импорт удалён,
+  перенос опубликован 25 октября 2026 года. Проверка: `--check-layout --check-activity`
+  у `tools/preview/preview.mjs`. Сохраняй исходные LF при подготовке кандидатов:
+  CRLF могут остаться внутри многострочных значений CSSOM. Детали — `docs/q05-migration.md`.
 
 ## Особенности Shikimori и CSS
 
