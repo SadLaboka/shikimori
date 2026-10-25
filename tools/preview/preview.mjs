@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { splitCompiled, extractLocal, planFoundation, prepareUser, joinCompiled, HISTORY_SOURCE, ACTIVITY_SOURCE, POSTERS_SOURCE } from './css.mjs';
+import { splitCompiled, extractLocal, planFoundation, prepareUser, joinCompiled, HISTORY_SOURCE, ACTIVITY_SOURCE, POSTERS_SOURCE, E_DESIGN_PINS, assertVersionPinBytes } from './css.mjs';
 import { auditLayout, auditHistory, auditActivity, auditPosters } from './audit.mjs';
 import { checkHistoryStates } from './history-states.mjs';
 import { checkActivityStates } from './activity-states.mjs';
@@ -298,6 +298,23 @@ try {
       snapshotHash: hash(upstream), removedBlockHash: hash(planned.migration.originalBlock),
       remainingFoundationHash: hash(planned.foundation) };
   }
+  const activePins = E_DESIGN_PINS.filter(pin => extractLocal(local).imports.includes(pin.target));
+  report.versionPins = await Promise.all(activePins.map(async pin => {
+    const currentSource = publishedImports.includes(pin.target) ? pin.target : pin.source;
+    const markers = [...foundation.matchAll(/\/\*\s*(https?:[^*]+?)\s*\*\//g)];
+    const index = markers.findIndex(m => m[1] === currentSource);
+    if (index < 0) throw new Error('Pinned source compiled marker is missing.');
+    const originalBlock = foundation.slice(markers[index].index, markers[index+1]?.index ?? foundation.length);
+    const snapshot = await readFile(path.join(root,pin.snapshot));
+    const fetched = await context.request.get(pin.target);
+    if (!fetched.ok()) throw new Error(`Pinned source GET failed: HTTP ${fetched.status()}`);
+    assertVersionPinBytes(pin,snapshot,await fetched.body());
+    const rules = await signature(page,snapshot.toString('utf8'));
+    if (JSON.stringify(rules) !== JSON.stringify(await signature(page,originalBlock)))
+      throw new Error('Pinned snapshot differs from live compiled source; refusing pin.');
+    return { source:pin.source,target:pin.target,snapshot:pin.snapshot,sha256:pin.sha256,
+      parsedRules:rules.length,verified:true };
+  }));
   const replacement = joinCompiled(planned.foundation, prepareUser(local));
   report.candidateCompiledHash = hash(replacement);
   report.candidateCssomMatchesPublished = JSON.stringify(await signature(page, original)) === JSON.stringify(await signature(page, replacement));
@@ -358,6 +375,7 @@ try {
       widths: widths.filter(w=>[1440,390,360].includes(w)), output});
   }
   report.checks = {
+    versionPinsVerified: report.versionPins.length === activePins.length && report.versionPins.every(pin=>pin.verified),
     singleLocalPosterCopy: !postersMigrated || report.widths.every(r=>r.after.posterAudit.valid),
     exactPosterCascade: !postersMigrated || report.candidateCssomMatchesPublished,
     posterStatesVerified: !posterMode || report.posterStates?.valid === true,
@@ -397,6 +415,7 @@ try {
 ${report.historyStates ? `<p>Состояния истории: ${report.historyStates.cases.length} сравнений реального DOM и ${report.historyStates.fixtures.length} тестовых примеров; изменённых узлов: ${report.historyStates.changed}. Реальных записей ранобэ: ${report.historyStates.coverage.ranobe}.</p>` : ''}
 ${report.activityStates ? `<p>График: ${report.activityStates.cases.length} сравнений фаз и состояний; изменённых узлов: ${report.activityStates.changed}. <a href="activity.html">Снимки графика и состояния</a>.</p>` : ''}
 ${report.posterStates ? `<p>Постеры: ${report.posterStates.cases.length} проверок; <a href="posters.html">страницы, состояния и снимки</a>.</p>` : ''}
+${report.versionPins?.length ? `<p>Проверено фиксаций версии: ${report.versionPins.length}; исходники сверены по SHA256 и CSSOM.</p>` : ''}
 <pre>${escape(JSON.stringify(report.checks ?? {}, null, 2))}</pre>
 ${report.error ? `<p>Ошибка: ${escape(report.error)}</p>` : ''}
 ${report.widths.map(r => `<h2>${r.width} × ${r.height}</h2><p>Изменённые ключевые элементы: ${escape(r.changedElements.join(', ') || 'нет')}. Изменённые узлы компонента: ${r.componentChanges.length}; геометрия: ${r.componentGeometryChanges.length}.</p>${['top', 'details', 'component'].map(section => `<h3>${section}</h3><div class="pair">${['before', 'after'].map(phase => `<figure><figcaption>${phase}</figcaption><a href="${r.width}-${phase}-${section}.png"><img src="${r.width}-${phase}-${section}.png"></a></figure>`).join('')}</div><p><a href="${r.width}-diff-${section}.png">Диагностическая разница</a>: ${r.pixels[section].pixels} пикселей.</p>`).join('')}`).join('')}`;

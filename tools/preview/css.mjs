@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+export const E_DESIGN_PINS = JSON.parse(readFileSync(new URL('../../vendor/edesign-pins.json', import.meta.url), 'utf8'));
 // A deliberately limited model, not a replacement for Shikimori's sanitizer.
 export const USER_MARKER = '/* User Custom Styles */';
 export const LAYOUT_SOURCE = 'https://css-club.web.app/css/profile-content-layout-v1.css';
@@ -11,6 +14,25 @@ export function planFoundation(localText, publishedText, foundation) {
   const published = extractLocal(publishedText).imports;
   assertSameImports(published, published, foundation);
   if (JSON.stringify(local) === JSON.stringify(published)) return { foundation, migration: null };
+  // Version pinning preserves every CSS byte in the compiled foundation.
+  // Only approved URL labels may change; source verification is mandatory in preview.mjs.
+  if (local.length === published.length) {
+    const changes = local.flatMap((url, i) => url === published[i] ? [] :
+      [{ spec: E_DESIGN_PINS.find(pin => pin.source === published[i] && pin.target === url), i }]);
+    if (changes.length && changes.every(change => change.spec)) {
+      let next = foundation;
+      const versionPins = changes.map(({ spec }) => {
+        const markers = [...foundation.matchAll(/\/\*\s*(https?:[^*]+?)\s*\*\//g)];
+        const index = markers.findIndex(m => m[1] === spec.source);
+        if (index < 0) throw new Error('Version pin source marker missing.');
+        const marker = markers[index];
+        const end = markers[index + 1]?.index ?? foundation.length;
+        next = next.replace(marker[0], marker[0].replace(spec.source, spec.target));
+        return { ...spec, originalBlock: foundation.slice(marker.index, end) };
+      });
+      return { foundation: next, migration: null, versionPins };
+    }
+  }
   const approved = [
     { source: POSTERS_SOURCE, begin: '/* BEGIN LOCAL CUSTOM POSTERS', end: '/* END LOCAL CUSTOM POSTERS */', snapshot: 'vendor/custom_posters.min.css' },
     { source: ACTIVITY_SOURCE, begin: '/* BEGIN LOCAL ACTIVITY GRAPH', end: '/* END LOCAL ACTIVITY GRAPH */', snapshot: 'vendor/q05_animated_activity_graph.css' },
@@ -77,4 +99,11 @@ export function prepareUser(text) {
 
 export function joinCompiled(foundation, user) {
   return `${foundation}${USER_MARKER}\n${user}`;
+}
+
+export function assertVersionPinBytes(spec, snapshot, fetched) {
+  const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+  if (!/^[a-f0-9]{64}$/.test(spec.sha256) || hash(snapshot) !== spec.sha256 || hash(fetched) !== spec.sha256) {
+    throw new Error('Pinned source or vendor byte hash differs; refusing unverified source.');
+  }
 }
