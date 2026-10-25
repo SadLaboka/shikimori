@@ -479,7 +479,8 @@ a {
 }
 
 /*----------------------------------------------------------------------scrollbar----------------------------------------------------------------------*/
-@supports not selector(::-webkit-scrollbar) {
+/* Standard scrollbar styling is supported by Firefox and Chrome 121+. */
+@supports (scrollbar-width: thin) and (scrollbar-color: red blue) {
   html {
     scrollbar-width: thin;
     scrollbar-color: rgb(30, 38, 185) rgb(153, 0, 62);
