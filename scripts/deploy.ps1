@@ -6,6 +6,8 @@ param(
     [Parameter(Mandatory, ParameterSetName = 'Authorize')][switch]$Authorize,
     [Parameter(Mandatory, ParameterSetName = 'Refresh')][switch]$RefreshCredentials,
     [Parameter(ParameterSetName = 'Inspect')][string]$Baseline,
+    [Parameter(ParameterSetName = 'Inspect')][Parameter(ParameterSetName = 'Publish')][switch]$CompactDiff,
+    [Parameter(ParameterSetName = 'Inspect')][Parameter(ParameterSetName = 'Publish')][string]$ExpectedCssSha256,
     [string]$CssPath = (Join-Path (Split-Path $PSScriptRoot -Parent) 'styles_optimized.css'),
     [string]$ConfigPath = (Join-Path (Split-Path $PSScriptRoot -Parent) 'deploy.config.json')
 )
@@ -168,10 +170,30 @@ function Get-TextHash([string]$Text) {
     finally { $algorithm.Dispose() }
 }
 
+function Get-DiffDirectory {
+    return Join-Path (Split-Path $PSScriptRoot -Parent) '.preview/deploy'
+}
+
 function Show-CssDiff([string]$BeforePath, [string]$AfterPath) {
     if (-not (Get-Command git -ErrorAction SilentlyContinue)) { throw 'Для построчного diff необходим Git.' }
-    & git --no-pager diff --no-index --no-ext-diff --no-textconv -- $BeforePath $AfterPath
+    $lines = @(& git --no-pager diff --no-index --no-ext-diff --no-textconv -- $BeforePath $AfterPath)
     if ($LASTEXITCODE -notin 0, 1) { throw 'Не удалось построить diff. Публикация запрещена.' }
+    if (-not $CompactDiff) { $lines | ForEach-Object { Write-Host $_ }; return }
+    if ($lines.Count -eq 0) { Write-Host 'Diff: CSS совпадает.'; return }
+    # Keep the complete review artifact; shorten console output only.
+    $directory = Get-DiffDirectory
+    [void][IO.Directory]::CreateDirectory($directory)
+    $artifact = Join-Path $directory ('css-' + [guid]::NewGuid().ToString('N') + '.diff')
+    [IO.File]::WriteAllLines($artifact, [string[]]$lines, [Text.UTF8Encoding]::new($false))
+    $body = @($lines | Where-Object { $_ -notmatch '^(diff --git |index |--- |\+\+\+ )' })
+    $added = @($body | Where-Object { $_.StartsWith('+') }).Count
+    $removed = @($body | Where-Object { $_.StartsWith('-') }).Count
+    Write-Host "Diff: +$added / -$removed строк. Полный diff: $artifact"
+    $preview = ($body | Select-Object -First 40) -join [Environment]::NewLine
+    $truncated = $body.Count -gt 40 -or $preview.Length -gt 6000
+    if ($preview.Length -gt 6000) { $preview = $preview.Substring(0, 6000) }
+    Write-Host $preview
+    if ($truncated) { Write-Host 'Вывод сокращён; перед подтверждением прочитайте полный diff.' }
 }
 
 function Invoke-Deployment {
@@ -179,6 +201,9 @@ function Invoke-Deployment {
     $css = [IO.File]::ReadAllText((Resolve-Path -LiteralPath $CssPath).Path, $encoding)
     if ([string]::IsNullOrWhiteSpace($css)) { throw 'CSS пуст. Публикация пустого стиля запрещена.' }
     $cssHash = Get-TextHash $css
+    if ($ExpectedCssSha256 -and ($ExpectedCssSha256 -notmatch '^[a-fA-F0-9]{64}$' -or $cssHash -ine $ExpectedCssSha256)) {
+        throw 'CSS отличается от проверенного SHA256. Публикация остановлена до чтения credentials и запросов к API.'
+    }
     $temporary = Join-Path ([IO.Path]::GetTempPath()) ([guid]::NewGuid().ToString() + '.css')
     try {
         # Diff and PATCH always use this same in-memory snapshot, even if the source file changes.

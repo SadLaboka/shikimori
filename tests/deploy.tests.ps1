@@ -10,6 +10,7 @@ try {
     . (Join-Path $repository 'scripts/deploy.ps1') -DryRun -Baseline $fixture -CssPath $fixture
     $transportFunction = ${function:Request-Api}
     $credentialReader = ${function:Read-Credentials}
+    $diffFunction = ${function:Show-CssDiff}
     $Baseline = $null
     $CssPath = $fixture
     $script:Config = [pscustomobject]@{
@@ -87,6 +88,48 @@ try {
     try { Invoke-Deployment } catch { $failed = $true }
     if (-not $failed -or $script:reads -ne 0) { throw 'Empty CSS accepted' }
     Write-Host 'PASS: backup and empty CSS'
+    # Hash pinning fails before credentials/network and does not replace confirmation.
+    [IO.File]::WriteAllText($fixture, 'body { color: blue; }')
+    $ExpectedCssSha256 = '0' * 64
+    $script:reads = 0; $script:patches = 0
+    $failed = $false
+    try { Invoke-Deployment } catch { $failed = $_.Exception.Message.Contains('SHA256') }
+    if (-not $failed -or $script:reads -ne 0 -or $script:patches -ne 0) { throw 'Hash mismatch was not blocked' }
+    $ExpectedCssSha256 = (Get-TextHash ([IO.File]::ReadAllText($fixture))).ToLowerInvariant()
+    $script:scenario = 'success'; $Publish = $true
+    $script:remote = 'old CSS'; $script:reads = 0; $script:patches = 0
+    $script:confirmed = ''; $script:reviewed = ''; $script:sent = ''
+    Invoke-Deployment
+    if ($script:patches -ne 1 -or $script:confirmed -cne 'PUBLISH FixtureUser 34' -or $script:sent -cne $script:reviewed) {
+        throw 'Hash-pinned publication bypassed review/confirmation'
+    }
+    $ExpectedCssSha256 = $null
+    Write-Host 'PASS: expected CSS hash guards the reviewed snapshot'
+    # Large diff stays complete on disk while console output is bounded.
+    function Get-DiffDirectory { return Join-Path $work 'diffs' }
+    $beforeDiff = Join-Path $work 'before.css'
+    $afterDiff = Join-Path $work 'after.css'
+    [IO.File]::WriteAllText($beforeDiff, 'body { color: red; }')
+    [IO.File]::WriteAllLines($afterDiff, [string[]]((1..150 | ForEach-Object { ".item-$_ { color: blue; }" }) + '.tail { content: "DIFF_TAIL_SENTINEL"; }'))
+    $CompactDiff = $true
+    $summary = @(& $diffFunction $beforeDiff $afterDiff 6>&1)
+    $artifact = @(Get-ChildItem -LiteralPath (Join-Path $work 'diffs') -Filter '*.diff')
+    if ($summary.Count -gt 45 -or ($summary -join "`n").Contains('DIFF_TAIL_SENTINEL') -or
+        $artifact.Count -ne 1 -or -not [IO.File]::ReadAllText($artifact[0].FullName).Contains('DIFF_TAIL_SENTINEL')) {
+        throw 'Compact diff is unbounded or its complete artifact is missing'
+    }
+    $fullDiffCharacters = [IO.File]::ReadAllText($artifact[0].FullName).Length
+    $summaryCharacters = ($summary -join "`n").Length
+    # A minified CSS line must not bypass the character bound.
+    [IO.File]::WriteAllText($afterDiff, ('.large{--text:' + ('x' * 20000) + 'DIFF_TAIL_SENTINEL;}'))
+    $longSummary = @(& $diffFunction $beforeDiff $afterDiff 6>&1)
+    $artifacts = @(Get-ChildItem -LiteralPath (Join-Path $work 'diffs') -Filter '*.diff')
+    if (($longSummary -join "`n").Length -gt 7000 -or ($longSummary -join "`n").Contains('DIFF_TAIL_SENTINEL') -or
+        $artifacts.Count -ne 2 -or -not ($artifacts | Where-Object { [IO.File]::ReadAllText($_.FullName).Contains('x' * 20000) })) {
+        throw 'Minified CSS bypassed compact output bounds or was truncated on disk'
+    }
+    Write-Host "PASS: compact diff ($fullDiffCharacters characters on disk, $summaryCharacters in console); minified-line guard"
+    $CompactDiff = $false
     # Exercise actual HTTP wrapper without opening a network connection.
     function Start-Sleep { param($Milliseconds) }
     function Invoke-RestMethod {
