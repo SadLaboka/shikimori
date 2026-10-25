@@ -5,6 +5,7 @@ import {execFileSync} from 'node:child_process';
 import {chromium} from 'playwright';
 import {OWNED_IMPORTS,ownedImportRevision,planFoundation,assertVersionPinBytes,prepareUser,joinCompiled} from './css.mjs';
 import {verifyMain1ButtonCandidate,verifyMain1ButtonCssomDelta,DUPLICATE_BUTTON_BLOCK} from './main1-button-pilot.mjs';
+import {verifyRadiusCandidate,verifyRadiusDelta,RADIUS_BEFORE,RADIUS_AFTER} from './main3-radius.mjs';
 for(const spec of OWNED_IMPORTS) {
 
 test(`${spec.local}: owned-source relocation only changes an approved URL label at the same cascade position`,()=>{
@@ -23,6 +24,7 @@ test(`${spec.local}: owned baseline and approved working version are bound to sa
   const working=await readFile(new URL('../../'+spec.local,import.meta.url));
   const committed=execFileSync('git',['show',`${revision}:${spec.local}`],{maxBuffer:2*1024*1024});
   if(spec.local==='css/base/main_code_1.css')verifyMain1ButtonCandidate(snapshot,working);
+  else if(spec.local==='css/base/main_code_3.css'&&!snapshot.equals(working))verifyRadiusCandidate(snapshot,working);
   else assertVersionPinBytes(spec,snapshot,working);
   assertVersionPinBytes(spec,snapshot,committed);
   assert.throws(()=>assertVersionPinBytes(spec,snapshot,Buffer.concat([working,Buffer.from('\nbody{color:red}')])));
@@ -39,6 +41,7 @@ test(`${spec.local}: real module preserves CSSOM except its explicitly approved 
   const browser=await chromium.launch();try{const page=await browser.newPage();await page.setContent('<style></style>');
     const parse=css=>page.evaluate(css=>{const s=document.querySelector('style');s.textContent=css;return [...s.sheet.cssRules].map(r=>r.cssText);},css);
     if(spec.local==='css/base/main_code_1.css')verifyMain1ButtonCssomDelta(await parse(snapshot),await parse(module),await parse(DUPLICATE_BUTTON_BLOCK));
+    else if(spec.local==='css/base/main_code_3.css'&&module!==snapshot)verifyRadiusDelta(await parse(snapshot),await parse(module),await parse(RADIUS_BEFORE),await parse(RADIUS_AFTER));
     else assert.deepEqual(await parse(module),await parse(snapshot));
     assert.deepEqual(await parse(joinCompiled(planned.foundation,prepareUser(local))),await parse(joinCompiled(prefix,prepareUser(source))));
     const rules=await parse(module),mediaIndex=rules.findIndex(rule=>rule.startsWith('@media'));

@@ -16,6 +16,7 @@ import { CATALOG_URL, installCatalogTheme, ensureCatalogFilters, checkFilterStat
 import {MAIN1_SPEC,DUPLICATE_BUTTON_BLOCK,verifyMain1ButtonCandidate,applyMain1ButtonCandidate,verifyMain1ButtonCssomDelta} from './main1-button-pilot.mjs';
 import {checkButtonStates} from './button-states.mjs';
 import {MAIN1_OPTIMIZATION,optimizedMain1Revision} from './css.mjs';
+import {MAIN3_SPEC,RADIUS_BEFORE,RADIUS_AFTER,verifyRadiusCandidate,applyRadiusCandidate,verifyRadiusDelta,sampleRadiusMargins,MAIN3_RELEASE,planRadiusRelease,radiusReleaseRevision} from './main3-radius.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const { values } = parseArgs({ options: {
@@ -29,6 +30,7 @@ const { values } = parseArgs({ options: {
   'check-history': { type: 'boolean', default: false },
   'check-filters': { type: 'boolean', default: false },
   'main1-button-candidate': { type: 'string' },
+  'main3-radius-candidate': { type: 'string' },
   'baseline-css': { type: 'string' }, 'baseline-compiled': { type: 'string' },
 } });
 if (!['profile','history','catalog'].includes(values.component)) throw new Error('Component must be profile, history or catalog.');
@@ -41,6 +43,9 @@ if (values['check-history'] && !historyMode) throw new Error('--check-history re
 if (values['check-layout'] && values.component!=='profile') throw new Error('--check-layout requires the real profile component.');
 if (values['check-filters'] && !catalogMode) throw new Error('--check-filters requires --component catalog.');
 const buttonPilot=Boolean(values['main1-button-candidate']);
+const radiusPilot=Boolean(values['main3-radius-candidate']);
+if(radiusPilot&&(buttonPilot||values['local-imports']||values['baseline-css']||values['baseline-compiled']))
+  throw new Error('--main3-radius-candidate requires a live verified baseline without other pilots.');
 if(buttonPilot&&(values.component!=='profile'||values['local-imports']||values['baseline-css']||values['baseline-compiled']))
   throw new Error('--main1-button-candidate requires the live profile baseline and remote source verification.');
 if (Boolean(values['baseline-css']) !== Boolean(values['baseline-compiled'])) {
@@ -53,6 +58,12 @@ if (!widths.length || widths.some(w => !Number.isInteger(w) || w < 320 || w > 38
 const localPath = path.resolve(root, values.css ?? 'styles_optimized.css');
 const local = await readFile(localPath, 'utf8');
 const buttonCandidatePath=buttonPilot?path.resolve(root,values['main1-button-candidate']):null;
+const radiusRelease=extractLocal(local).imports.includes(MAIN3_RELEASE.target);
+const radiusMode=radiusPilot||radiusRelease;
+if(radiusPilot&&radiusRelease)throw new Error("Use normal preview for a released main3 URL.");
+const radiusCandidatePath=radiusRelease?path.join(root,MAIN3_SPEC.local):radiusPilot?path.resolve(root,values['main3-radius-candidate']):null;
+if(radiusPilot&&(!radiusCandidatePath.startsWith(root)||path.extname(radiusCandidatePath)!=='.css'))
+  throw new Error('Main3 candidate must be a workspace CSS file.');
 if(buttonPilot&&(!buttonCandidatePath.startsWith(root)||path.extname(buttonCandidatePath)!=='.css'))
   throw new Error('Main1 candidate must be a workspace CSS file.');
 const referenceLayout = await readFile(path.join(root, 'vendor/profile-content-layout-v1.css'), 'utf8');
@@ -71,6 +82,7 @@ const PAGE = catalogMode ? CATALOG_URL : historyMode ? `${PROFILE}/history` : PR
 const SOURCE_PAGE = catalogMode ? PROFILE : PAGE;
 const STYLE = 'https://shikimori.io/api/styles/1343722';
 const selectors = catalogMode ? {
+  ...(radiusMode?{page:'.l-page'}:{}),
   catalog: '.l-content .cc-entries', firstCard: '.l-content .b-catalog_entry',
   filters: '.b-collection-filters', filtersHead: '.c-filters-head',
   control: '.c-ms-control', rating: '.c-ms[data-field="rating"]',
@@ -185,6 +197,7 @@ async function computed(page) {
         content: style.content, display: style.display, width: style.width, height: style.height,
         backgroundImage: style.backgroundImage, animationName: style.animationName,
         position: style.position, zIndex: style.zIndex, transform: style.transform,
+        borderRadius: style.borderRadius,
       }; };
       return [name, {
         rect: { x: rect.x + scrollX, y: rect.y + scrollY, width: rect.width, height: rect.height },
@@ -221,6 +234,11 @@ async function capture(page, width, phase, css) {
   await page.evaluate(() => scrollTo(0, 0));
   await settle(page);
   const state = await computed(page);
+  if(radiusMode){
+    const margins=await page.locator('.l-page').evaluate(sampleRadiusMargins);
+    Object.assign(state.elements.page.style,margins.computed);
+    state.rawResolvedPageMargins=margins.resolved;
+  }
   if(catalogMode && Object.values(state.elements).some(el=>el.missing))throw new Error('Required catalogue measurement target is missing.');
   const component = await layoutState(page);
   const layoutAudit = await auditLayout(page, referenceLayout);
@@ -318,7 +336,7 @@ try {
   const original = values['baseline-compiled']
     ? await readFile(path.resolve(root, values['baseline-compiled']), 'utf8') : liveOriginal;
   const { foundation, user } = splitCompiled(original);
-  const planned = planFoundation(local, publishedSource, foundation);
+  const planned = radiusRelease?planRadiusRelease(local,publishedSource,foundation):planFoundation(local, publishedSource, foundation);
   const expectedBaseline = joinCompiled(foundation, prepareUser(publishedSource));
   const actualRules = await signature(page, original);
   const modelRules = await signature(page, expectedBaseline);
@@ -363,7 +381,8 @@ try {
     const block=foundation.slice(markers[index].index,markers[index+1]?.index??foundation.length);
     const snapshot=await readFile(path.join(root,spec.snapshot));
     const working=await readFile(path.join(root,spec.local));
-    assertVersionPinBytes(spec,snapshot,working);
+    if(radiusMode&&spec.local===MAIN3_SPEC.local&&!snapshot.equals(working))verifyRadiusCandidate(snapshot,working);
+    else assertVersionPinBytes(spec,snapshot,working);
     let candidateBytes;
     if(values['local-imports']) {
       try{candidateBytes=execFileSync('git',['show',`${revision}:${spec.local}`],
@@ -419,6 +438,40 @@ try {
     report.publicationReady=false; // Real component coverage remains incomplete.
   }
   let candidateFoundation=planned.foundation;
+  if(radiusRelease){
+    const revision=radiusReleaseRevision();
+    const snapshot=await readFile(path.join(root,MAIN3_SPEC.snapshot));
+    const candidate=await readFile(path.join(root,MAIN3_SPEC.local));
+    verifyRadiusCandidate(snapshot,candidate);
+    const response=await context.request.get(MAIN3_RELEASE.target);
+    if(!response.ok())throw new Error(`Main3 release GET failed: HTTP ${response.status()}`);
+    const remote=await response.body();verifyRadiusCandidate(snapshot,remote);
+    const alreadyPublished=publishedImports.includes(MAIN3_RELEASE.target);
+    const source=alreadyPublished?MAIN3_RELEASE.target:MAIN3_RELEASE.source;
+    const markers=[...foundation.matchAll(/\/\*\s*(https?:[^*]+?)\s*\*\//g)];
+    const matches=markers.filter(m=>m[1]===source);
+    if(matches.length!==1)throw new Error('Main3 release compiled source must be unique.');
+    const i=markers.indexOf(matches[0]),block=foundation.slice(matches[0].index,markers[i+1]?.index??foundation.length);
+    const upstream=E_DESIGN_PINS.find(pin=>pin.target===MAIN3_SPEC.source);
+    assertVersionPinRules(upstream,await signature(page,(alreadyPublished?remote:snapshot).toString('utf8')),await signature(page,block));
+    if(!alreadyPublished){
+      const previous=await context.request.get(MAIN3_RELEASE.source);
+      if(!previous.ok())throw new Error('Main3 previous source unavailable.');
+      assertVersionPinBytes(MAIN3_SPEC,snapshot,await previous.body());
+    }
+    report.radiusRelease={...MAIN3_RELEASE,revision,alreadyPublished,remoteVerified:true};
+  }
+  if(radiusMode){
+    if(!radiusRelease&&(local!==published.css||planned.migration))throw new Error('Main3 pilot cannot include other CSS/import changes.');
+    report.radiusPilot=verifyRadiusCandidate(await readFile(path.join(root,MAIN3_SPEC.snapshot)),await readFile(radiusCandidatePath));
+    if(!radiusRelease)candidateFoundation=applyRadiusCandidate(candidateFoundation);
+    report.sourceMode='local-main3-radius-pilot';
+    report.publicationReady=false;
+    if(radiusRelease&&publishedImports.includes(MAIN3_RELEASE.target))report.radiusPilot.onlyApprovedChange=JSON.stringify(await signature(page,original))===JSON.stringify(await signature(page,joinCompiled(candidateFoundation,prepareUser(local))));
+    else Object.assign(report.radiusPilot,verifyRadiusDelta(await signature(page,original),
+      await signature(page,joinCompiled(candidateFoundation,prepareUser(local))),
+      await signature(page,RADIUS_BEFORE),await signature(page,RADIUS_AFTER)));
+  }
   if(buttonPilot){
     if(local!==published.css||planned.migration)throw new Error('Main1 pilot cannot be combined with other CSS/import changes.');
     const snapshot=await readFile(path.join(root,MAIN1_SPEC.snapshot));
@@ -466,6 +519,20 @@ try {
     if (splitCompiled(applied).foundation !== candidateFoundation || applied !== replacement) {
       throw new Error('Foundation preservation or replacement integrity failed.');
     }
+    if(radiusMode&&catalogMode){
+      // A/A control reproduces stale outer auto margins after in-place reparse.
+      // Give both phases the same fresh-document lifecycle; keep strict geometry.
+      const response=await page.goto(PAGE,{waitUntil:'load'});
+      if(!response?.ok()||new URL(page.url()).pathname!==new URL(PAGE).pathname)throw new Error('Candidate catalogue reload failed.');
+      await page.locator('.c-ms-control').first().waitFor({state:'attached'});
+      await installCatalogTheme(page,replacement);
+      await page.addStyleTag({content:freeze});
+      await page.locator('style#custom_css').evaluate((s,text)=>{s.textContent=text+'\n/* preview baseline recalculation */';},replacement);
+      await settle(page);
+      await page.locator('style#custom_css').evaluate((s,text)=>{s.textContent=text;},replacement);
+      if(await page.locator('style#custom_css').textContent()!==replacement)throw new Error('Reloaded candidate integrity failed.');
+      report.radiusPilot.catalogFreshDocuments=true;
+    }
     const after = await capture(page, width, 'after', replacement);
     const changes = Object.keys(selectors).filter(key =>
       JSON.stringify(before.state.elements[key]) !== JSON.stringify(after.state.elements[key]));
@@ -503,7 +570,7 @@ try {
       widths: widths.filter(w=>[1440,390,360].includes(w)), output});
   }
   if(values['check-filters']) report.filterStates=await checkFilterStates({page,baseline:original,candidate:replacement,widths,output});
-  if(buttonPilot||optimizedMain1)report.buttonStates=await checkButtonStates({page,baseline:original,candidate:replacement,widths,output});
+  if(buttonPilot||(optimizedMain1&&!radiusMode))report.buttonStates=await checkButtonStates({page,baseline:original,candidate:replacement,widths,output});
   report.checks = {
     ownedImportsVerified: report.ownedImports.length===activeOwned.length && report.ownedImports.every(row=>row.verified),
     versionPinsVerified: report.versionPins.length === activePins.length && report.versionPins.every(pin=>pin.verified),
@@ -527,7 +594,7 @@ try {
   };
   report.verdict = Object.values(report.checks).every(Boolean) ? (values['local-imports'] ? 'LOCAL PASS' : 'PASS') : 'FAIL';
   if ((catalogMode || values['check-layout'] || values['check-history'] || values['check-activity'] || values['check-filters'] || posterMode) && report.verdict === 'FAIL') process.exitCode = 1;
-  if(buttonPilot||optimizedMain1){
+  if(buttonPilot||(optimizedMain1&&!radiusMode)){
     report.strictMigrationVerdict=report.verdict;
     const expectedDelta=new Set(['exactPosterCascade','unchangedNonLayoutCascade']);
     report.pilotChecks={onlyApprovedRemoval:buttonPilot?report.buttonPilot.onlyApprovedRemoval:
@@ -538,6 +605,15 @@ try {
     const technical=report.pilotChecks.onlyApprovedRemoval&&report.pilotChecks.otherChecksPassed&&report.pilotChecks.buttonStatesEquivalent;
     report.verdict=!technical?'FAIL':report.pilotChecks.realButtonCoverage?'LOCAL PILOT PASS':'INCOMPLETE';
     process.exitCode=!technical?1:report.pilotChecks.realButtonCoverage?0:2;
+  }
+  if(radiusMode){
+    report.strictMigrationVerdict=report.verdict;
+    const expectedDelta=new Set(['exactPosterCascade','unchangedNonLayoutCascade']);
+    report.radiusPilot.realPageCoverage=report.widths.every(r=>!r.before.state.elements.page?.missing&&
+      r.before.state.elements.page?.rect.width>0&&r.after.state.elements.page?.rect.width>0);
+    report.radiusPilot.otherChecksPassed=Object.entries(report.checks).every(([key,value])=>value||expectedDelta.has(key));
+    const pass=report.radiusPilot.onlyApprovedChange&&report.radiusPilot.realPageCoverage&&report.radiusPilot.otherChecksPassed;
+    report.verdict=pass?'LOCAL RADIUS PASS':'FAIL';process.exitCode=pass?0:1;
   }
   console.log(`${values.component} audit: ${report.verdict}`);
   await page.locator('style#custom_css').evaluate((style, text) => { style.textContent = text; }, liveOriginal);
@@ -555,6 +631,7 @@ try {
 <h1>Локальный предпросмотр CSS</h1>${values['local-imports'] ? '<p><strong>Локальная копия модуля и Git-коммит проверены. Удалённый URL не проверен; этот результат не подтверждает готовность публикации.</strong></p>' : ''}<p>Стиль на сайте не изменён этим прогоном. ${report.migration ? `Только проверенный блок ${report.migration.source === POSTERS_SOURCE ? 'механизма постеров' : report.migration.source === ACTIVITY_SOURCE ? 'графика активности' : report.migration.source === HISTORY_SOURCE ? 'подписей истории' : 'раскладки'} перенесён из импорта в локальную часть; остальные импорты сохранены.` : 'Импортированная основа сохранена.'} Слева — опубликованный CSS, справа — локальная замена.</p>
 ${buttonPilot ? '<p><strong>Локальный пилот: из основы убран только проверенный дубль кнопки main1. Новый удалённый источник не подключён. Это не готовность публикации.</strong></p>' : ''}
 ${report.main1Optimization ? '<p><strong>Оптимизированный main1: удалённый источник и точное удаление дубля проверены. Покрытие реального компонента указано отдельно; INCOMPLETE не означает общий PASS.</strong></p>' : ''}
+${report.radiusPilot ? `<p>Локальный main3: только удаление раннего радиуса. Строгий миграционный статус: ${report.strictMigrationVerdict}. Неизменённые состояния кнопки main1 не повторялись.</p><pre>${escape(JSON.stringify(report.radiusPilot,null,2))}</pre>` : ''}
 ${catalogMode ? '<p>Настоящий анонимный каталог: опубликованная тема профиля и кандидат временно заменяют его реальный custom_css slot. Настройки аккаунта не меняются.</p>' : ''}
 <p>CSS-анимации остановлены; GIF/WebP продолжают менять кадры. Pixel diff не является автоматическим вердиктом.</p>
 <p>Совпадение модели обработки с опубликованным CSSOM: ${report.baselineCssomMatches ?? false}. <a href="report.json">Вычисленные стили и полный отчёт</a>.</p>
