@@ -1,10 +1,10 @@
 import { createHash } from 'node:crypto';
-import { LAYOUT_SOURCE, HISTORY_SOURCE, HISTORY_COMPAT, USER_MARKER } from './css.mjs';
+import { LAYOUT_SOURCE, HISTORY_SOURCE, HISTORY_COMPAT, ACTIVITY_SOURCE, USER_MARKER } from './css.mjs';
 
 // Inspect the LIVE stylesheet. Text snapshots alone cannot prove that an old
 // imported copy stopped participating in the cascade.
-export async function auditRules(page, referenceCss, { source = LAYOUT_SOURCE, expectedCount = 10, compatibility = '' } = {}) {
-  const result = await page.evaluate(({ referenceCss, source, marker, expectedCount, compatibility }) => {
+export async function auditRules(page, referenceCss, { source = LAYOUT_SOURCE, expectedCount = 10, compatibility = '', allowOverrides = false } = {}) {
+  const result = await page.evaluate(({ referenceCss, source, marker, expectedCount, compatibility, allowOverrides }) => {
     const element = document.querySelector('style#custom_css');
     const text = element.textContent;
     const index = text.indexOf(marker);
@@ -46,7 +46,7 @@ export async function auditRules(page, referenceCss, { source = LAYOUT_SOURCE, e
       try { outside.push(...inventory(sheet.cssRules)); }
       catch { unreadableSheets.push(sheet.href ?? '(inline)'); }
     }
-    const sameSelector = (a, b) => a.selector === b.selector && JSON.stringify(a.conditions) === JSON.stringify(b.conditions);
+    const sameSelector = (a, b) => a.selector === b.selector && (a.selector !== null || a.cssText.split('{')[0].trim() === b.cssText.split('{')[0].trim()) && JSON.stringify(a.conditions) === JSON.stringify(b.conditions);
     const exact = (a, b) => sameSelector(a, b) && a.cssText === b.cssText;
     const rules = reference.map(rule => ({
       selector: rule.selector, conditions: rule.conditions, cssText: rule.cssText,
@@ -57,10 +57,10 @@ export async function auditRules(page, referenceCss, { source = LAYOUT_SOURCE, e
       selectorCopies: actual.filter(row => sameSelector(row, rule)).length,
       positions: actual.flatMap((row, position) => exact(row, rule) ? [position] : []),
     }));
-    const selected = actual.filter(row => reference.some(rule => sameSelector(row, rule)));
+    const selected = actual.filter(row => reference.some(rule => exact(row, rule)));
     const originalOrder = JSON.stringify(selected) === JSON.stringify(reference);
     const isCompat = row => compat.some(rule => exact(row, rule));
-    const nonLayout = actual.filter(row => !reference.some(rule => sameSelector(row, rule)) && !isCompat(row));
+    const nonLayout = actual.filter(row => !reference.some(rule => exact(row, rule)) && !isCompat(row));
     const pseudos = nonLayout.filter(row => /::?(?:before|after)\b/.test(row.selector ?? ''));
     const compatibilityCopies = actual.filter(isCompat).length;
     const compatibilityValid = !compat.length || (compatibilityCopies === 1 && user.filter(isCompat).length === 1 &&
@@ -89,10 +89,10 @@ export async function auditRules(page, referenceCss, { source = LAYOUT_SOURCE, e
       unexpandedImportRules: actual.filter(row => /^@import\b/i.test(row.cssText)).length,
       valid: !importedMarkerPresent && originalOrder && rules.length === expectedCount && unreadableSheets.length === 0 && compatibilityValid && posterContentExpected &&
         rules.every(rule => rule.actualCopies === 1 && rule.outsideCopies === 0 && rule.foundationCopies === 0 &&
-          rule.userCopies === 1 && rule.selectorCopies === 1),
+          rule.userCopies === 1 && (allowOverrides || rule.selectorCopies === 1)),
       nonLayout, pseudos,
     };
-  }, { referenceCss, source, marker: USER_MARKER, expectedCount, compatibility });
+  }, { referenceCss, source, marker: USER_MARKER, expectedCount, compatibility, allowOverrides });
   const digest = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
   const { nonLayout, pseudos, ...audit } = result;
   return { ...audit, nonLayoutCascadeHash: digest(nonLayout),
@@ -102,3 +102,6 @@ export async function auditRules(page, referenceCss, { source = LAYOUT_SOURCE, e
 export const auditLayout = (page, referenceCss) => auditRules(page, referenceCss);
 export const auditHistory = (page, referenceCss) => auditRules(page, referenceCss,
   { source: HISTORY_SOURCE, expectedCount: 7, compatibility: HISTORY_COMPAT });
+
+export const auditActivity = (page, referenceCss) => auditRules(page, referenceCss,
+  { source: ACTIVITY_SOURCE, expectedCount: 40, allowOverrides: true });

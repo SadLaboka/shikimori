@@ -6,14 +6,16 @@ import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { splitCompiled, extractLocal, planFoundation, prepareUser, joinCompiled, HISTORY_SOURCE } from './css.mjs';
-import { auditLayout, auditHistory } from './audit.mjs';
+import { splitCompiled, extractLocal, planFoundation, prepareUser, joinCompiled, HISTORY_SOURCE, ACTIVITY_SOURCE } from './css.mjs';
+import { auditLayout, auditHistory, auditActivity } from './audit.mjs';
 import { checkHistoryStates } from './history-states.mjs';
+import { checkActivityStates } from './activity-states.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const { values } = parseArgs({ options: {
   css: { type: 'string' }, widths: { type: 'string', default: '1440,390,360' },
   headed: { type: 'boolean', default: false },
+  'check-activity': { type: 'boolean', default: false },
   'check-layout': { type: 'boolean', default: false },
   component: { type: 'string', default: 'profile' },
   'check-history': { type: 'boolean', default: false },
@@ -21,6 +23,7 @@ const { values } = parseArgs({ options: {
 } });
 if (!['profile','history'].includes(values.component)) throw new Error('Component must be profile or history.');
 const historyMode = values.component === 'history';
+if (values['check-activity'] && historyMode) throw new Error('--check-activity requires the profile page.');
 if (values['check-history'] && !historyMode) throw new Error('--check-history requires --component history.');
 if (values['check-layout'] && historyMode) throw new Error('--check-layout requires the real profile component.');
 if (Boolean(values['baseline-css']) !== Boolean(values['baseline-compiled'])) {
@@ -34,6 +37,8 @@ const localPath = path.resolve(root, values.css ?? 'styles_optimized.css');
 const local = await readFile(localPath, 'utf8');
 const referenceLayout = await readFile(path.join(root, 'vendor/profile-content-layout-v1.css'), 'utf8');
 const referenceHistory = await readFile(path.join(root, 'vendor/q03_history_bookmarks.css'), 'utf8');
+const referenceActivity = await readFile(path.join(root, 'vendor/q05_animated_activity_graph.css'), 'utf8');
+const activityMigrated = !extractLocal(local).imports.includes(ACTIVITY_SOURCE);
 const historyMigrated = !extractLocal(local).imports.includes(HISTORY_SOURCE);
 const run = new Date().toISOString().replace(/[:.]/g, '-');
 const output = path.join(root, '.preview', run);
@@ -184,6 +189,7 @@ async function capture(page, width, phase) {
   const component = await layoutState(page);
   const layoutAudit = await auditLayout(page, referenceLayout);
   const historyAudit = await auditHistory(page, referenceHistory);
+  const activityAudit = await auditActivity(page, referenceActivity);
   if (historyMode && await page.locator('.history-page span > a').count() === 0) throw new Error('History component has no real targets.');
   // Already paused by settle(). 'disabled' would finish finite effects and fire
   // animationend, changing the page between the before/after measurements.
@@ -201,7 +207,7 @@ async function capture(page, width, phase) {
   await settle(page);
   if (historyMode) await page.screenshot({ path: path.join(output, `${width}-${phase}-component.png`), animations: 'allow' });
   else await layout.screenshot({ path: path.join(output, `${width}-${phase}-component.png`), animations: 'allow' });
-  return { state, assets, component, layoutAudit, historyAudit };
+  return { state, assets, component, layoutAudit, historyAudit, activityAudit };
 }
 
 async function diff(width, section) {
@@ -336,21 +342,26 @@ try {
     report.historyStates = await checkHistoryStates({ context, page, baseline: original, candidate: replacement,
       widths: stateWidths.length?stateWidths:widths, output });
   }
+  if (values['check-activity'] && report.widths.every(r=>r.after.activityAudit.valid)) {
+    report.activityStates = await checkActivityStates({ page, baseline: original, candidate: replacement, widths, output });
+  }
   report.checks = {
     exactAppliedCandidate: report.widths.every(r => r.appliedCompiledHash === report.candidateCompiledHash),
     singleLocalCopyWithoutOldImport: report.widths.every(r => r.after.layoutAudit.valid),
+    singleLocalActivityCopy: !activityMigrated || report.widths.every(r => r.after.activityAudit.valid),
+    activityStatesVerified: !values['check-activity'] || report.activityStates?.valid === true,
     singleLocalHistoryCopy: !historyMigrated || report.widths.every(r => r.after.historyAudit.valid),
     unchangedNonLayoutCascade: report.widths.every(r => {
-      const key=historyMigrated?'historyAudit':'layoutAudit';return r.before[key].nonLayoutCascadeHash === r.after[key].nonLayoutCascadeHash; }),
+      const key=activityMigrated?'activityAudit':historyMigrated?'historyAudit':'layoutAudit';return r.before[key].nonLayoutCascadeHash === r.after[key].nonLayoutCascadeHash; }),
     unchangedPseudoRules: report.widths.every(r => {
-      const key=historyMigrated?'historyAudit':'layoutAudit';return r.before[key].pseudoRuleHash === r.after[key].pseudoRuleHash; }),
+      const key=activityMigrated?'activityAudit':historyMigrated?'historyAudit':'layoutAudit';return r.before[key].pseudoRuleHash === r.after[key].pseudoRuleHash; }),
     sameStylesheetPosition: report.widths.every(r => r.before.layoutAudit.sheetIndex === r.after.layoutAudit.sheetIndex &&
       r.after.layoutAudit.customCssElements === 1),
     unchangedMeasuredElements: report.widths.every(r => r.changedElements.length === 0 && r.componentChanges.length === 0),
     historyStatesVerified: !values['check-history'] || report.historyStates?.valid === true,
   };
   report.verdict = Object.values(report.checks).every(Boolean) ? 'PASS' : 'FAIL';
-  if ((values['check-layout'] || values['check-history']) && report.verdict === 'FAIL') process.exitCode = 1;
+  if ((values['check-layout'] || values['check-history'] || values['check-activity']) && report.verdict === 'FAIL') process.exitCode = 1;
   console.log(`${values.component} audit: ${report.verdict}`);
   await page.locator('style#custom_css').evaluate((style, text) => { style.textContent = text; }, liveOriginal);
   await context.close();
@@ -364,11 +375,12 @@ try {
   const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const html = `<!doctype html><meta charset="utf-8"><title>Shikimori local CSS preview</title>
 <style>body{font:16px system-ui;margin:24px;background:#171717;color:#ddd}a{color:#9bf}.pair{display:flex;gap:12px;align-items:flex-start}.pair figure{margin:0;flex:1;min-width:0}img{width:100%;height:auto}pre{white-space:pre-wrap}</style>
-<h1>Локальный предпросмотр CSS</h1><p>Стиль на сайте не изменён этим прогоном. ${report.migration ? `Только проверенный блок ${report.migration.source === HISTORY_SOURCE ? 'подписей истории' : 'раскладки'} перенесён из импорта в локальную часть; остальные импорты сохранены.` : 'Импортированная основа сохранена.'} Слева — опубликованный CSS, справа — локальная замена.</p>
+<h1>Локальный предпросмотр CSS</h1><p>Стиль на сайте не изменён этим прогоном. ${report.migration ? `Только проверенный блок ${report.migration.source === ACTIVITY_SOURCE ? 'графика активности' : report.migration.source === HISTORY_SOURCE ? 'подписей истории' : 'раскладки'} перенесён из импорта в локальную часть; остальные импорты сохранены.` : 'Импортированная основа сохранена.'} Слева — опубликованный CSS, справа — локальная замена.</p>
 <p>CSS-анимации остановлены; GIF/WebP продолжают менять кадры. Pixel diff не является автоматическим вердиктом.</p>
 <p>Совпадение модели обработки с опубликованным CSSOM: ${report.baselineCssomMatches ?? false}. <a href="report.json">Вычисленные стили и полный отчёт</a>.</p>
 <p>Аудит ${historyMode ? 'истории' : 'раскладки'}: <strong>${report.verdict ?? 'ERROR'}</strong>. ${report.historicalReplay ? 'Повторяется сохранённый CSS до публикации на текущем DOM.' : 'База сравнения — текущий опубликованный CSS.'}</p>
 ${report.historyStates ? `<p>Состояния истории: ${report.historyStates.cases.length} сравнений реального DOM и ${report.historyStates.fixtures.length} тестовых примеров; изменённых узлов: ${report.historyStates.changed}. Реальных записей ранобэ: ${report.historyStates.coverage.ranobe}.</p>` : ''}
+${report.activityStates ? `<p>График: ${report.activityStates.cases.length} сравнений фаз и состояний; изменённых узлов: ${report.activityStates.changed}. <a href="activity.html">Снимки графика и состояния</a>.</p>` : ''}
 <pre>${escape(JSON.stringify(report.checks ?? {}, null, 2))}</pre>
 ${report.error ? `<p>Ошибка: ${escape(report.error)}</p>` : ''}
 ${report.widths.map(r => `<h2>${r.width} × ${r.height}</h2><p>Изменённые ключевые элементы: ${escape(r.changedElements.join(', ') || 'нет')}. Изменённые узлы компонента: ${r.componentChanges.length}; геометрия: ${r.componentGeometryChanges.length}.</p>${['top', 'details', 'component'].map(section => `<h3>${section}</h3><div class="pair">${['before', 'after'].map(phase => `<figure><figcaption>${phase}</figcaption><a href="${r.width}-${phase}-${section}.png"><img src="${r.width}-${phase}-${section}.png"></a></figure>`).join('')}</div><p><a href="${r.width}-diff-${section}.png">Диагностическая разница</a>: ${r.pixels[section].pixels} пикселей.</p>`).join('')}`).join('')}`;
