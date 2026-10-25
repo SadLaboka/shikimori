@@ -1,0 +1,14 @@
+[
+  {
+    "source": "https://raw.githubusercontent.com/ed-main/ed-main.github.io/master/cssfiles/main_code_2.css",
+    "target": "https://raw.githubusercontent.com/ed-main/ed-main.github.io/d54e91b58c7c16def6f73e7289e29f895a984195/cssfiles/main_code_2.css",
+    "snapshot": "vendor/edesign/main_code_2.css",
+    "sha256": "da2a492ad16b7f018852b2307508a61b297bc80a191a6f22b31fdd6ac2950f18"
+  },
+  {
+    "source": "https://raw.githubusercontent.com/ed-main/ed-main.github.io/master/cssfiles/main_code_3.css",
+    "target": "https://raw.githubusercontent.com/ed-main/ed-main.github.io/d54e91b58c7c16def6f73e7289e29f895a984195/cssfiles/main_code_3.css",
+    "snapshot": "vendor/edesign/main_code_3.css",
+    "sha256": "2074e255cdd771b188dd901be7e8fcfbc74f30054d50e1e179bd74373d968556"
+  }
+]

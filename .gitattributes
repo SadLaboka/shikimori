@@ -1,0 +1,2 @@
+# Preserve byte hashes of pinned upstream snapshots across Windows checkouts.
+vendor/edesign/*.css text eol=lf

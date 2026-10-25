@@ -33,3 +33,11 @@ SHA256: `c8925ac43965cf9931ec6bddea528fef2ea57b98880431ba261ec5522cc5212b`.
 Десять правил используются в `BEGIN/END LOCAL CUSTOM POSTERS`, без новой лицензии
 на сторонний код. Снимок служит для сверки, не подключается второй копией.
 Перенос и ограничения проверки — `docs/posters-migration.md`.
+
+`edesign/main_code_2.css` и `edesign/main_code_3.css` — полные исходники ed-main,
+полученные 25 октября 2026 года из коммита
+`d54e91b58c7c16def6f73e7289e29f895a984195` репозитория
+https://github.com/ed-main/ed-main.github.io.
+Разрешённые пары URL и SHA256 — `edesign-pins.json`. Файлы служат эталонами,
+не подключаются второй копией; авторство остаётся у ed-main, новая лицензия
+на сторонний код не назначается. Подробности — `docs/edesign-foundation.md`.
