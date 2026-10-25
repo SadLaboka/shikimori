@@ -12,5 +12,12 @@
     "local": "css/base/main_code_2.css",
     "snapshot": "vendor/edesign/main_code_2.css",
     "sha256": "da2a492ad16b7f018852b2307508a61b297bc80a191a6f22b31fdd6ac2950f18"
+  },
+  {
+    "source": "https://raw.githubusercontent.com/ed-main/ed-main.github.io/d54e91b58c7c16def6f73e7289e29f895a984195/cssfiles/main_code_1.css",
+    "target": "https://raw.githubusercontent.com/SadLaboka/shikimori/dc6db3f940645bd22d13a7c5a0ae18ca7137d683/css/base/main_code_1.css",
+    "local": "css/base/main_code_1.css",
+    "snapshot": "vendor/edesign/main_code_1.css",
+    "sha256": "6418d0256c575f1244c0b0b42cb5c3cecd43b9de3cd4d2af87a84f948cb84e83"
   }
 ]
