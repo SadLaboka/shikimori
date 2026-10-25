@@ -7,7 +7,7 @@ $work = Join-Path ([IO.Path]::GetTempPath()) ('shiki-deploy-test-' + [guid]::New
 try {
     $fixture = Join-Path $work 'fixture.css'
     [IO.File]::WriteAllText($fixture, '/* Проверка UTF-8 */ body { color: blue; }')
-    . (Join-Path $repository 'scripts/deploy.ps1') -DryRun -Baseline $fixture -CssPath $fixture
+    . (Join-Path $repository 'scripts/deploy.ps1') -DryRun -Baseline $fixture -CssPath $fixture -Timings
     $transportFunction = ${function:Request-Api}
     $credentialReader = ${function:Read-Credentials}
     $diffFunction = ${function:Show-CssDiff}
@@ -154,6 +154,13 @@ try {
         throw 'Unsafe or missing HTTP error message'
     }
     Write-Host 'PASS: HTTP UTF-8, redirect policy, sanitized errors'
+    foreach ($stage in 'diff', 'api-throttle', 'api-network') {
+        if (-not $script:DeploymentTimings.Contains($stage) -or $script:DeploymentTimings[$stage] -lt 0) {
+            throw "Missing numeric timing: $stage"
+        }
+    }
+    if ((ConvertTo-Json $script:DeploymentTimings -Compress).Contains('PRIVATE_SENTINEL')) { throw 'Timing leaked an error' }
+    Write-Host 'PASS: offline and mock transport timing, including failed HTTP'
     # DPAPI round-trip with synthetic values in the disposable test directory.
     if ($IsWindows) {
         Save-Credentials @{ accessToken = 'fixture-access'; refreshToken = 'fixture-refresh'; clientSecret = 'fixture-secret' }

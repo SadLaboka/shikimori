@@ -8,6 +8,7 @@ param(
     [Parameter(ParameterSetName = 'Inspect')][string]$Baseline,
     [Parameter(ParameterSetName = 'Inspect')][Parameter(ParameterSetName = 'Publish')][switch]$CompactDiff,
     [Parameter(ParameterSetName = 'Inspect')][Parameter(ParameterSetName = 'Publish')][string]$ExpectedCssSha256,
+    [switch]$Timings,
     [string]$CssPath = (Join-Path (Split-Path $PSScriptRoot -Parent) 'styles_optimized.css'),
     [string]$ConfigPath = (Join-Path (Split-Path $PSScriptRoot -Parent) 'deploy.config.json')
 )
@@ -19,6 +20,14 @@ $ProgressPreference = 'SilentlyContinue'
 $VerbosePreference = 'SilentlyContinue'
 $DebugPreference = 'SilentlyContinue'
 $script:ApiRoot = 'https://shikimori.io'
+$script:DeploymentClock = [Diagnostics.Stopwatch]::StartNew()
+$script:DeploymentTimings = [ordered]@{}
+
+function Add-DeploymentTiming([string]$Stage, [Diagnostics.Stopwatch]$Clock) {
+    if (-not $Timings) { return }
+    if (-not $script:DeploymentTimings.Contains($Stage)) { $script:DeploymentTimings[$Stage] = 0.0 }
+    $script:DeploymentTimings[$Stage] += $Clock.Elapsed.TotalMilliseconds
+}
 
 function Read-PrivateValue([string]$Prompt) {
     $secure = Read-Host $Prompt -AsSecureString
@@ -26,8 +35,11 @@ function Read-PrivateValue([string]$Prompt) {
 }
 
 function Confirm-Action([string]$Phrase) {
+    $clock = [Diagnostics.Stopwatch]::StartNew()
+    try {
     Write-Host "Для подтверждения введите: $Phrase"
     if ((Read-Host 'Подтверждение') -cne $Phrase) { throw 'Действие отменено.' }
+    } finally { Add-DeploymentTiming 'confirmation' $clock }
 }
 
 function Get-PrivateDirectory {
@@ -76,9 +88,13 @@ function Request-Api([string]$Method, [string]$Path, $Body = $null, [string]$Tok
         $request.ContentType = 'application/json; charset=utf-8'
         $request.Body = [Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $Body -Depth 6 -Compress))
     }
+    $networkClock = $null
     try {
         # Sequential requests, below the published 5 rps / 90 rpm limits.
+        $throttleClock = [Diagnostics.Stopwatch]::StartNew()
         Start-Sleep -Milliseconds 750
+        Add-DeploymentTiming 'api-throttle' $throttleClock
+        $networkClock = [Diagnostics.Stopwatch]::StartNew()
         return Invoke-RestMethod @request
     } catch {
         $status = 'network'
@@ -86,6 +102,8 @@ function Request-Api([string]$Method, [string]$Path, $Body = $null, [string]$Tok
             $status = [int]$_.Exception.Response.StatusCode
         }
         throw "Запрос $Method $Path не завершён успешно (HTTP $status). Секреты и ответ сервера скрыты."
+    } finally {
+        if ($null -ne $networkClock) { Add-DeploymentTiming 'api-network' $networkClock }
     }
 }
 
@@ -175,6 +193,8 @@ function Get-DiffDirectory {
 }
 
 function Show-CssDiff([string]$BeforePath, [string]$AfterPath) {
+    $clock = [Diagnostics.Stopwatch]::StartNew()
+    try {
     if (-not (Get-Command git -ErrorAction SilentlyContinue)) { throw 'Для построчного diff необходим Git.' }
     $lines = @(& git --no-pager diff --no-index --no-ext-diff --no-textconv -- $BeforePath $AfterPath)
     if ($LASTEXITCODE -notin 0, 1) { throw 'Не удалось построить diff. Публикация запрещена.' }
@@ -194,6 +214,7 @@ function Show-CssDiff([string]$BeforePath, [string]$AfterPath) {
     if ($preview.Length -gt 6000) { $preview = $preview.Substring(0, 6000) }
     Write-Host $preview
     if ($truncated) { Write-Host 'Вывод сокращён; перед подтверждением прочитайте полный diff.' }
+    } finally { Add-DeploymentTiming 'diff' $clock }
 }
 
 function Invoke-Deployment {
@@ -278,4 +299,10 @@ try {
     # All HTTP errors are sanitized in Request-Api; do not print ErrorRecord/stack/request.
     Write-Host ('Остановлено: ' + $_.Exception.Message) -ForegroundColor Red
     throw 'Операция не завершена. Смотрите безопасное сообщение выше.'
+} finally {
+    if ($Timings) {
+        $summary = [ordered]@{ total = [math]::Round($script:DeploymentClock.Elapsed.TotalMilliseconds) }
+        foreach ($stage in $script:DeploymentTimings.Keys) { $summary[$stage] = [math]::Round($script:DeploymentTimings[$stage]) }
+        Write-Host ('Timing (ms): ' + (ConvertTo-Json $summary -Compress))
+    }
 }
