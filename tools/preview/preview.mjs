@@ -12,6 +12,7 @@ import { auditLayout, auditHistory, auditActivity, auditPosters } from './audit.
 import { checkHistoryStates } from './history-states.mjs';
 import { checkActivityStates } from './activity-states.mjs';
 import { checkPosterStates } from './poster-states.mjs';
+import { CATALOG_URL, installCatalogTheme, ensureCatalogFilters, checkFilterStates, isCatalogPagination, isCatalogAdRequest } from './filter-states.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const { values } = parseArgs({ options: {
@@ -23,15 +24,18 @@ const { values } = parseArgs({ options: {
   'check-layout': { type: 'boolean', default: false },
   component: { type: 'string', default: 'profile' },
   'check-history': { type: 'boolean', default: false },
+  'check-filters': { type: 'boolean', default: false },
   'baseline-css': { type: 'string' }, 'baseline-compiled': { type: 'string' },
 } });
-if (!['profile','history'].includes(values.component)) throw new Error('Component must be profile or history.');
+if (!['profile','history','catalog'].includes(values.component)) throw new Error('Component must be profile, history or catalog.');
 const posterMode = values['check-posters'];
 const historyMode = values.component === 'history';
-if (posterMode && historyMode) throw new Error('--check-posters requires the profile page.');
-if (values['check-activity'] && historyMode) throw new Error('--check-activity requires the profile page.');
+const catalogMode = values.component === 'catalog';
+if (posterMode && values.component!=='profile') throw new Error('--check-posters requires the profile page.');
+if (values['check-activity'] && values.component!=='profile') throw new Error('--check-activity requires the profile page.');
 if (values['check-history'] && !historyMode) throw new Error('--check-history requires --component history.');
-if (values['check-layout'] && historyMode) throw new Error('--check-layout requires the real profile component.');
+if (values['check-layout'] && values.component!=='profile') throw new Error('--check-layout requires the real profile component.');
+if (values['check-filters'] && !catalogMode) throw new Error('--check-filters requires --component catalog.');
 if (Boolean(values['baseline-css']) !== Boolean(values['baseline-compiled'])) {
   throw new Error('Historical replay requires both --baseline-css and --baseline-compiled.');
 }
@@ -53,9 +57,14 @@ const output = path.join(root, '.preview', run);
 await mkdir(output, { recursive: true });
 const hash = s => createHash('sha256').update(s).digest('hex');
 const PROFILE = 'https://shikimori.io/SadLaboka';
-const PAGE = historyMode ? `${PROFILE}/history` : PROFILE;
+const PAGE = catalogMode ? CATALOG_URL : historyMode ? `${PROFILE}/history` : PROFILE;
+const SOURCE_PAGE = catalogMode ? PROFILE : PAGE;
 const STYLE = 'https://shikimori.io/api/styles/1343722';
-const selectors = historyMode ? {
+const selectors = catalogMode ? {
+  catalog: '.l-content .cc-entries', firstCard: '.l-content .b-catalog_entry',
+  filters: '.b-collection-filters', filtersHead: '.c-filters-head',
+  control: '.c-ms-control', rating: '.c-ms[data-field="rating"]',
+} : historyMode ? {
   page: '.l-page', history: '.history-page', firstEntry: '.history-page span > a',
 } : {
   page: '.l-page', head: '.profile-head', content: '.profile-content',
@@ -71,7 +80,7 @@ if(values['local-imports'] && !activeOwned.length) throw new Error('--local-impo
 const report = {
   sourceMode: values['local-imports'] ? 'local-owned-imports' : 'remote-imports',
   profile: PAGE, component: values.component, created: new Date().toISOString(), localHash: hash(local),
-  mode: 'replace-user-section-in-existing-style-element', engine: 'chromium',
+  mode: catalogMode ? 'replace-profile-theme-in-catalog-style-element' : 'replace-user-section-in-existing-style-element', engine: 'chromium',
   warnings: [
     'Fresh anonymous browser context; no user cookies, tokens or storageState.',
     'CSS animations paused at time 0; transitions disabled equally before and after.',
@@ -107,7 +116,7 @@ async function settle(page) {
 }
 
 async function warmup(page) {
-  for (const selector of ['.solid', '.activity', '.cc-favourites', '.achievements', '.l-footer']) {
+  for (const selector of catalogMode ? [] : ['.solid', '.activity', '.cc-favourites', '.achievements', '.l-footer']) {
     const element = page.locator(selector).first();
     if (await element.count() && await element.isVisible()) {
       // Some responsive blocks are hidden; CSS animations can also prevent Playwright's
@@ -177,8 +186,8 @@ async function computed(page) {
 }
 
 async function layoutState(page) {
-  return page.evaluate(historyMode => {
-    const elements = [...document.querySelectorAll(historyMode ? '.history-page, .history-page *' : '.profile-content > .cc-2, .profile-content > .cc-2 *')];
+  return page.evaluate(({historyMode,catalogMode}) => {
+    const elements = [...document.querySelectorAll(catalogMode ? '.b-collection-filters, .b-collection-filters *, .l-content .b-catalog_entry, .l-content .b-catalog_entry *' : historyMode ? '.history-page, .history-page *' : '.profile-content > .cc-2, .profile-content > .cc-2 *')];
     return elements.map((el, index) => {
       const rect = el.getBoundingClientRect();
       const style = getComputedStyle(el);
@@ -186,35 +195,43 @@ async function layoutState(page) {
         rect: { x: rect.x + scrollX, y: rect.y + scrollY, width: rect.width, height: rect.height },
         // All resolved CSS properties, including rules inherited from later imports.
         style: Object.fromEntries([...style].map(property => [property, style.getPropertyValue(property)])),
-        ...(historyMode ? { pseudos: Object.fromEntries(['::before','::after'].map(p => { const cs=getComputedStyle(el,p); return [p,
+        ...(historyMode||catalogMode ? { pseudos: Object.fromEntries(['::before','::after'].map(p => { const cs=getComputedStyle(el,p); return [p,
           Object.fromEntries(['content','display','width','height','color','border','margin-right','border-radius','position','filter'].map(k=>[k,cs.getPropertyValue(k)]))]; })) } : {}) };
     });
-  }, historyMode);
+  }, {historyMode,catalogMode});
 }
 
-async function capture(page, width, phase) {
+async function capture(page, width, phase, css) {
+  if(catalogMode) await ensureCatalogFilters(page);
   const assets = await warmup(page);
+  if(catalogMode){
+    await installCatalogTheme(page,css);
+    await ensureCatalogFilters(page);
+  }
   await page.evaluate(() => scrollTo(0, 0));
   await settle(page);
   const state = await computed(page);
+  if(catalogMode && Object.values(state.elements).some(el=>el.missing))throw new Error('Required catalogue measurement target is missing.');
   const component = await layoutState(page);
   const layoutAudit = await auditLayout(page, referenceLayout);
   const historyAudit = await auditHistory(page, referenceHistory, referencePosters);
   const activityAudit = await auditActivity(page, referenceActivity);
   const posterAudit = await auditPosters(page, referencePosters);
   if (historyMode && await page.locator('.history-page span > a').count() === 0) throw new Error('History component has no real targets.');
+  if (catalogMode && (!await page.locator('.l-content .b-catalog_entry').count() || !await page.locator('.c-ms-control').first().isVisible())) throw new Error('Catalog component has no visible real targets.');
   // Already paused by settle(). 'disabled' would finish finite effects and fire
   // animationend, changing the page between the before/after measurements.
   await page.screenshot({ path: path.join(output, `${width}-${phase}-top.png`), animations: 'allow' });
-  await page.locator(historyMode ? '.history-page' : '.cc-favourites').first().evaluate(el => el.scrollIntoView({ block: 'start', behavior: 'instant' }));
+  const detailSelector=catalogMode ? '.l-content' : historyMode ? '.history-page' : '.cc-favourites';
+  await page.locator(detailSelector).first().evaluate(el => el.scrollIntoView({ block: 'start', behavior: 'instant' }));
   // Align the section heading near the top, rather than relying on its old page Y coordinate.
-  await page.evaluate(historyMode => {
-    const element = document.querySelector(historyMode ? '.history-page' : '.cc-favourites');
+  await page.evaluate(selector => {
+    const element = document.querySelector(selector);
     scrollTo(0, element.getBoundingClientRect().top + scrollY - 110);
-  }, historyMode);
+  }, detailSelector);
   await settle(page);
   await page.screenshot({ path: path.join(output, `${width}-${phase}-details.png`), animations: 'allow' });
-  const layout = page.locator(historyMode ? '.history-page' : '.profile-content > .cc-2').first();
+  const layout = page.locator(catalogMode ? '.b-collection-filters' : historyMode ? '.history-page' : '.profile-content > .cc-2').first();
   await layout.evaluate(el => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
   await settle(page);
   if (historyMode) await page.screenshot({ path: path.join(output, `${width}-${phase}-component.png`), animations: 'allow' });
@@ -253,6 +270,14 @@ try {
     deviceScaleFactor: 1, serviceWorkers: 'block' });
   await context.route('**/*', async route => {
     const request = route.request();
+    if(catalogMode && isCatalogAdRequest(request.url(),request.resourceType())){
+      report.blockedRequests.catalogAds=(report.blockedRequests.catalogAds??0)+1;
+      return route.abort();
+    }
+    if(catalogMode && isCatalogPagination(request.url())){
+      report.blockedRequests.catalogPagination=(report.blockedRequests.catalogPagination??0)+1;
+      return route.abort();
+    }
     if (!['GET', 'HEAD'].includes(request.method())) {
       report.blockedRequests[request.method()] = (report.blockedRequests[request.method()] ?? 0) + 1;
       return route.abort();
@@ -276,9 +301,9 @@ try {
   report.localEqualsPublishedSource = local === publishedSource;
   const page = await context.newPage();
   page.setDefaultTimeout(20000);
-  await page.goto(PAGE, { waitUntil: 'domcontentloaded' });
+  await page.goto(SOURCE_PAGE, { waitUntil: 'domcontentloaded' });
   await page.locator('style#custom_css').waitFor({ state: 'attached' });
-  if (new URL(page.url()).pathname !== new URL(PAGE).pathname) throw new Error('Component navigation was redirected.');
+  if (new URL(page.url()).pathname !== new URL(SOURCE_PAGE).pathname) throw new Error('Component navigation was redirected.');
   const liveOriginal = await page.locator('style#custom_css').textContent();
   const original = values['baseline-compiled']
     ? await readFile(path.resolve(root, values['baseline-compiled']), 'utf8') : liveOriginal;
@@ -354,23 +379,34 @@ try {
   await writeFile(path.join(output, 'published-compiled.css'), original);
   await writeFile(path.join(output, 'candidate-compiled.css'), replacement);
   await writeFile(path.join(output, 'local-source.css'), local);
+  if(catalogMode)report.catalogTheme={source:PROFILE,target:PAGE,viewports:[]};
   await page.addStyleTag({ content: freeze });
   for (const width of widths) {
     const height = width >= 1024 ? 900 : 844;
     await page.setViewportSize({ width, height });
+    if(catalogMode){
+      // A fresh catalogue document avoids carrying its JS responsive-menu state
+      // from the previous viewport into the baseline measurement.
+      const response=await page.goto(PAGE,{waitUntil:'load'});
+      if(!response?.ok())throw new Error(`Catalog GET failed: HTTP ${response?.status()}`);
+      if(new URL(page.url()).pathname!==new URL(PAGE).pathname)throw new Error('Catalog navigation was redirected.');
+      await page.locator('.c-ms-control').first().waitFor({state:'attached'});
+      report.catalogTheme.viewports.push({width,...await installCatalogTheme(page,original)});
+      await page.addStyleTag({content:freeze});
+    }
     // Force a real baseline style recalculation too: assigning identical text may
     // reuse Blink's initial resolved auto-margin cache while the candidate reparses.
     await page.locator('style#custom_css').evaluate((style,text)=>{style.textContent=text+'\n/* preview baseline recalculation */';}, original);
     await settle(page);
     // Replace text in the SAME element at the SAME cascade position. Never append candidate CSS.
     await page.locator('style#custom_css').evaluate((style, text) => { style.textContent = text; }, original);
-    const before = await capture(page, width, 'before');
+    const before = await capture(page, width, 'before', original);
     await page.locator('style#custom_css').evaluate((style, text) => { style.textContent = text; }, replacement);
     const applied = await page.locator('style#custom_css').textContent();
     if (splitCompiled(applied).foundation !== planned.foundation || applied !== replacement) {
       throw new Error('Foundation preservation or replacement integrity failed.');
     }
-    const after = await capture(page, width, 'after');
+    const after = await capture(page, width, 'after', replacement);
     const changes = Object.keys(selectors).filter(key =>
       JSON.stringify(before.state.elements[key]) !== JSON.stringify(after.state.elements[key]));
     const indices = Array.from({ length: Math.max(before.component.length, after.component.length) }, (_, i) => i);
@@ -406,6 +442,7 @@ try {
     report.posterStates = await checkPosterStates({context, page, baseline: original, candidate: replacement,
       widths: widths.filter(w=>[1440,390,360].includes(w)), output});
   }
+  if(values['check-filters']) report.filterStates=await checkFilterStates({page,baseline:original,candidate:replacement,widths,output});
   report.checks = {
     ownedImportsVerified: report.ownedImports.length===activeOwned.length && report.ownedImports.every(row=>row.verified),
     versionPinsVerified: report.versionPins.length === activePins.length && report.versionPins.every(pin=>pin.verified),
@@ -425,9 +462,10 @@ try {
       r.after.layoutAudit.customCssElements === 1),
     unchangedMeasuredElements: report.widths.every(r => r.changedElements.length === 0 && r.componentChanges.length === 0),
     historyStatesVerified: !values['check-history'] || report.historyStates?.valid === true,
+    filterStatesVerified: !values['check-filters'] || report.filterStates?.valid === true,
   };
   report.verdict = Object.values(report.checks).every(Boolean) ? (values['local-imports'] ? 'LOCAL PASS' : 'PASS') : 'FAIL';
-  if ((values['check-layout'] || values['check-history'] || values['check-activity'] || posterMode) && report.verdict === 'FAIL') process.exitCode = 1;
+  if ((catalogMode || values['check-layout'] || values['check-history'] || values['check-activity'] || values['check-filters'] || posterMode) && report.verdict === 'FAIL') process.exitCode = 1;
   console.log(`${values.component} audit: ${report.verdict}`);
   await page.locator('style#custom_css').evaluate((style, text) => { style.textContent = text; }, liveOriginal);
   await context.close();
@@ -442,9 +480,11 @@ try {
   const html = `<!doctype html><meta charset="utf-8"><title>Shikimori local CSS preview</title>
 <style>body{font:16px system-ui;margin:24px;background:#171717;color:#ddd}a{color:#9bf}.pair{display:flex;gap:12px;align-items:flex-start}.pair figure{margin:0;flex:1;min-width:0}img{width:100%;height:auto}pre{white-space:pre-wrap}</style>
 <h1>Локальный предпросмотр CSS</h1>${values['local-imports'] ? '<p><strong>Локальная копия модуля и Git-коммит проверены. Удалённый URL не проверен; этот результат не подтверждает готовность публикации.</strong></p>' : ''}<p>Стиль на сайте не изменён этим прогоном. ${report.migration ? `Только проверенный блок ${report.migration.source === POSTERS_SOURCE ? 'механизма постеров' : report.migration.source === ACTIVITY_SOURCE ? 'графика активности' : report.migration.source === HISTORY_SOURCE ? 'подписей истории' : 'раскладки'} перенесён из импорта в локальную часть; остальные импорты сохранены.` : 'Импортированная основа сохранена.'} Слева — опубликованный CSS, справа — локальная замена.</p>
+${catalogMode ? '<p>Настоящий анонимный каталог: опубликованная тема профиля и кандидат временно заменяют его реальный custom_css slot. Настройки аккаунта не меняются.</p>' : ''}
 <p>CSS-анимации остановлены; GIF/WebP продолжают менять кадры. Pixel diff не является автоматическим вердиктом.</p>
 <p>Совпадение модели обработки с опубликованным CSSOM: ${report.baselineCssomMatches ?? false}. <a href="report.json">Вычисленные стили и полный отчёт</a>.</p>
-<p>Аудит ${historyMode ? 'истории' : 'раскладки'}: <strong>${report.verdict ?? 'ERROR'}</strong>. ${report.historicalReplay ? 'Повторяется сохранённый CSS до публикации на текущем DOM.' : 'База сравнения — текущий опубликованный CSS.'}</p>
+<p>Аудит ${catalogMode ? 'каталога' : historyMode ? 'истории' : 'раскладки'}: <strong>${report.verdict ?? 'ERROR'}</strong>. ${report.historicalReplay ? 'Повторяется сохранённый CSS до публикации на текущем DOM.' : 'База сравнения — текущий опубликованный CSS.'}</p>
+${report.filterStates ? `<p>Фильтры реального каталога: ${report.filterStates.cases.length} проверок; <a href="filters.html">состояния и снимки</a>.</p>` : ''}
 ${report.historyStates ? `<p>Состояния истории: ${report.historyStates.cases.length} сравнений реального DOM и ${report.historyStates.fixtures.length} тестовых примеров; изменённых узлов: ${report.historyStates.changed}. Реальных записей ранобэ: ${report.historyStates.coverage.ranobe}.</p>` : ''}
 ${report.activityStates ? `<p>График: ${report.activityStates.cases.length} сравнений фаз и состояний; изменённых узлов: ${report.activityStates.changed}. <a href="activity.html">Снимки графика и состояния</a>.</p>` : ''}
 ${report.posterStates ? `<p>Постеры: ${report.posterStates.cases.length} проверок; <a href="posters.html">страницы, состояния и снимки</a>.</p>` : ''}
