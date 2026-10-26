@@ -107,6 +107,7 @@ const report = {
   profile: PAGE, component: values.component, created: new Date().toISOString(), localHash: hash(local),
   mode: catalogMode ? 'replace-profile-theme-in-catalog-style-element' : 'replace-user-section-in-existing-style-element', engine: 'chromium',
   warnings: [
+    'Third-party and fullscreen-ad scripts are isolated on every page; ad behavior is outside scope.',
     'Fresh anonymous browser context; no user cookies, tokens or storageState.',
     'CSS animations paused at time 0; transitions disabled equally before and after.',
     'Animated GIF/WebP frames are NOT frozen. Pixel differences are diagnostic, not a pass/fail verdict.',
@@ -293,8 +294,8 @@ try {
     deviceScaleFactor: 1, serviceWorkers: 'block' });
   await context.route('**/*', async route => {
     const request = route.request();
-    if(catalogMode && isCatalogAdRequest(request.url(),request.resourceType())){
-      report.blockedRequests.catalogAds=(report.blockedRequests.catalogAds??0)+1;
+    if(isCatalogAdRequest(request.url(),request.resourceType())){
+      report.blockedRequests.isolatedScripts=(report.blockedRequests.isolatedScripts??0)+1;
       return route.abort();
     }
     if(catalogMode && isCatalogPagination(request.url())){
