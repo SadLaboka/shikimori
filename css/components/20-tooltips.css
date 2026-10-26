@@ -1,0 +1,11 @@
+/* Принудительно скрываем стандартные всплывающие подсказки (Tipsy) на странице профиля, 
+   чтобы они не дублировали текст из твоей выезжающей шторки */
+body#profiles_show .tipsy,
+.p-profiles-show .tipsy {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+}
+

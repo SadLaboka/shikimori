@@ -1,0 +1,242 @@
+/*-------------------------------------------------------------------------Ачивки---------------------------------------------------------------------*/
+#profiles_show .cc-achievements {
+ flex-wrap: wrap;
+}
+
+#profiles_show .achievements .c-column:nth-child(1) .cc-achievements .b-achievement, #profiles_show .achievements .c-column:nth-child(2) .cc-achievements .b-achievement {
+ width: 49%;
+}
+
+
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge:nth-child(5),
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge:nth-child(6),
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge:nth-child(7),
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge:nth-child(8){
+ display: inline-block !important;
+}
+
+.c-column:has(.cc-authors) { display: none; }
+
+.c-column:has(.cc-franchises) { width: 100% !important; }
+
+.cc-franchises {
+ display: grid !important;
+ grid-template-columns: repeat(4, 1fr);
+ grid-gap: 16px;
+}
+
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge {
+ width: 100% !important;
+ margin: 0 !important;
+ right: 0 !important;
+}
+
+
+
+/* Картинки ачивок */
+@media { /* Пустой медиа-запрос */ }
+
+.p-profiles .b-achievement > .c-image > .inner:after {
+  display: block;
+  content: '';
+  background-size: cover !important;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: visible !important;
+  z-index: -1;
+}
+
+
+
+/* Для Общих, Жанровых, Авторов */
+
+.p-profiles .b-achievement[data-hint^='300 просмотренных аниме'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='300 просмотренных аниме'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='300 просмотренных аниме'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-2-a2a0a28bec_slif4g.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='400 просмотренных аниме'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='400 просмотренных аниме'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='400 просмотренных аниме'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-2-a2a0a28bec_slif4g.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='500 просмотренных аниме'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='500 просмотренных аниме'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='500 просмотренных аниме'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-2-a2a0a28bec_slif4g.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Длиннотайтлы'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Длиннотайтлы'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Длиннотайтлы'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462093/ezgif-6-bc535ef564_jotcxf.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Генки'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Генки'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Генки'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462102/ezgif-2500addbd95a964c_gyxeki.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Комедия'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Комедия'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Комедия'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462089/ezgif-3-46249482d0_rhmgyi.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Историческое'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Историческое'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Историческое'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462089/ezgif-5-c63124b016_nnldxb.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Фэнтези'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Фэнтези'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Фэнтези'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462100/ezgif-2aafa23ddde327f8_hqkspy.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Военное'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Военное'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Военное'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462092/ezgif-24a49b8ba1f73140_vqoz8q.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Фантастика'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Фантастика'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Фантастика'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462101/ezgif-2793fb783ff3af19_w5sosw.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Хоррор'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Хоррор'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Хоррор'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-5-c585253462_uxintc.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Романтика'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Романтика'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Романтика'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462096/ezgif-5-5b1d32ae00_o3vprz.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Драма'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Драма'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Драма'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462093/ezgif-5-64cdf8728a_nudzfi.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Безумие / Психологическое'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Безумие / Психологическое'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Безумие / Психологическое'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462097/ezgif-228c209b4af243_rcxisr.webp);
+}
+
+
+/* Франшизы */
+/* 1. Базовые стили контейнера (возвращаем кликабельность) */
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge {
+  position: relative !important;
+  overflow: hidden !important;
+  pointer-events: auto !important; /* Перебиваем pointer-events: none из твоих стилей */
+  cursor: pointer;
+  display: inline-block !important;
+}
+
+/* 2. Оригинальные картинки делаем прозрачными. 
+      ВАЖНО: именно opacity: 0, чтобы они продолжали занимать место 
+      и не давали блоку схлопнуться в 0 пикселей! */
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge img {
+  display: block !important;
+  opacity: 0 !important; 
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* 3. Фоновые картинки через ::before */
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 2 !important;
+  border-radius: 8px !important;
+}
+
+/* 4. Шторка с текстом через ::after */
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge::after {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  
+  background: rgba(0, 0, 0, 0.85) !important;
+  color: #fff !important;
+  
+  padding: 8px 6px !important;
+  text-align: center !important;
+  font-size: 11px !important;
+  font-weight: bold !important;
+  line-height: 1.3 !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  
+  transform: translateY(100%) !important;
+  transition: transform 0.3s ease !important;
+  z-index: 10 !important;
+  pointer-events: none !important; /* Пропускаем клики сквозь шторку к самой ссылке */
+}
+
+/* 5. При наведении шторка плавно выезжает снизу */
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge:hover::after {
+  transform: translateY(0) !important;
+}
+
+/* 6. Привязываем ФОНОВЫЕ КАРТИНКИ к уникальному URL каждой франшизы */
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mob_psycho"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462100/ezgif-2fb6b6e6e1c264f1_fhjs8z.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="overlord"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781644102/ezgif-296258fb46ef33f9_rgj8hp.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mushoku_tensei"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462102/ezgif-24d3525415e5aaa7_ucewg6.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="kaguya_sama"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781642843/ezgif-83c6562aba12d4e6_xlhdes.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="danmachi"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781643791/ezgif-2bfefb29c69512bc_ggqnmu.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="gintama"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462094/ezgif-225799239b961b02_w9dsg7.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="hajime_no_ippo"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781643916/ezgif-201c95d9c469f304_sqxmyw.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="kingdom"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462095/ezgif-1-46d69f5544_yrnxdi.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mushishi"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462090/ezgif-5-6373b1c81e_prtthi.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="konosuba"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462097/ezgif-5-ce8fac38a3_saabib.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="bleach"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462094/ezgif-243d112cb0d1e5e2_phxvaj.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="bakuman"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462099/ezgif-5-fafca6e508_eohezg.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="quanzhi_fashi"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781644837/ezgif-8522f1b6635790c4_sozf3b.webp) !important; }
+
+
+/* 7. Привязываем ТЕКСТ для шторки по уникальному URL */
+
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mob_psycho"]::after { content: "Моб Психо 100" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="overlord"]::after { content: "Повелитель" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mushoku_tensei"]::after { content: "Реинкарнация безработного" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="kaguya_sama"]::after { content: "Госпожа Кагуя: в любви как на войне" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="danmachi"]::after { content: "Разве плохо искать себе пару в подземелье?" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="gintama"]::after { content: "Гинтама" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="hajime_no_ippo"]::after { content: "Первый шаг" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="kingdom"]::after { content: "Царство" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mushishi"]::after { content: "Мастер муши" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="konosuba"]::after { content: "Этот замечательный мир!" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="bleach"]::after { content: "Блич" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="bakuman"]::after { content: "Бакуман" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="quanzhi_fashi"]::after { content: "Маг на полную ставку" !important; }
+
+

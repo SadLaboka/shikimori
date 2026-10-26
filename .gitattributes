@@ -8,3 +8,6 @@ css/base/*.css text eol=lf
 css/base/main_code_1.css whitespace=-blank-at-eol
 # Preserve the byte-identical main4 snapshot as well.
 css/base/main_code_4mob.css whitespace=-blank-at-eol
+# Source components and deployment output must concatenate identically on Windows.
+css/components/*.css text eol=lf
+styles_optimized.css text eol=lf

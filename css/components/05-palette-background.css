@@ -1,0 +1,58 @@
+body {
+background: rgba(0, 0, 0, 0.4);
+}
+
+body:after {
+background-color: black;
+}
+@media (min-width: 1280px) {
+body:after {
+  background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781461880/ezgif-4c18dc226bcfa80a_croiuj.webp), url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781508170/ezgif-3665fe919cd9a076_stw83p.webp);
+  background-size: contain, contain;
+  background-position: left center, right center;
+  background-color: black;
+}
+}
+*/
+.l-footer:after {
+  content: "*Dark Forest*";
+}
+
+html:root {
+--white-color: 255, 255, 255;
+    --light-color: 199, 199, 199;
+    --dark-color: 171, 171, 171;
+    --bright-color: 74, 81, 199;
+    --dull-color: 134, 102, 96;
+    --input-color: 102, 102, 102;
+    --hover-bottoms-1: 25, 18, 17;
+    --buttoms-color: 25, 24, 23;
+    --hover-buttoms-2: 153, 0, 62;
+    --very-high-rating: 244, 6, 151;
+    --high-rating: 153, 0, 62;
+    --average-rating: 30, 38, 185;
+    --small-rating: 1, 4, 75;
+    --time-filled: 153, 0, 62;
+    --time-empty: 25, 23, 23;
+    --anime-inprocess: 1, 4, 75;
+    --anime-complete: 30, 38, 185;
+    --manga-inprocess: 189, 15, 86;
+    --manga-complete: 153, 0, 62;
+    --hover-color: 153, 0, 62;
+    --shadows-color: 0, 0, 0;
+    --block-color: 20, 20, 20;
+    --menu-back: 9, 9, 9;
+    --nick-cover: 84, 23, 23;
+    --popup-color: 153, 0, 62;
+    --hundred: 1;
+}
+
+
+a {
+	color: rgba(var(--bright-color), 1);
+}
+
+.p-profiles .profile-head .c-brief .avatar .profile-actions {
+ margin-left: 12px;
+}
+

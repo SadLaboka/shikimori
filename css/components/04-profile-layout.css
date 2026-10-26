@@ -1,0 +1,54 @@
+/* BEGIN LOCAL PROFILE LAYOUT
+   Source: CSS-club, https://css-club.web.app/css/profile-content-layout-v1.css
+   Upstream snapshot: vendor/profile-content-layout-v1.css.
+   Kept verbatim for the first migration; original breakpoint and specificity preserved.
+*/
+@media screen and (min-width: 768px) {
+  #profiles_show .profile-content > .cc-2 > .c-column {
+    width: 100%;
+  }
+
+  #profiles_show .profile-content > .cc-2 > .c-left {
+    width: 77%;
+    padding-right: 30px;
+    margin-right: 0;
+  }
+
+  #profiles_show .profile-content .lifetime {
+    margin-bottom: 15px;
+  }
+
+  #profiles_show .profile-content > .cc-2 > .c-right {
+    position: static;
+    float: none;
+  }
+
+  #profiles_show .profile-content > .cc-2 > .c-right > .cc-2a {
+    width: 23%;
+    overflow: hidden;
+  }
+
+  #profiles_show .profile-content > .cc-2 > .c-right > .cc-2a > .c-column {
+    width: 100%;
+    margin: 0;
+  }
+
+  #profiles_show .profile-content > .cc-2 > .c-right > .cc-2a > :last-child {
+    margin-top: 15px;
+  }
+
+  #profiles_show .profile-content > .cc-2 > .c-right > .block {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  #profiles_show .profile-content .activity .graph.x26 {
+    display: none;
+  }
+
+  #profiles_show .profile-content .activity .graph.x34 {
+    display: block;
+  }
+}
+/* END LOCAL PROFILE LAYOUT */
+

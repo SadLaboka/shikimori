@@ -1,0 +1,42 @@
+/*-------------------------------------------------------------------------------Поиск----------------------------------------------------------------*/
+/* Пульсация маркера поиска */
+.search-marker {
+    display: inline-block;
+    color: rgba(var(--light-color), 0.8);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/* Комбинированная анимация */
+.global-search input[type="text"] {
+    transition: all 0.3s ease;
+    border: 2px solid rgba(var(--light-color), 0.5);
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+.global-search input[type="text"]:focus {
+    border-color: rgba(var(--hover-color), 1);
+    box-shadow: 0 0 8px rgba(var(--hover-color), 0.7), 0 0 20px rgba(var(--hover-color), 0.5);
+    animation: combined-animation 1.5s infinite;
+}
+
+@keyframes combined-animation {
+    0%, 100% {
+        border-color: rgba(var(--hover-color), 1);
+        box-shadow: 0 0 8px rgba(var(--hover-color), 0.7), 0 0 20px rgba(var(--hover-color), 0.5);
+    }
+    50% {
+        border-color: rgba(var(--bright-color), 1);
+        box-shadow: 0 0 12px rgba(var(--bright-color), 1), 0 0 30px rgba(var(--bright-color), 0.8);
+    }
+}
+

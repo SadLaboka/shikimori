@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "parts": [
+    "components/00-custom-posters.css",
+    "components/01-foundation.css",
+    "components/02-activity-graph.css",
+    "components/03-history.css",
+    "components/04-profile-layout.css",
+    "components/05-palette-background.css",
+    "components/06-scrollbars.css",
+    "components/07-header.css",
+    "components/08-profile-identity.css",
+    "components/09-section-headings.css",
+    "components/10-profile-top.css",
+    "components/11-entry-avatar.css",
+    "components/12-profile-content.css",
+    "components/13-list-progress.css",
+    "components/14-search.css",
+    "components/15-comments.css",
+    "components/16-achievements.css",
+    "components/17-favorites.css",
+    "components/18-rendering.css",
+    "components/19-filters.css",
+    "components/20-tooltips.css",
+    "components/21-mobile.css"
+  ]
+}

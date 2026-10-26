@@ -1,0 +1,44 @@
+/*----------------------------------------------------------------------------sign in-----------------------------------------------------------------*/
+.l-top_menu-v2 .menu-icon.sign_in {
+   overflow: visible;
+   animation: logo_animation 6s linear infinite;
+   outline: none;
+}
+.l-top_menu-v2 .menu-icon.sign_in:after {
+  font-size: 18px;
+  font-weight: 500;
+  -webkit-box-reflect: below 1px linear-gradient(transparent, #0008);
+  line-height: 0.70em;
+  font-family: "Rubik Spray Paint", system-ui;  
+}
+}
+
+
+/*---------------------------------------------------------------------------Gif-аватар----------------------------------------------------------------*/
+.p-profiles .profile-head .avatar, .p-user_rates-index .l-menu .avatar {
+  position: relative;
+}
+
+.p-profiles .profile-head .avatar::before, .p-user_rates-index .l-menu .avatar::before {
+  content: "";
+  position: absolute;
+  margin-left: 18px;
+  margin-top: 20px;
+  inset: 0;
+  max-width: 160px;
+  max-height: 160px;
+  background: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462729/ezgif-68bfaf998569b54e_fz0j2z.webp") center / cover;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.p-user_rates-index .l-menu .avatar::before {
+  margin-left: 48px;
+  background: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-7-234e06a3f3_ggpnpq.webp") center / cover;
+}
+
+.p-profiles .profile-head .avatar img, .p-user_rates-index .l-menu .avatar img {
+  opacity: 0;
+}
+
+

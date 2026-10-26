@@ -1,0 +1,73 @@
+/*---------------------------------------------------------------------------Активность----------------------------------------------------------------*/
+#profiles_show > section > div > div.profile-head > div.c-info > div.c-additionals {
+ display: none;
+}
+
+
+/*----------------------------------------------------------------------Обо мне заголовок--------------------------------------------------------------*/
+.profile-content .about.block > div { display: none; }
+
+/*---------------------------------------------------------------------------sadlaboka-----------------------------------------------------------------*/
+.p-profiles .profile-head .c-brief header.head .aliases {
+  font-size: 0 !important;
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781560382/ezgif-2b7144768c04a2ad_podvfl.webp);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 72px;
+  
+  /* Плавная анимация увеличения */
+  transition: transform 0.4s ease;
+  transform-origin: center center;
+}
+
+.p-profiles .profile-head .c-brief header.head .notice {
+  text-align: center;
+  
+  /* Плавное появление и исчезновение */
+  transition: opacity 0.4s ease;
+  opacity: 1;
+}
+
+/* Эффекты при наведении на заголовок */
+.p-profiles .profile-head .c-brief header.head:hover .aliases {
+  transform: scale(1.4); /* Увеличение на 40% - подберите значение под себя */
+}
+
+.p-profiles .profile-head .c-brief header.head:hover .notice {
+  opacity: 0; /* Плавно исчезает */
+}
+
+/*------------------------------------------------------------------------------Блоки------------------------------------------------------------------*/
+.profile-content.profile-content.profile-content {
+ display: flex;
+ flex-direction: column;
+}
+
+
+.block.cc-2 {
+ order: 2;
+ margin-top: 2px;
+}
+/*----------------------------------------------------------------------------Обо мне------------------------------------------------------------------*/
+.block.about {
+  order: 1;
+}
+.block.achievements {
+margin-top: 6px;
+order: 3;
+}
+.block.cc_favourites {
+  order: 5;
+}
+.c-right:last-child {
+ order: 5;
+}
+.block {
+  order: 4;
+}
+.block:last-child {
+  margin-top: 10px;
+}
+
+

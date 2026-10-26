@@ -1,0 +1,69 @@
+/*------------------------------------------------------------------Поле для комметария---------------------------------------------------------------*/
+/* Базовое состояние */
+.comment_body {
+    position: relative; /* Для позиционирования */
+    border-radius: 15px; /* Закругление углов */
+    padding: 5px; /* Внутренний отступ */
+    margin: 10px 0; /* Отступ сверху и снизу */
+    background: rgba(var(--block-color), 0.8); /* Фон контейнера */
+    outline: 2px solid rgba(51, 61, 255, 0.8); /* Синяя рамка */
+    outline-offset: -4px; /* Отступ рамки внутрь */
+    transition: all 0.3s ease, outline 0s ease 0s; /* Мгновенное исчезновение рамки */
+    box-shadow: 
+        0 0 10px 4px rgba(51, 61, 255, 0.6), /* Ближний слой затухания */
+        0 0 20px 8px rgba(51, 61, 255, 0.3); /* Дальний слой затухания */
+}
+
+/* Состояние фокуса */
+.comment_body:focus-within {
+    transform: scale(1.05); /* Увеличиваем весь контейнер */
+    transform-origin: center; /* Центрируем масштабирование */
+    outline: 2px solid rgba(189, 15, 86, 0.8); /* Розовая рамка */
+    outline-offset: -6px; /* Больший отступ рамки внутрь */
+    padding: 7px 28px; /* Асимметричный padding для горизонтального увеличения */
+    margin: 20px 0; /* Увеличиваем отступ сверху и снизу */
+    box-shadow: 
+        0 0 10px 4px rgba(189, 15, 86, 0.6), /* Ближний слой затухания (розовый) */
+        0 0 20px 8px rgba(189, 15, 86, 0.3); /* Дальний слой затухания (розовый) */
+    animation: glow-animation 2s infinite; /* Добавляем анимацию */
+    transition: all 0.3s ease, outline 0s ease 0s; /* Мгновенное появление рамки */
+}
+
+/* Анимация для рамки в состоянии фокуса */
+@keyframes glow-animation {
+    0%, 100% {
+        box-shadow: 
+            0 0 10px 4px rgba(189, 15, 86, 0.6),
+            0 0 20px 8px rgba(189, 15, 86, 0.3);
+    }
+    50% {
+        box-shadow: 
+            0 0 15px 6px rgba(189, 15, 86, 0.8),
+            0 0 30px 12px rgba(189, 15, 86, 0.5);
+    }
+}
+
+/* Текстовое поле внутри .comment_body */
+.comment_body textarea {
+    background: transparent; /* Прозрачный фон */
+    border: none; /* Убираем границу */
+    padding: 6px; /* Уменьшаем паддинг */
+    font-size: 12px;
+    color: rgba(var(--white-color), 1);
+    resize: none;
+    width: 100%;
+    height: 89px;
+    box-sizing: border-box; /* Учитываем padding в размерах */
+    position: relative;
+    z-index: 3; /* Размещаем текстовое поле поверх рамки */
+    transition: transform 0.3s ease; /* Плавное увеличение */
+    transform-origin: center; /* Центрируем масштабирование */
+}
+
+/* Градиентный фон при фокусе */
+.comment_body:focus-within textarea {
+    background: linear-gradient(135deg, 
+        rgba(var(--anime-inprocess), 0.1), 
+        rgba(var(--manga-complete), 0.05));
+    transform: scale(1.05); /* Увеличение поля */
+}

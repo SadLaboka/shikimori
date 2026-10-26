@@ -1,0 +1,37 @@
+/*---------------------------------------------------------------------status------------------------------------------------------------------------*/
+.p-profiles .profile-head .c-brief header.head .misc {
+ display: none;
+}
+
+/*-------------------------------------------------------------------nickname------------------------------------------------------------------------*/
+.l-top_menu-v2 .menu-dropdown > span .nickname {
+ animation: logo_animation 6s linear infinite;
+ -webkit-box-reflect: below 1px linear-gradient(transparent, #0008);
+ line-height: 0.70em;
+ outline: none;
+ font-size: 20px;
+ font-family: "DynaPuff", system-ui;
+ font-weight: 700;
+}
+
+/*Анимация никнейма*/
+@keyframes nickname_animation
+{
+  0%,18%,20%,50.1%,60%,65.1%,80%,90.1%,92%
+  {
+    color: #333dff;
+    text-shadow: none;
+  }
+  2%,18.1%, 20.1%,30%,50%,60%,60.1%,65%,70%,80.1%,90%,92.1%,100%
+  {
+    color: #fff;
+    text-shadow: 0 0 10px #333dff,
+    0 0 20px #333dff,
+    0 0 40px #333dff,
+    0 0 80px #333dff,
+    0 0 160px #333dff;
+  }
+}
+
+
+

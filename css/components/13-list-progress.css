@@ -1,0 +1,29 @@
+/*---------------------------------------------------------------------------Прогресс бар---------------------------------------------------------------*/
+.bar .first {
+ animation: scalebar 1.5s ease-in;
+ transform-origin: left;
+}
+.bar .second {
+ animation: scalebar 1.5s ease-in;
+ transform-origin: center;
+}
+.bar .third {
+ animation: scalebar 1.5s ease-in;
+ transform-origin: right;
+}
+@keyframes scalebar{
+  0% {
+   transform: scaleX(0);
+   color: transparent;
+  }
+  90% {
+   color: transparent;
+  }
+  99% {
+   transform: scaleX(1);
+  }
+  100% {
+   color: inhirit;
+  }
+}
+

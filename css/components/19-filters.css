@@ -1,0 +1,73 @@
+/* Шапка новых фильтров: текстовая ссылка вместо круглых кнопок темы */
+.b-collection-filters .c-filters-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-sizing: border-box;
+  height: auto;
+  min-height: 32px;
+  padding: 6px 12px;
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.b-collection-filters .c-filters-head > .misc-links {
+  position: static;
+  flex: 0 0 auto;
+  width: auto;
+  height: auto;
+  margin: 0 0 0 auto;
+  padding: 0;
+  line-height: inherit;
+}
+
+.b-collection-filters .c-filters-head > .misc-links > a {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  font-size: 12px !important;
+  line-height: inherit;
+  white-space: nowrap;
+}
+
+.b-collection-filters .c-filters-head > .misc-links > a::before,
+.b-collection-filters .c-filters-head > .misc-links > a::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Раскрывающиеся списки фильтров: общая палитра для компонента c-ms */
+.c-ms .c-ms-dropdown {
+  background-color: rgb(var(--block-color)) !important;
+  color: rgb(var(--light-color)) !important;
+  border-color: rgba(var(--bright-color), 0.5) !important;
+  box-shadow: 0 4px 16px rgba(var(--shadows-color), 0.6);
+}
+
+.c-ms .c-ms-options {
+  background-color: transparent !important;
+  color: rgb(var(--light-color)) !important;
+}
+
+.c-ms .c-ms-option {
+  color: rgb(var(--light-color)) !important;
+}
+
+.c-ms .c-ms-option:hover,
+.c-ms .c-ms-option:focus-visible {
+  background-color: rgba(var(--bright-color), 0.25) !important;
+  color: rgb(var(--white-color)) !important;
+}
+
+.c-ms .c-ms-option-mark {
+  border-color: rgba(var(--light-color), 0.6) !important;
+}
+
+.c-ms .c-ms-control:focus-visible {
+  outline: 2px solid rgb(var(--bright-color));
+  outline-offset: 2px;
+}
+

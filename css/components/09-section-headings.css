@@ -1,0 +1,71 @@
+/*---------------------------------------------------------------------animated border----------------------------------------------------------------*/
+
+.subheadline {
+  background-color: rgba(var(--block-color));
+  margin-top: 4px;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.subheadline::before,
+.subheadline::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  z-index: -1;
+  border-radius: 15px;
+  filter: blur(0.1rem);
+  opacity: 0.97;
+}
+
+.subheadline::before {
+  background: linear-gradient(
+    90deg, 
+    transparent 0%,
+    transparent 15%,
+    rgba(51, 61, 255, 0.2) 25%,
+    #333dff 35%,
+    rgba(51, 61, 255, 0.2) 45%,
+    transparent 50%,
+    transparent 100%
+  );
+  background-size: 200%;
+  animation: animation_border_left 2s linear infinite;
+}
+
+.subheadline::after {
+  background: linear-gradient(
+    90deg, 
+    transparent 0%,
+    transparent 50%,
+    rgba(189, 15, 86, 0.2) 55%,
+    #bd0f56 65%,
+    rgba(189, 15, 86, 0.2) 75%,
+    transparent 85%,
+    transparent 100%
+  );
+  background-size: 200%;
+  animation: animation_border_right 2s linear infinite;
+}
+
+@keyframes animation_border_left {
+  0%, 100% {
+    background-position: 0% 0;
+  }
+  50% {
+    background-position: 50% 0;
+  }
+}
+
+@keyframes animation_border_right {
+  0%, 100% {
+    background-position: 100% 0;
+  }
+  50% {
+    background-position: 50% 0;
+  }
+}
+
