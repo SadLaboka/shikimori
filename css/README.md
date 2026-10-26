@@ -1,5 +1,17 @@
 # Рабочие модули оформления
 
+Собственные правила редактируются в `components/`, порядок — `components.json`.
+Итоговый `styles_optimized.css` собирается без преобразования байтов:
+`node scripts/build-css.mjs --write`. Кандидат перед проверкой:
+`node scripts/build-css.mjs --write --output .preview/candidate.css`.
+Структура и ограничения — [components.md](../docs/components.md).
+
+## Основа: исходные снимки переноса
+
+Ниже перечислены исходные версии четырёх модулей. Рабочие main1/main3 позднее
+получили точечные оптимизации, разрешённые `main1-optimization.json` и
+`main3-optimization.json`; vendor сохраняет исходные байты и авторство.
+
 `base/main_code_3.css` — рабочая копия E-design / ed-main для первого пилота
 прямого импорта из этого репозитория. Начальный файл побайтно совпадает с
 `vendor/edesign/main_code_3.css`; исходник:

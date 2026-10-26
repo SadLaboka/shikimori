@@ -23,7 +23,8 @@ https://github.com/SadLaboka/shikimori, ветка `main`. Общайся по-�
 
 ## Основные пути
 
-- `styles_optimized.css` — основной CSS, путь сохраняй; `about.md` — BBCode «Обо мне».
+- `css/components/` — исходники, порядок в `css/components.json`; `about.md` — BBCode.
+- `styles_optimized.css` — собираемый CSS; `node scripts/build-css.mjs --check` перед проверкой/выпуском.
 - `vendor/` — исходники перенесённой основы; сохраняй авторство.
 - `tools/preview/` — Playwright; результаты в игнорируемой `.preview/`.
 - `deploy.config.json` — шаблон; `deploy.local.json` — игнорируемые настройки.
