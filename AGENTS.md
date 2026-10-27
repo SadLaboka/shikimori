@@ -24,6 +24,7 @@ https://github.com/SadLaboka/shikimori, ветка `main`. Общайся по-�
 ## Основные пути
 
 - `css/components/` — исходники, порядок в `css/components.json`; `about.md` — BBCode.
+- `css/themes/<slug>/` — отдельные схемы и их полные CSS; корневой CSS сохраняет основную тему.
 - `styles_optimized.css` — собираемый CSS; `node scripts/build-css.mjs --check` перед проверкой/выпуском.
 - `vendor/` — исходники перенесённой основы; сохраняй авторство.
 - `tools/preview/` — Playwright; результаты в игнорируемой `.preview/`.
@@ -40,6 +41,8 @@ https://github.com/SadLaboka/shikimori, ветка `main`. Общайся по-�
   diff и корректность инструкций. Не выдавай это за проверку оформления.
 - Для CSS проверяй синтаксис, затронутые селекторы, media и состояния в браузере.
   Для дизайна/оптимизации используй `.agents/skills/shikimori-css-design/SKILL.md`.
+  Для отдельных цветовых схем и переключения — `.agents/skills/shikimori-color-schemes/SKILL.md`;
+  для перекраски самих GIF/WebP — `.agents/skills/shikimori-animated-recolor/SKILL.md`.
   Для миграции используй `.agents/skills/shikimori-css-migration/SKILL.md`:
   обязательные проверки эквивалентности не сокращать ради экономии.
 - Для изменений deploy запускай `tests/deploy.tests.ps1` с подставным API;

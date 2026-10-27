@@ -1,0 +1,4 @@
+interface:
+  display_name: "Перекраска анимаций Shikimori"
+  short_description: "Цвета WebP и GIF с проверкой кадров и прозрачности"
+  default_prompt: "Используй $shikimori-animated-recolor, чтобы перекрасить существующую анимацию под палитру, сохранив движение и прозрачность."

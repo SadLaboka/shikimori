@@ -1,0 +1,4 @@
+interface:
+  display_name: "Цветовые схемы Shikimori"
+  short_description: "Отдельные палитры, ресурсы и возврат к прежней теме"
+  default_prompt: "Используй $shikimori-color-schemes, чтобы добавить отдельную цветовую схему и сохранить возможность возврата к основной."

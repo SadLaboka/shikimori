@@ -1,12 +1,17 @@
 ---
 name: shikimori-css-design
-description: "Изменения дизайна, адаптивности и оптимизация CSS темы Shikimori с локальной проверкой. Перенос импортов — shikimori-css-migration."
+description: "Изменения дизайна, адаптивности и оптимизация CSS темы Shikimori с локальной проверкой. Отдельные палитры — shikimori-color-schemes; перенос импортов — shikimori-css-migration."
 ---
 
 # Shikimori CSS design
 
 Соблюдай [AGENTS.md](../../../AGENTS.md). При оптимизации текущий вид — эталон;
 при дизайне меняй только согласованное. Skill не разрешает публикацию или push.
+
+Для создания отдельной схемы или организации переключения используй
+[shikimori-color-schemes](../shikimori-color-schemes/SKILL.md); этот навык
+задаёт визуальные проверки её CSS. Для перекраски самих GIF/WebP —
+[shikimori-animated-recolor](../shikimori-animated-recolor/SKILL.md).
 
 ## Контекст по необходимости
 
