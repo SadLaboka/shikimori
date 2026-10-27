@@ -31,8 +31,8 @@
 
 ## Устройство репозитория
 
-Оформление построено на E-design и CSS-club. Четыре файла основы E-design
-подключаются из этого репозитория по закреплённым commit-URL, шрифты — через
+Четыре файла общей CSS-основы подключаются из этого репозитория
+по закреплённым commit-URL, шрифты — через
 Google Fonts. Собственные правила разделены на компоненты; цветовые схемы
 используют общую основу и свои переопределения.
 
@@ -92,8 +92,8 @@ node scripts/build-emerald-scarlet.mjs --check
 [Архитектура](docs/architecture.md) · [Публикация и OAuth](docs/deployment.md) ·
 [Миграция](docs/style-migration.md) · [Производительность](docs/performance.md).
 
-Основа оформления — [E-design / ed-main](https://github.com/ed-main/ed-main.github.io)
-и [CSS-club](https://shikimori.io/clubs/811-css-club-nastroyka-vneshnego-vida-sayta).
+В оформлении используются модули
+[CSS-club](https://shikimori.io/clubs/811-css-club-nastroyka-vneshnego-vida-sayta).
 Шрифты Rubik Spray Paint и DynaPuff подключены через Google Fonts.
 Изображения размещены на внешнем хостинге; авторство и условия использования
 стороннего кода, шрифтов и изображений остаются у их правообладателей.

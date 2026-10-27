@@ -18,6 +18,11 @@ body:after {
   content: "*Dark Forest*";
 }
 
+/* Hide the inherited theme label; source attribution remains in vendor/. */
+.l-footer::before {
+  content: none;
+}
+
 html:root {
 --white-color: 255, 255, 255;
     --light-color: 199, 199, 199;
