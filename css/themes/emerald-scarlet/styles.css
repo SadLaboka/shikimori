@@ -1,0 +1,2010 @@
+/* BEGIN LOCAL CUSTOM POSTERS
+   Source: CSS-club custom_posters.min.css; verbatim, original cascade position.
+*/
+.b-catalog_entry>.cover .image-cutter{background:var(--custom-image,none) var(--custom-settings,center top / cover);border-radius:var(--custom-images-radius,.01px)}.b-catalog_entry-tooltip>.entry-tooltip_container>a::before,.b-collection-topic>.inner .collection-row .cover .image-cutter::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;background:var(--custom-image,none) var(--custom-settings,center top / cover);border-radius:var(--custom-images-radius,.01px)}.b-catalog_entry-tooltip>.entry-tooltip_container>a img,.b-catalog_entry>.cover .image-cutter img{opacity:var(--show-default, 1);aspect-ratio:var(--custom-image-ratio,auto)}.b-catalog_entry-tooltip>.entry-tooltip_container>a{position:relative;align-self:start;flex-shrink:0;width:160px}.b-catalog_entry-tooltip>.entry-tooltip_container>a img{vertical-align:top}.b-collection-topic>.inner .collection-row .cover .image-cutter{background:0 0}.b-collection-topic>.inner .collection-row .cover .image-cutter img{position:static}.b-collection-topic>.inner .collection-row.is-censored .cover .image-cutter::before,.b-collection-topic>.inner .collection-row.is-spoilers .cover .image-cutter::before{filter:var(--custom-images-filter-censored, blur(7px) grayscale(15%));transition:filter var(--custom-images-filter-transition, .5s)}.b-collection-topic>.inner .collection-row.is-spoilers .cover .image-cutter::before{filter:var(--custom-images-filter-spoilers, var(--custom-images-filter-censored, blur(10px) grayscale(.75)))}.b-collection-topic>.inner .collection-row.is-censored .cover:hover .image-cutter::before,.b-collection-topic>.inner .collection-row.is-spoilers .cover:hover .image-cutter::before{filter:var(--custom-images-filter-disabled, blur(0) grayscale(0))}
+/* END LOCAL CUSTOM POSTERS */
+
+/* AUTO=sticky_menu */ @media screen and (min-width: 1025px) { .l-top_menu-v2 { position: sticky; top: 0; } .l-top_menu-v2 .active .submenu { max-height: calc(100vh - var(--top-menu-height)); overflow-y: auto; } }
+@import url('https://fonts.googleapis.com/css2?family=Rubik+Spray+Paint&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap');
+@import url("https://raw.githubusercontent.com/SadLaboka/shikimori/9c8e3373f0d65490823e609f56472fc168a9b8a7/css/base/main_code_1.css");
+@import url("https://raw.githubusercontent.com/SadLaboka/shikimori/a96dc9d93e8ae8edb76912f8f3ca970a96241c8b/css/base/main_code_2.css");
+@import url("https://raw.githubusercontent.com/SadLaboka/shikimori/8fc0b68fa3578b6e8a3884dbb23651d86d885f73/css/base/main_code_3.css");
+@import url("https://raw.githubusercontent.com/SadLaboka/shikimori/8912ca67ab5e4915c6ba9ea065f9ee609481ccd3/css/base/main_code_4mob.css");
+
+
+
+/* BEGIN LOCAL ACTIVITY GRAPH
+   Source: ed-main q05_animated_activity_graph.css; verbatim, no optimization.
+*/
+.bar.vertical .line {
+  background: transparent;
+  -webkit-border-radius: 14px;
+  -moz-border-radius: 14px;
+  border-radius: 14px;
+}
+.bar.vertical .line .bar-container .bar {
+  background: transparent;
+}
+.bar.vertical .line:nth-child(1) {
+  -webkit-animation: fluctuations 2.5s 1.6s infinite linear;
+  -moz-animation: fluctuations 2.5s 1.6s infinite linear;
+  -o-animation: fluctuations 2.5s 1.6s infinite linear;
+  animation: fluctuations 2.5s 1.6s infinite linear;
+}
+.bar.vertical .line:nth-child(2) {
+  -webkit-animation: fluctuations 2.5s 1.4s infinite linear;
+  -moz-animation: fluctuations 2.5s 1.4s infinite linear;
+  -o-animation: fluctuations 2.5s 1.4s infinite linear;
+  animation: fluctuations 2.5s 1.4s infinite linear;
+}
+.bar.vertical .line:nth-child(3) {
+  -webkit-animation: fluctuations 2.5s 1.2s infinite linear;
+  -moz-animation: fluctuations 2.5s 1.2s infinite linear;
+  -o-animation: fluctuations 2.5s 1.2s infinite linear;
+  animation: fluctuations 2.5s 1.2s infinite linear;
+}
+.bar.vertical .line:nth-child(4) {
+  -webkit-animation: fluctuations 2.5s 1s infinite linear;
+  -moz-animation: fluctuations 2.5s 1s infinite linear;
+  -o-animation: fluctuations 2.5s 1s infinite linear;
+  animation: fluctuations 2.5s 1s infinite linear;
+}
+.bar.vertical .line:nth-child(5) {
+  -webkit-animation: fluctuations 2.5s 0.8s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.8s infinite linear;
+  -o-animation: fluctuations 2.5s 0.8s infinite linear;
+  animation: fluctuations 2.5s 0.8s infinite linear;
+}
+.bar.vertical .line:nth-child(6) {
+  -webkit-animation: fluctuations 2.5s 0.6s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.6s infinite linear;
+  -o-animation: fluctuations 2.5s 0.6s infinite linear;
+  animation: fluctuations 2.5s 0.6s infinite linear;
+}
+.bar.vertical .line:nth-child(7) {
+  -webkit-animation: fluctuations 2.5s 0.4s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.4s infinite linear;
+  -o-animation: fluctuations 2.5s 0.4s infinite linear;
+  animation: fluctuations 2.5s 0.4s infinite linear;
+}
+.bar.vertical .line:nth-child(8) {
+  -webkit-animation: fluctuations 2.5s 0.2s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.2s infinite linear;
+  -o-animation: fluctuations 2.5s 0.2s infinite linear;
+  animation: fluctuations 2.5s 0.2s infinite linear;
+}
+.bar.vertical .line:nth-child(9) {
+  -webkit-animation: fluctuations 2.5s 0s infinite linear;
+  -moz-animation: fluctuations 2.5s 0s infinite linear;
+  -o-animation: fluctuations 2.5s 0s infinite linear;
+  animation: fluctuations 2.5s 0s infinite linear;
+}
+.bar.vertical .line:nth-child(10) {
+  -webkit-animation: fluctuations 2.5s 0.2s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.2s infinite linear;
+  -o-animation: fluctuations 2.5s 0.2s infinite linear;
+  animation: fluctuations 2.5s 0.2s infinite linear;
+}
+.bar.vertical .line:nth-child(11) {
+  -webkit-animation: fluctuations 2.5s 0.4s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.4s infinite linear;
+  -o-animation: fluctuations 2.5s 0.4s infinite linear;
+  animation: fluctuations 2.5s 0.4s infinite linear;
+}
+.bar.vertical .line:nth-child(12) {
+  -webkit-animation: fluctuations 2.5s 0.6s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.6s infinite linear;
+  -o-animation: fluctuations 2.5s 0.6s infinite linear;
+  animation: fluctuations 2.5s 0.6s infinite linear;
+}
+.bar.vertical .line:nth-child(13) {
+  -webkit-animation: fluctuations 2.5s 0.8s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.8s infinite linear;
+  -o-animation: fluctuations 2.5s 0.8s infinite linear;
+  animation: fluctuations 2.5s 0.8s infinite linear;
+}
+.bar.vertical .line:nth-child(14) {
+  -webkit-animation: fluctuations 2.5s 1s infinite linear;
+  -moz-animation: fluctuations 2.5s 1s infinite linear;
+  -o-animation: fluctuations 2.5s 1s infinite linear;
+  animation: fluctuations 2.5s 1s infinite linear;
+}
+.bar.vertical .line:nth-child(15) {
+  -webkit-animation: fluctuations 2.5s 1.2s infinite linear;
+  -moz-animation: fluctuations 2.5s 1.2s infinite linear;
+  -o-animation: fluctuations 2.5s 1.2s infinite linear;
+  animation: fluctuations 2.5s 1.2s infinite linear;
+}
+.bar.vertical .line:nth-child(16) {
+  -webkit-animation: fluctuations 2.5s 1.4s infinite linear;
+  -moz-animation: fluctuations 2.5s 1.4s infinite linear;
+  -o-animation: fluctuations 2.5s 1.4s infinite linear;
+  animation: fluctuations 2.5s 1.4s infinite linear;
+}
+.bar.vertical .line:nth-child(17) {
+  -webkit-animation: fluctuations 2.5s 1.6s infinite linear;
+  -moz-animation: fluctuations 2.5s 1.6s infinite linear;
+  -o-animation: fluctuations 2.5s 1.6s infinite linear;
+  animation: fluctuations 2.5s 1.6s infinite linear;
+}
+.bar.vertical .line:nth-child(18) {
+  -webkit-animation: fluctuations 2.5s 1.4s infinite linear;
+  -moz-animation: fluctuations 2.5s 1.4s infinite linear;
+  -o-animation: fluctuations 2.5s 1.4s infinite linear;
+  animation: fluctuations 2.5s 1.4s infinite linear;
+}
+.bar.vertical .line:nth-child(19) {
+  -webkit-animation: fluctuations 2.5s 1.2s infinite linear;
+  -moz-animation: fluctuations 2.5s 1.2s infinite linear;
+  -o-animation: fluctuations 2.5s 1.2s infinite linear;
+  animation: fluctuations 2.5s 1.2s infinite linear;
+}
+.bar.vertical .line:nth-child(20) {
+  -webkit-animation: fluctuations 2.5s 1s infinite linear;
+  -moz-animation: fluctuations 2.5s 1s infinite linear;
+  -o-animation: fluctuations 2.5s 1s infinite linear;
+  animation: fluctuations 2.5s 1s infinite linear;
+}
+.bar.vertical .line:nth-child(21) {
+  -webkit-animation: fluctuations 2.5s 0.8s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.8s infinite linear;
+  -o-animation: fluctuations 2.5s 0.8s infinite linear;
+  animation: fluctuations 2.5s 0.8s infinite linear;
+}
+.bar.vertical .line:nth-child(22) {
+  -webkit-animation: fluctuations 2.5s 0.6s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.6s infinite linear;
+  -o-animation: fluctuations 2.5s 0.6s infinite linear;
+  animation: fluctuations 2.5s 0.6s infinite linear;
+}
+.bar.vertical .line:nth-child(23) {
+  -webkit-animation: fluctuations 2.5s 0.4s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.4s infinite linear;
+  -o-animation: fluctuations 2.5s 0.4s infinite linear;
+  animation: fluctuations 2.5s 0.4s infinite linear;
+}
+.bar.vertical .line:nth-child(24) {
+  -webkit-animation: fluctuations 2.5s 0.2s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.2s infinite linear;
+  -o-animation: fluctuations 2.5s 0.2s infinite linear;
+  animation: fluctuations 2.5s 0.2s infinite linear;
+}
+.bar.vertical .line:nth-child(25) {
+  -webkit-animation: fluctuations 2.5s 0s infinite linear;
+  -moz-animation: fluctuations 2.5s 0s infinite linear;
+  -o-animation: fluctuations 2.5s 0s infinite linear;
+  animation: fluctuations 2.5s 0s infinite linear;
+}
+.bar.vertical .line:nth-child(26) {
+  -webkit-animation: fluctuations 2.5s 0.2s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.2s infinite linear;
+  -o-animation: fluctuations 2.5s 0.2s infinite linear;
+  animation: fluctuations 2.5s 0.2s infinite linear;
+}
+.bar.vertical .line:nth-child(27) {
+  -webkit-animation: fluctuations 2.5s 0.4s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.4s infinite linear;
+  -o-animation: fluctuations 2.5s 0.4s infinite linear;
+  animation: fluctuations 2.5s 0.4s infinite linear;
+}
+.bar.vertical .line:nth-child(28) {
+  -webkit-animation: fluctuations 2.5s 0.6s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.6s infinite linear;
+  -o-animation: fluctuations 2.5s 0.6s infinite linear;
+  animation: fluctuations 2.5s 0.6s infinite linear;
+}
+.bar.vertical .line:nth-child(29) {
+  -webkit-animation: fluctuations 2.5s 0.8s infinite linear;
+  -moz-animation: fluctuations 2.5s 0.8s infinite linear;
+  -o-animation: fluctuations 2.5s 0.8s infinite linear;
+  animation: fluctuations 2.5s 0.8s infinite linear;
+}
+.bar.vertical .line:nth-child(30) {
+  -webkit-animation: fluctuations 2.5s 1s infinite linear;
+  -moz-animation: fluctuations 2.5s 1s infinite linear;
+  -o-animation: fluctuations 2.5s 1s infinite linear;
+  animation: fluctuations 2.5s 1s infinite linear;
+}
+.bar.vertical .line:nth-child(31) {
+  -webkit-animation: fluctuations 2.5s 1.2s infinite linear;
+  -moz-animation: fluctuations 2.5s 1.2s infinite linear;
+  -o-animation: fluctuations 2.5s 1.2s infinite linear;
+  animation: fluctuations 2.5s 1.2s infinite linear;
+}
+.bar.vertical .line:nth-child(32) {
+  -webkit-animation: fluctuations 2.5s 1.4s infinite linear;
+  -moz-animation: fluctuations 2.5s 1.4s infinite linear;
+  -o-animation: fluctuations 2.5s 1.4s infinite linear;
+  animation: fluctuations 2.5s 1.4s infinite linear;
+}
+.bar.vertical .line:nth-child(33) {
+  -webkit-animation: fluctuations 2.5s 1.6s infinite linear;
+  -moz-animation: fluctuations 2.5s 1.6s infinite linear;
+  -o-animation: fluctuations 2.5s 1.6s infinite linear;
+  animation: fluctuations 2.5s 1.6s infinite linear;
+}
+.bar.vertical .line:nth-child(34) {
+  -webkit-animation: fluctuations 2.5s 0s infinite linear;
+  -moz-animation: fluctuations 2.5s 0s infinite linear;
+  -o-animation: fluctuations 2.5s 0s infinite linear;
+  animation: fluctuations 2.5s 0s infinite linear;
+}
+.bar.vertical .line:nth-child(-n + 34):hover {
+  -webkit-animation-play-state: paused;
+  -moz-animation-play-state: paused;
+  -o-animation-play-state: paused;
+  animation-play-state: paused;
+}
+.bar.vertical .line:nth-child(-n + 34) {
+  -webkit-animation-play-state: running;
+  -moz-animation-play-state: running;
+  -o-animation-play-state: running;
+  animation-play-state: running;
+}
+@-webkit-keyframes fluctuations {
+  0% {
+    background-color: rgba(var(--very-high-rating), var(--hundred));
+    margin-top: 35px;
+    margin-bottom: 45px;
+    height: 20px;
+  }
+  50% {
+    background-color: rgba(var(--average-rating), var(--hundred));
+    height: 95px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  100% {
+    background-color: rgba(var(--small-rating), var(--hundred));
+    height: 20px;
+    margin-top: 35px;
+    margin-bottom: 45px;
+  }
+}
+@-moz-keyframes fluctuations {
+  0% {
+    background-color: rgba(var(--very-high-rating), var(--hundred));
+    margin-top: 35px;
+    margin-bottom: 45px;
+    height: 20px;
+  }
+  50% {
+    background-color: rgba(var(--average-rating), var(--hundred));
+    height: 95px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  100% {
+    background-color: rgba(var(--small-rating), var(--hundred));
+    height: 20px;
+    margin-top: 35px;
+    margin-bottom: 45px;
+  }
+}
+@-o-keyframes fluctuations {
+   0% {
+    background-color: rgba(var(--very-high-rating), var(--hundred));
+    margin-top: 35px;
+    margin-bottom: 45px;
+    height: 20px;
+  }
+  50% {
+    background-color: rgba(var(--average-rating), var(--hundred));
+    height: 95px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  100% {
+    background-color: rgba(var(--small-rating), var(--hundred));
+    height: 20px;
+    margin-top: 35px;
+    margin-bottom: 45px;
+  }
+}
+@keyframes fluctuations {
+    0% {
+    background-color: rgba(var(--very-high-rating), var(--hundred));
+    margin-top: 35px;
+    margin-bottom: 45px;
+    height: 20px;
+  }
+  50% {
+    background-color: rgba(var(--average-rating), var(--hundred));
+    height: 95px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  100% {
+    background-color: rgba(var(--small-rating), var(--hundred));
+    height: 20px;
+    margin-top: 35px;
+    margin-bottom: 45px;
+  }
+}
+/* END LOCAL ACTIVITY GRAPH */
+
+/* BEGIN LOCAL HISTORY BOOKMARKS
+   Source: ed-main q03_history_bookmarks.css; seven rules, no optimization.
+*/
+.history-page span > a:before {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 18px;
+    margin-right: 10px;
+    width: 70px;
+    border-radius: 10px;
+}
+.history-page a[href ^= "/a"]:before {
+    content: 'Аниме ';
+    color: #59d279;
+    border: 2px solid #41825773;
+}
+.history-page a[href ^= "/m"]:before {
+    content: 'Манга ';
+    color: #e878c1;
+    border: 2px solid #a5538973;
+}
+.history-page a[href ^= "/r"]:before {
+    content: 'Ранобэ ';
+    color: #6bc2ec;
+    border: 2px solid #5288a273;
+}
+[data-locale="en"] .history-page a[href ^= "/a"]:before {
+    content: 'Anime ';
+}
+[data-locale="en"] .history-page a[href ^= "/m"]:before {
+    content: 'Manga ';
+}
+[data-locale="en"] .history-page a[href ^= "/r"]:before {
+    content: 'Ranobe ';
+}
+/* END LOCAL HISTORY BOOKMARKS */
+
+/* CASCADE COMPATIBILITY: restore the existing tooltip content priority after q03.
+   Expected poster declaration: content: "" (normal priority). Re-audit on poster updates. */
+.b-catalog_entry-tooltip > .entry-tooltip_container > a::before { content: ""; }
+
+/* BEGIN LOCAL PROFILE LAYOUT
+   Source: CSS-club, https://css-club.web.app/css/profile-content-layout-v1.css
+   Upstream snapshot: vendor/profile-content-layout-v1.css.
+   Kept verbatim for the first migration; original breakpoint and specificity preserved.
+*/
+@media screen and (min-width: 768px) {
+  #profiles_show .profile-content > .cc-2 > .c-column {
+    width: 100%;
+  }
+
+  #profiles_show .profile-content > .cc-2 > .c-left {
+    width: 77%;
+    padding-right: 30px;
+    margin-right: 0;
+  }
+
+  #profiles_show .profile-content .lifetime {
+    margin-bottom: 15px;
+  }
+
+  #profiles_show .profile-content > .cc-2 > .c-right {
+    position: static;
+    float: none;
+  }
+
+  #profiles_show .profile-content > .cc-2 > .c-right > .cc-2a {
+    width: 23%;
+    overflow: hidden;
+  }
+
+  #profiles_show .profile-content > .cc-2 > .c-right > .cc-2a > .c-column {
+    width: 100%;
+    margin: 0;
+  }
+
+  #profiles_show .profile-content > .cc-2 > .c-right > .cc-2a > :last-child {
+    margin-top: 15px;
+  }
+
+  #profiles_show .profile-content > .cc-2 > .c-right > .block {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  #profiles_show .profile-content .activity .graph.x26 {
+    display: none;
+  }
+
+  #profiles_show .profile-content .activity .graph.x34 {
+    display: block;
+  }
+}
+/* END LOCAL PROFILE LAYOUT */
+
+body {
+background: rgba(0, 0, 0, 0.4);
+}
+
+body:after {
+background-color: black;
+}
+@media (min-width: 1280px) {
+body:after {
+  background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781461880/ezgif-4c18dc226bcfa80a_croiuj.webp), url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781508170/ezgif-3665fe919cd9a076_stw83p.webp);
+  background-size: contain, contain;
+  background-position: left center, right center;
+  background-color: black;
+}
+}
+*/
+.l-footer:after {
+  content: "*Dark Forest*";
+}
+
+html:root {
+--white-color: 255, 255, 255;
+    --light-color: 199, 199, 199;
+    --dark-color: 171, 171, 171;
+    --bright-color: 74, 81, 199;
+    --dull-color: 134, 102, 96;
+    --input-color: 102, 102, 102;
+    --hover-bottoms-1: 25, 18, 17;
+    --buttoms-color: 25, 24, 23;
+    --hover-buttoms-2: 153, 0, 62;
+    --very-high-rating: 244, 6, 151;
+    --high-rating: 153, 0, 62;
+    --average-rating: 30, 38, 185;
+    --small-rating: 1, 4, 75;
+    --time-filled: 153, 0, 62;
+    --time-empty: 25, 23, 23;
+    --anime-inprocess: 1, 4, 75;
+    --anime-complete: 30, 38, 185;
+    --manga-inprocess: 189, 15, 86;
+    --manga-complete: 153, 0, 62;
+    --hover-color: 153, 0, 62;
+    --shadows-color: 0, 0, 0;
+    --block-color: 20, 20, 20;
+    --menu-back: 9, 9, 9;
+    --nick-cover: 84, 23, 23;
+    --popup-color: 153, 0, 62;
+    --hundred: 1;
+}
+
+
+a {
+	color: rgba(var(--bright-color), 1);
+}
+
+.p-profiles .profile-head .c-brief .avatar .profile-actions {
+ margin-left: 12px;
+}
+
+/*----------------------------------------------------------------------scrollbar----------------------------------------------------------------------*/
+/* Firefox: preserve its existing native scrollbar. */
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(32, 120, 84) rgb(211, 37, 64);
+  }
+  html:hover {
+    scrollbar-color: rgb(21, 66, 48) rgb(211, 37, 64);
+  }
+}
+/* Chrome: explicit geometry and colors, including hover and dragging. */
+@supports selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+  :is(html, body)::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background: rgb(211, 37, 64);
+  }
+  :is(html, body)::-webkit-scrollbar-track {
+    display: block;
+    background: rgb(211, 37, 64);
+    border: 0;
+    margin: 0;
+  }
+  :is(html, body)::-webkit-scrollbar-thumb,
+  :is(html, body)::-webkit-scrollbar-thumb:hover,
+  :is(html, body)::-webkit-scrollbar-thumb:active {
+    background: rgb(21, 66, 48);
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    transition: none;
+  }
+  :is(html, body)::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+  :is(html, body)::-webkit-scrollbar-corner,
+  :is(html, body)::-webkit-resizer {
+    display: none;
+  }
+}
+/*---------------------------------------------------------------------shiki logo---------------------------------------------------------------------*/
+.l-top_menu-v2 .logo-container .logo {
+  display: none;
+}
+.l-top_menu-v2 .logo-container:before {
+ content: "shikimori";
+ animation: nickname_animation 6s linear infinite;
+ text-align: center;
+ font-size: 24px;
+ margin-left: 24px;
+ font-weight: 700;
+ font-family: "DynaPuff", system-ui;
+ -webkit-box-reflect: below 1px linear-gradient(transparent, #0008);
+ line-height: 0.70em;
+ outline: none;
+}
+/*Анимация лого*/
+@keyframes logo_animation
+{
+  0%,18%,20%,50.1%,60%,65.1%,80%,90.1%,92%
+  {
+    color: #d32540;
+    text-shadow: none;
+  }
+  2%,18.1%, 20.1%,30%,50%,60%,60.1%,65%,70%,80.1%,90%,92.1%,100%
+  {
+    color: #fff;
+    text-shadow: 0 0 10px #f4475d,
+    0 0 20px #f4475d,
+    0 0 40px #f4475d,
+    0 0 80px #f4475d,
+    0 0 160px #f4475d;
+  }
+}
+
+
+/*---------------------------------------------------------------------top-menu----------------------------------------------------------------------*/
+.l-top_menu-v2 .menu-dropdown>span span, .l-top_menu-v2 .menu-dropdown>span a {
+  font-size: 20px;
+  font-family: "Rubik Spray Paint", system-ui; 
+  font-weight: 400;
+  text-align: center;
+  -webkit-box-reflect: below 1px linear-gradient(transparent, #0008);
+  line-height: 0.70em;
+  animation: nickname_animation 6s linear infinite;
+  overflow: visible;
+}
+
+
+
+/* Firefox: box-reflect отсутствует. Копии текста не участвуют в раскладке.
+   Маска переворачивается вместе с текстом: отражение затухает вниз.
+   У произвольных имён нет текстового атрибута на span; имя задано только
+   для подтверждённого аватара SadLaboka, а не для всех профилей. */
+@supports (-moz-appearance: none) and (not (-webkit-box-reflect: below)) {
+  .l-top_menu-v2 .logo-container,
+  .l-top_menu-v2 .menu-icon.sign_in,
+  .l-top_menu-v2 .menu-dropdown > span span {
+    position: relative;
+  }
+
+  .l-top_menu-v2 .logo-container::after {
+    content: "shikimori" / "";
+    left: 29px; /* padding 5px + margin-left оригинала 24px */
+    top: calc(50% + .35em + 1px);
+    font: 700 24px/.7 "DynaPuff", system-ui;
+    animation: nickname_animation 6s linear infinite;
+  }
+
+  @media (min-width: 1024px) {
+  .l-top_menu-v2 .menu-icon.sign_in::before {
+    content: attr(data-text) / "";
+    position: absolute;
+    display: block;
+    width: max-content;
+    height: .7em;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    transform: scaleY(-1);
+    mask-image: linear-gradient(transparent, #0008);
+    left: 15px; /* padding оригинальной кнопки */
+    top: calc(50% + .35em + 1px);
+    font: 500 18px/.7 "Rubik Spray Paint", system-ui;
+  }
+  }
+
+  .l-top_menu-v2 .menu-dropdown > span span::after {
+    content: var(--header-reflection-text, none) / "";
+    left: 0;
+    top: calc(100% + 1px);
+    font: inherit;
+  }
+
+  .l-top_menu-v2 .logo-container::after,
+  .l-top_menu-v2 .menu-dropdown > span span::after {
+    position: absolute;
+    display: block;
+    width: max-content;
+    height: .7em;
+    line-height: .7;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    transform: scaleY(-1);
+    mask-image: linear-gradient(transparent, #0008);
+  }
+
+  .l-top_menu-v2 .menu-dropdown.main > .icon-avatar:has(> img[alt="SadLaboka"]) > span,
+  .l-top_menu-v2 .menu-dropdown.profile > span > a:has(> img[alt="SadLaboka"]) > .nickname {
+    --header-reflection-text: "SadLaboka";
+  }
+
+  /* Русские подписи разделов; в других локалях не подменяем текст. */
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-home > span { --header-reflection-text: "Главная"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-tierlists > span { --header-reflection-text: "Тирлисты"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-top > span { --header-reflection-text: "Топ"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-recommendations > span { --header-reflection-text: "Рекомендации"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-contests > span { --header-reflection-text: "Турниры"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-current_contest > span { --header-reflection-text: "Текущий турнир"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-info > span { --header-reflection-text: "О сайте"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-socials > span { --header-reflection-text: "Мы в соц. сетях"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-moderation > span { --header-reflection-text: "Модерация"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-anime_list > span { --header-reflection-text: "Список аниме"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-manga_list > span { --header-reflection-text: "Список манги"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-mail > span { --header-reflection-text: "Почта"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-achievements > span { --header-reflection-text: "Достижения"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-settings > span { --header-reflection-text: "Настройки"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-site_rules > span { --header-reflection-text: "Правила сайта"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-faq > span { --header-reflection-text: "FAQ"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-characters > span { --header-reflection-text: "Персонажи"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-people > span { --header-reflection-text: "Люди"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-play > span { --header-reflection-text: "Аниме онлайн"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-other > span { --header-reflection-text: "Прочее"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-main_menu > span { --header-reflection-text: "Основное меню"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-search > span { --header-reflection-text: "Поиск"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-profile > span { --header-reflection-text: "Профиль"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-anime > span { --header-reflection-text: "Аниме"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-manga > span { --header-reflection-text: "Манга"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-ranobe > span { --header-reflection-text: "Ранобэ"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-forum > span { --header-reflection-text: "Форум"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-clubs > span { --header-reflection-text: "Клубы"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-collections > span { --header-reflection-text: "Коллекции"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-critiques > span { --header-reflection-text: "Рецензии"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-articles > span { --header-reflection-text: "Статьи"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-users > span { --header-reflection-text: "Пользователи"; }
+  body[data-locale="ru"] .l-top_menu-v2 .menu-dropdown.main > .icon-calendar > span { --header-reflection-text: "Календарь"; }
+}
+
+/*---------------------------------------------------------------------status------------------------------------------------------------------------*/
+.p-profiles .profile-head .c-brief header.head .misc {
+ display: none;
+}
+
+/*-------------------------------------------------------------------nickname------------------------------------------------------------------------*/
+.l-top_menu-v2 .menu-dropdown > span .nickname {
+ animation: logo_animation 6s linear infinite;
+ -webkit-box-reflect: below 1px linear-gradient(transparent, #0008);
+ line-height: 0.70em;
+ outline: none;
+ font-size: 20px;
+ font-family: "DynaPuff", system-ui;
+ font-weight: 700;
+}
+
+/*Анимация никнейма*/
+@keyframes nickname_animation
+{
+  0%,18%,20%,50.1%,60%,65.1%,80%,90.1%,92%
+  {
+    color: #38d982;
+    text-shadow: none;
+  }
+  2%,18.1%, 20.1%,30%,50%,60%,60.1%,65%,70%,80.1%,90%,92.1%,100%
+  {
+    color: #fff;
+    text-shadow: 0 0 10px #38d982,
+    0 0 20px #38d982,
+    0 0 40px #38d982,
+    0 0 80px #38d982,
+    0 0 160px #38d982;
+  }
+}
+
+
+
+/*---------------------------------------------------------------------animated border----------------------------------------------------------------*/
+
+.subheadline {
+  background-color: rgba(var(--block-color));
+  margin-top: 4px;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.subheadline::before,
+.subheadline::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  z-index: -1;
+  border-radius: 15px;
+  filter: blur(0.1rem);
+  opacity: 0.97;
+}
+
+.subheadline::before {
+  background: linear-gradient(
+    90deg, 
+    transparent 0%,
+    transparent 15%,
+    rgba(56, 217, 130, 0.2) 25%,
+    #38d982 35%,
+    rgba(56, 217, 130, 0.2) 45%,
+    transparent 50%,
+    transparent 100%
+  );
+  background-size: 200%;
+  animation: animation_border_left 2s linear infinite;
+}
+
+.subheadline::after {
+  background: linear-gradient(
+    90deg, 
+    transparent 0%,
+    transparent 50%,
+    rgba(244, 71, 93, 0.2) 55%,
+    #f4475d 65%,
+    rgba(244, 71, 93, 0.2) 75%,
+    transparent 85%,
+    transparent 100%
+  );
+  background-size: 200%;
+  animation: animation_border_right 2s linear infinite;
+}
+
+@keyframes animation_border_left {
+  0%, 100% {
+    background-position: 0% 0;
+  }
+  50% {
+    background-position: 50% 0;
+  }
+}
+
+@keyframes animation_border_right {
+  0%, 100% {
+    background-position: 100% 0;
+  }
+  50% {
+    background-position: 50% 0;
+  }
+}
+
+/*--------------------------------------------------------------------------Top---------------------------------------------------------------------*/
+/* 1. Базовые стили контейнера */
+.solid {
+  position: relative;
+  border-radius: 20px; /* Внешнее скругление всего блока */
+  overflow: hidden;    /* Обрезает вращающийся градиент, чтобы он не вылезал */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 5px;        /* Толщина светящейся рамки */
+  background: rgb(14, 19, 18); /* Фон внутри блока */
+  z-index: 0;
+}
+
+/* 2. Вращающийся неоновый импульс */
+.solid::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(21, 66, 48, 1) 40deg,     
+    rgba(211, 37, 64, 1) 80deg,   
+    transparent 120deg,
+    transparent 180deg,
+    rgba(211, 37, 64, 1) 220deg,  
+    rgba(21, 66, 48, 1) 260deg,    
+    transparent 300deg
+  );
+  animation: solid-neon-spin 3s linear infinite;
+  z-index: -1; 
+  filter: blur(2px);
+}
+
+@keyframes solid-neon-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 3. Поднимаем сами картинки над градиентом */
+.solid > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* 4. Принудительно убираем скругление у ВСЕХ картинок и их оберток */
+.solid a,
+.solid .b-image,
+.solid img {
+  border-radius: 0 !important;
+}
+
+/* 5. Точечно скругляем только 4 угла блока */
+/* Значение 17px = 20px (радиус контейнера) - 3px (padding).  */
+
+/* Верхний левый угол (1-я картинка) */
+.solid > a:nth-of-type(1) {
+  border-top-left-radius: 15px !important;
+  overflow: hidden; /* Обрезает внутренности ссылки по скругленному углу */
+}
+.solid > a:nth-of-type(1) .b-image,
+.solid > a:nth-of-type(1) img {
+  border-top-left-radius: 15px !important;
+}
+
+/* Верхний правый угол (4-я картинка) */
+.solid > a:nth-of-type(4) {
+  border-top-right-radius: 15px !important;
+  overflow: hidden;
+}
+.solid > a:nth-of-type(4) .b-image,
+.solid > a:nth-of-type(4) img {
+  border-top-right-radius: 15px !important;
+}
+
+/* Нижний левый угол (17-я картинка) */
+.solid > a:nth-of-type(17) {
+  border-bottom-left-radius: 15px !important;
+  overflow: hidden;
+}
+.solid > a:nth-of-type(17) .b-image,
+.solid > a:nth-of-type(17) img {
+  border-bottom-left-radius: 15px !important;
+}
+
+/* Нижний правый угол (20-я картинка) */
+.solid > a:nth-of-type(20) {
+  border-bottom-right-radius: 15px !important;
+  overflow: hidden;
+}
+.solid > a:nth-of-type(20) .b-image,
+.solid > a:nth-of-type(20) img {
+  border-bottom-right-radius: 15px !important;
+}
+/*----------------------------------------------------------------------------sign in-----------------------------------------------------------------*/
+.l-top_menu-v2 .menu-icon.sign_in {
+   overflow: visible;
+   animation: logo_animation 6s linear infinite;
+   outline: none;
+}
+.l-top_menu-v2 .menu-icon.sign_in:after {
+  font-size: 18px;
+  font-weight: 500;
+  -webkit-box-reflect: below 1px linear-gradient(transparent, #0008);
+  line-height: 0.70em;
+  font-family: "Rubik Spray Paint", system-ui;  
+}
+}
+
+
+/*---------------------------------------------------------------------------Gif-аватар----------------------------------------------------------------*/
+.p-profiles .profile-head .avatar, .p-user_rates-index .l-menu .avatar {
+  position: relative;
+}
+
+.p-profiles .profile-head .avatar::before, .p-user_rates-index .l-menu .avatar::before {
+  content: "";
+  position: absolute;
+  margin-left: 18px;
+  margin-top: 20px;
+  inset: 0;
+  max-width: 160px;
+  max-height: 160px;
+  background: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462729/ezgif-68bfaf998569b54e_fz0j2z.webp") center / cover;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.p-user_rates-index .l-menu .avatar::before {
+  margin-left: 48px;
+  background: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-7-234e06a3f3_ggpnpq.webp") center / cover;
+}
+
+.p-profiles .profile-head .avatar img, .p-user_rates-index .l-menu .avatar img {
+  opacity: 0;
+}
+
+
+/*---------------------------------------------------------------------------Активность----------------------------------------------------------------*/
+#profiles_show > section > div > div.profile-head > div.c-info > div.c-additionals {
+ display: none;
+}
+
+
+/*----------------------------------------------------------------------Обо мне заголовок--------------------------------------------------------------*/
+.profile-content .about.block > div { display: none; }
+
+/*---------------------------------------------------------------------------sadlaboka-----------------------------------------------------------------*/
+.p-profiles .profile-head .c-brief header.head .aliases {
+  font-size: 0 !important;
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781560382/ezgif-2b7144768c04a2ad_podvfl.webp);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 72px;
+  
+  /* Плавная анимация увеличения */
+  transition: transform 0.4s ease;
+  transform-origin: center center;
+}
+
+.p-profiles .profile-head .c-brief header.head .notice {
+  text-align: center;
+  
+  /* Плавное появление и исчезновение */
+  transition: opacity 0.4s ease;
+  opacity: 1;
+}
+
+/* Эффекты при наведении на заголовок */
+.p-profiles .profile-head .c-brief header.head:hover .aliases {
+  transform: scale(1.4); /* Увеличение на 40% - подберите значение под себя */
+}
+
+.p-profiles .profile-head .c-brief header.head:hover .notice {
+  opacity: 0; /* Плавно исчезает */
+}
+
+/*------------------------------------------------------------------------------Блоки------------------------------------------------------------------*/
+.profile-content.profile-content.profile-content {
+ display: flex;
+ flex-direction: column;
+}
+
+
+.block.cc-2 {
+ order: 2;
+ margin-top: 2px;
+}
+/*----------------------------------------------------------------------------Обо мне------------------------------------------------------------------*/
+.block.about {
+  order: 1;
+}
+.block.achievements {
+margin-top: 6px;
+order: 3;
+}
+.block.cc_favourites {
+  order: 5;
+}
+.c-right:last-child {
+ order: 5;
+}
+.block {
+  order: 4;
+}
+.block:last-child {
+  margin-top: 10px;
+}
+
+
+/*---------------------------------------------------------------------------Прогресс бар---------------------------------------------------------------*/
+.bar .first {
+ animation: scalebar 1.5s ease-in;
+ transform-origin: left;
+}
+.bar .second {
+ animation: scalebar 1.5s ease-in;
+ transform-origin: center;
+}
+.bar .third {
+ animation: scalebar 1.5s ease-in;
+ transform-origin: right;
+}
+@keyframes scalebar{
+  0% {
+   transform: scaleX(0);
+   color: transparent;
+  }
+  90% {
+   color: transparent;
+  }
+  99% {
+   transform: scaleX(1);
+  }
+  100% {
+   color: inhirit;
+  }
+}
+
+/*-------------------------------------------------------------------------------Поиск----------------------------------------------------------------*/
+/* Пульсация маркера поиска */
+.search-marker {
+    display: inline-block;
+    color: rgba(var(--light-color), 0.8);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/* Комбинированная анимация */
+.global-search input[type="text"] {
+    transition: all 0.3s ease;
+    border: 2px solid rgba(var(--light-color), 0.5);
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+.global-search input[type="text"]:focus {
+    border-color: rgba(var(--hover-color), 1);
+    box-shadow: 0 0 8px rgba(var(--hover-color), 0.7), 0 0 20px rgba(var(--hover-color), 0.5);
+    animation: combined-animation 1.5s infinite;
+}
+
+@keyframes combined-animation {
+    0%, 100% {
+        border-color: rgba(var(--hover-color), 1);
+        box-shadow: 0 0 8px rgba(var(--hover-color), 0.7), 0 0 20px rgba(var(--hover-color), 0.5);
+    }
+    50% {
+        border-color: rgba(var(--bright-color), 1);
+        box-shadow: 0 0 12px rgba(var(--bright-color), 1), 0 0 30px rgba(var(--bright-color), 0.8);
+    }
+}
+
+/*------------------------------------------------------------------Поле для комметария---------------------------------------------------------------*/
+/* Базовое состояние */
+.comment_body {
+    position: relative; /* Для позиционирования */
+    border-radius: 15px; /* Закругление углов */
+    padding: 5px; /* Внутренний отступ */
+    margin: 10px 0; /* Отступ сверху и снизу */
+    background: rgba(var(--block-color), 0.8); /* Фон контейнера */
+    outline: 2px solid rgba(56, 217, 130, 0.8); /* Синяя рамка */
+    outline-offset: -4px; /* Отступ рамки внутрь */
+    transition: all 0.3s ease, outline 0s ease 0s; /* Мгновенное исчезновение рамки */
+    box-shadow: 
+        0 0 10px 4px rgba(56, 217, 130, 0.6), /* Ближний слой затухания */
+        0 0 20px 8px rgba(56, 217, 130, 0.3); /* Дальний слой затухания */
+}
+
+/* Состояние фокуса */
+.comment_body:focus-within {
+    transform: scale(1.05); /* Увеличиваем весь контейнер */
+    transform-origin: center; /* Центрируем масштабирование */
+    outline: 2px solid rgba(244, 71, 93, 0.8); /* Розовая рамка */
+    outline-offset: -6px; /* Больший отступ рамки внутрь */
+    padding: 7px 28px; /* Асимметричный padding для горизонтального увеличения */
+    margin: 20px 0; /* Увеличиваем отступ сверху и снизу */
+    box-shadow: 
+        0 0 10px 4px rgba(244, 71, 93, 0.6), /* Ближний слой затухания (розовый) */
+        0 0 20px 8px rgba(244, 71, 93, 0.3); /* Дальний слой затухания (розовый) */
+    animation: glow-animation 2s infinite; /* Добавляем анимацию */
+    transition: all 0.3s ease, outline 0s ease 0s; /* Мгновенное появление рамки */
+}
+
+/* Анимация для рамки в состоянии фокуса */
+@keyframes glow-animation {
+    0%, 100% {
+        box-shadow: 
+            0 0 10px 4px rgba(244, 71, 93, 0.6),
+            0 0 20px 8px rgba(244, 71, 93, 0.3);
+    }
+    50% {
+        box-shadow: 
+            0 0 15px 6px rgba(244, 71, 93, 0.8),
+            0 0 30px 12px rgba(244, 71, 93, 0.5);
+    }
+}
+
+/* Текстовое поле внутри .comment_body */
+.comment_body textarea {
+    background: transparent; /* Прозрачный фон */
+    border: none; /* Убираем границу */
+    padding: 6px; /* Уменьшаем паддинг */
+    font-size: 12px;
+    color: rgba(var(--white-color), 1);
+    resize: none;
+    width: 100%;
+    height: 89px;
+    box-sizing: border-box; /* Учитываем padding в размерах */
+    position: relative;
+    z-index: 3; /* Размещаем текстовое поле поверх рамки */
+    transition: transform 0.3s ease; /* Плавное увеличение */
+    transform-origin: center; /* Центрируем масштабирование */
+}
+
+/* Градиентный фон при фокусе */
+.comment_body:focus-within textarea {
+    background: linear-gradient(135deg, 
+        rgba(var(--anime-inprocess), 0.1), 
+        rgba(var(--manga-complete), 0.05));
+    transform: scale(1.05); /* Увеличение поля */
+}
+/*-------------------------------------------------------------------------Ачивки---------------------------------------------------------------------*/
+#profiles_show .cc-achievements {
+ flex-wrap: wrap;
+}
+
+#profiles_show .achievements .c-column:nth-child(1) .cc-achievements .b-achievement, #profiles_show .achievements .c-column:nth-child(2) .cc-achievements .b-achievement {
+ width: 49%;
+}
+
+
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge:nth-child(5),
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge:nth-child(6),
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge:nth-child(7),
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge:nth-child(8){
+ display: inline-block !important;
+}
+
+.c-column:has(.cc-authors) { display: none; }
+
+.c-column:has(.cc-franchises) { width: 100% !important; }
+
+.cc-franchises {
+ display: grid !important;
+ grid-template-columns: repeat(4, 1fr);
+ grid-gap: 16px;
+}
+
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge {
+ width: 100% !important;
+ margin: 0 !important;
+ right: 0 !important;
+}
+
+
+
+/* Картинки ачивок */
+@media { /* Пустой медиа-запрос */ }
+
+.p-profiles .b-achievement > .c-image > .inner:after {
+  display: block;
+  content: '';
+  background-size: cover !important;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: visible !important;
+  z-index: -1;
+}
+
+
+
+/* Для Общих, Жанровых, Авторов */
+
+.p-profiles .b-achievement[data-hint^='300 просмотренных аниме'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='300 просмотренных аниме'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='300 просмотренных аниме'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-2-a2a0a28bec_slif4g.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='400 просмотренных аниме'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='400 просмотренных аниме'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='400 просмотренных аниме'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-2-a2a0a28bec_slif4g.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='500 просмотренных аниме'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='500 просмотренных аниме'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='500 просмотренных аниме'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-2-a2a0a28bec_slif4g.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Длиннотайтлы'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Длиннотайтлы'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Длиннотайтлы'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462093/ezgif-6-bc535ef564_jotcxf.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Генки'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Генки'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Генки'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462102/ezgif-2500addbd95a964c_gyxeki.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Комедия'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Комедия'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Комедия'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462089/ezgif-3-46249482d0_rhmgyi.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Историческое'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Историческое'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Историческое'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462089/ezgif-5-c63124b016_nnldxb.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Фэнтези'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Фэнтези'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Фэнтези'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462100/ezgif-2aafa23ddde327f8_hqkspy.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Военное'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Военное'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Военное'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462092/ezgif-24a49b8ba1f73140_vqoz8q.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Фантастика'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Фантастика'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Фантастика'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462101/ezgif-2793fb783ff3af19_w5sosw.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Хоррор'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Хоррор'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Хоррор'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-5-c585253462_uxintc.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Романтика'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Романтика'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Романтика'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462096/ezgif-5-5b1d32ae00_o3vprz.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Драма'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Драма'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Драма'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462093/ezgif-5-64cdf8728a_nudzfi.webp);
+}
+
+.p-profiles .b-achievement[data-hint^='Безумие / Психологическое'] .inner img {visibility: hidden;}
+.p-profiles .b-achievement[data-hint^='Безумие / Психологическое'] .inner .border {border-color: black !important}
+.p-profiles .b-achievement[data-hint^='Безумие / Психологическое'] .inner:after {
+  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462097/ezgif-228c209b4af243_rcxisr.webp);
+}
+
+
+/* Франшизы */
+/* 1. Базовые стили контейнера (возвращаем кликабельность) */
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge {
+  position: relative !important;
+  overflow: hidden !important;
+  pointer-events: auto !important; /* Перебиваем pointer-events: none из твоих стилей */
+  cursor: pointer;
+  display: inline-block !important;
+}
+
+/* 2. Оригинальные картинки делаем прозрачными. 
+      ВАЖНО: именно opacity: 0, чтобы они продолжали занимать место 
+      и не давали блоку схлопнуться в 0 пикселей! */
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge img {
+  display: block !important;
+  opacity: 0 !important; 
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* 3. Фоновые картинки через ::before */
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 2 !important;
+  border-radius: 8px !important;
+}
+
+/* 4. Шторка с текстом через ::after */
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge::after {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  
+  background: rgba(0, 0, 0, 0.85) !important;
+  color: #fff !important;
+  
+  padding: 8px 6px !important;
+  text-align: center !important;
+  font-size: 11px !important;
+  font-weight: bold !important;
+  line-height: 1.3 !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  
+  transform: translateY(100%) !important;
+  transition: transform 0.3s ease !important;
+  z-index: 10 !important;
+  pointer-events: none !important; /* Пропускаем клики сквозь шторку к самой ссылке */
+}
+
+/* 5. При наведении шторка плавно выезжает снизу */
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge:hover::after {
+  transform: translateY(0) !important;
+}
+
+/* 6. Привязываем ФОНОВЫЕ КАРТИНКИ к уникальному URL каждой франшизы */
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mob_psycho"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462100/ezgif-2fb6b6e6e1c264f1_fhjs8z.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="overlord"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781644102/ezgif-296258fb46ef33f9_rgj8hp.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mushoku_tensei"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462102/ezgif-24d3525415e5aaa7_ucewg6.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="kaguya_sama"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781642843/ezgif-83c6562aba12d4e6_xlhdes.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="danmachi"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781643791/ezgif-2bfefb29c69512bc_ggqnmu.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="gintama"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462094/ezgif-225799239b961b02_w9dsg7.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="hajime_no_ippo"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781643916/ezgif-201c95d9c469f304_sqxmyw.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="kingdom"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462095/ezgif-1-46d69f5544_yrnxdi.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mushishi"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462090/ezgif-5-6373b1c81e_prtthi.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="konosuba"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462097/ezgif-5-ce8fac38a3_saabib.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="bleach"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462094/ezgif-243d112cb0d1e5e2_phxvaj.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="bakuman"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462099/ezgif-5-fafca6e508_eohezg.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="quanzhi_fashi"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781644837/ezgif-8522f1b6635790c4_sozf3b.webp) !important; }
+
+
+/* 7. Привязываем ТЕКСТ для шторки по уникальному URL */
+
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mob_psycho"]::after { content: "Моб Психо 100" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="overlord"]::after { content: "Повелитель" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mushoku_tensei"]::after { content: "Реинкарнация безработного" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="kaguya_sama"]::after { content: "Госпожа Кагуя: в любви как на войне" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="danmachi"]::after { content: "Разве плохо искать себе пару в подземелье?" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="gintama"]::after { content: "Гинтама" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="hajime_no_ippo"]::after { content: "Первый шаг" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="kingdom"]::after { content: "Царство" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mushishi"]::after { content: "Мастер муши" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="konosuba"]::after { content: "Этот замечательный мир!" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="bleach"]::after { content: "Блич" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="bakuman"]::after { content: "Бакуман" !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="quanzhi_fashi"]::after { content: "Маг на полную ставку" !important; }
+
+
+/*-----------------------------------------------------------------Постеры избранное--------------------------------------------------------------------*/
+[href*="characters/184947-frieren"] {
+  --show-default: 0;
+  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462101/ezgif-2c61b2b2a03ef635_sdaqmy.webp");
+}
+
+[href*="characters/13020-askeladd"] {
+  --show-default: 0;
+  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462102/ezgif-2b723cbfb6b28ed9_gtdxwd.webp");
+}
+
+[href*="characters/62-zoro-roronoa"] {
+  --show-default: 0;
+  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462099/ezgif-5-fb72c53f55_codurj.webp");
+}
+
+[href*="characters/31-hisoka-morow"] {
+  --show-default: 0;
+  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462092/ezgif-5-d4a1b0ff0c_i5m6hj.webp");
+}
+
+[href*="characters/111335-eris-boreas-greyrat"] {
+  --show-default: 0;
+  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462094/ezgif-24c4dc6a0b22a66e_yetdmu.webp");
+}
+
+[href*="characters/164473-kento-nanami"] {
+  --show-default: 0;
+  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462094/ezgif-5-853ef6953f_eusoee.webp");
+}
+
+[href*="characters/85-kakashi-hatake"] {
+  --show-default: 0;
+  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462089/ezgif-5-d5bf925312_ktpop1.webp");
+}
+
+[href*="characters/147-kenshin-himura"] {
+  --show-default: 0;
+  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462100/ezgif-2e80d71a42d4f506_hdz6y6.webp");
+}
+
+[href*="characters/2910-obito-uchiha"] {
+  --show-default: 0;
+  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462088/ezgif-5-ecc85c1f4d_fafycw.webp");
+}
+
+[href*="characters/13045-bruno-bucciarati"] {
+  --show-default: 0;
+  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462099/ezgif-21a5b52600bf16d5_bkcswo.webp");
+}
+
+/* Отложенная отрисовка избранного и содержимого достижений на компьютере.
+   Основные заголовки остаются снаружи. Начальные оценки высоты приблизительные;
+   auto запоминает фактическую высоту после первой отрисовки, не фиксируя её. */
+@supports (content-visibility: auto) and (contain-intrinsic-block-size: auto 184px) {
+  @media (min-width: 1024px) {
+    #profiles_show.p-profiles-show .profile-content .cc-favourites {
+      content-visibility: auto;
+      contain-intrinsic-block-size: auto 184px;
+      overflow-clip-margin: 32px;
+    }
+
+    #profiles_show.p-profiles-show .profile-content .achievements > .cc-2 {
+      content-visibility: auto;
+      contain-intrinsic-block-size: auto 700px;
+      overflow-clip-margin: 32px;
+    }
+  }
+}
+
+/* График активности: постоянная геометрия вместо анимации height и margin.
+   Видимая высота 20–95px; положение учитывает общую строку inline-block.
+   Задержки 34 столбцов и пауза при наведении наследуются из импортированной темы. */
+@supports (clip-path: inset(0 round 14px)) {
+  .p-profiles-show .activity .bar.vertical > .line:nth-child(-n + 34) {
+    animation-name: none !important;
+    background-color: transparent !important;
+    height: 95px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-right: 0;
+  }
+
+  .p-profiles-show .activity .bar.vertical > .line:nth-child(-n + 34) > .bar-container {
+    animation-duration: inherit;
+    animation-delay: inherit;
+    animation-timing-function: inherit;
+    animation-iteration-count: inherit;
+    animation-play-state: inherit;
+  }
+
+  .p-profiles-show .activity .bar.vertical > .line:nth-child(-n + 34) > .bar-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    animation-name: profile-activity-pulse;
+    animation-duration: inherit;
+    animation-delay: inherit;
+    animation-timing-function: inherit;
+    animation-iteration-count: inherit;
+    animation-play-state: inherit;
+  }
+}
+
+@keyframes profile-activity-pulse {
+  0% {
+    clip-path: inset(35px 0 40px round 14px);
+    background-color: rgba(var(--very-high-rating), var(--hundred));
+  }
+  50% {
+    clip-path: inset(0 round 14px);
+    background-color: rgba(var(--average-rating), var(--hundred));
+  }
+  100% {
+    clip-path: inset(35px 0 40px round 14px);
+    background-color: rgba(var(--small-rating), var(--hundred));
+  }
+}
+
+/* Шапка новых фильтров: текстовая ссылка вместо круглых кнопок темы */
+.b-collection-filters .c-filters-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-sizing: border-box;
+  height: auto;
+  min-height: 32px;
+  padding: 6px 12px;
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.b-collection-filters .c-filters-head > .misc-links {
+  position: static;
+  flex: 0 0 auto;
+  width: auto;
+  height: auto;
+  margin: 0 0 0 auto;
+  padding: 0;
+  line-height: inherit;
+}
+
+.b-collection-filters .c-filters-head > .misc-links > a {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  font-size: 12px !important;
+  line-height: inherit;
+  white-space: nowrap;
+}
+
+.b-collection-filters .c-filters-head > .misc-links > a::before,
+.b-collection-filters .c-filters-head > .misc-links > a::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Раскрывающиеся списки фильтров: общая палитра для компонента c-ms */
+.c-ms .c-ms-dropdown {
+  background-color: rgb(var(--block-color)) !important;
+  color: rgb(var(--light-color)) !important;
+  border-color: rgba(var(--bright-color), 0.5) !important;
+  box-shadow: 0 4px 16px rgba(var(--shadows-color), 0.6);
+}
+
+.c-ms .c-ms-options {
+  background-color: transparent !important;
+  color: rgb(var(--light-color)) !important;
+}
+
+.c-ms .c-ms-option {
+  color: rgb(var(--light-color)) !important;
+}
+
+.c-ms .c-ms-option:hover,
+.c-ms .c-ms-option:focus-visible {
+  background-color: rgba(var(--bright-color), 0.25) !important;
+  color: rgb(var(--white-color)) !important;
+}
+
+.c-ms .c-ms-option-mark {
+  border-color: rgba(var(--light-color), 0.6) !important;
+}
+
+.c-ms .c-ms-control:focus-visible {
+  outline: 2px solid rgb(var(--bright-color));
+  outline-offset: 2px;
+}
+
+/* Принудительно скрываем стандартные всплывающие подсказки (Tipsy) на странице профиля, 
+   чтобы они не дублировали текст из твоей выезжающей шторки */
+body#profiles_show .tipsy,
+.p-profiles-show .tipsy {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+}
+
+/* BEGIN MOBILE ADAPTATION
+   Overrides of the existing theme; imported sources and image URLs stay intact. */
+@media screen and (max-width: 1023px) {
+  html, body, body::before, body::after {
+    background: #000 !important;
+  }
+
+  /* Compact navigation, without reflections in either browser engine. */
+  .l-top_menu-v2 .logo-container::before,
+  .l-top_menu-v2 .menu-dropdown > span span,
+  .l-top_menu-v2 .menu-dropdown > span a,
+  .l-top_menu-v2 .menu-dropdown > span .nickname,
+  .l-top_menu-v2 .menu-icon.sign_in::after,
+  .l-top_menu-v2 .menu-icon.sign_in {
+    animation: none;
+    color: rgb(var(--bright-color));
+    text-shadow: none;
+    -webkit-box-reflect: unset;
+    line-height: 1.2;
+  }
+  .l-top_menu-v2 .logo-container::after,
+  .l-top_menu-v2 .menu-dropdown > span span::after {
+    content: none !important;
+  }
+  .l-top_menu-v2 .logo-container::before {
+    margin-left: 8px;
+    font-size: 22px;
+  }
+  .l-top_menu-v2 .menu-dropdown > span span,
+  .l-top_menu-v2 .menu-dropdown > span a,
+  .l-top_menu-v2 .menu-dropdown > span .nickname {
+    font-size: 16px;
+  }
+  .l-top_menu-v2 .menu-icon,
+  .l-top_menu-v2 .submenu > a {
+    min-height: 44px;
+  }
+  .l-top_menu-v2 .active .submenu {
+    max-height: calc(100dvh - 50px);
+    overflow-y: auto;
+  }
+  .global-search input[type="text"] {
+    font-size: 16px;
+  }
+  .l-top_menu-v2 a:focus-visible,
+  .l-top_menu-v2 input:focus-visible,
+  .solid > a:focus-visible,
+  .cc-franchises .b-badge:focus-visible {
+    outline: 2px solid rgb(var(--bright-color)) !important;
+    outline-offset: -2px;
+  }
+
+  /* Remove the absolute mobile offsets and let the profile size itself. */
+  body#profiles_show .l-page {
+    margin-top: 12px !important;
+  }
+  body#profiles_show .profile-head {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: static;
+    top: auto;
+    height: auto;
+    padding: 12px 15px;
+  }
+  body#profiles_show .profile-content {
+    margin-top: 0;
+  }
+  #profiles_show .profile-head .c-brief {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+  }
+  #profiles_show .profile-head .c-brief .avatar {
+    position: relative;
+    float: none;
+    width: 112px;
+    margin: 0 auto !important;
+    padding: 0;
+  }
+  #profiles_show .profile-head .c-brief .avatar img {
+    display: block;
+    width: 112px;
+    height: 112px;
+    transform: none !important;
+  }
+  #profiles_show .profile-head .avatar::before {
+    inset: 0;
+    width: 112px;
+    height: 112px;
+    margin: 0;
+    pointer-events: none;
+  }
+  #profiles_show .profile-head .c-brief header.head {
+    position: static;
+    width: 100%;
+    margin: 12px 0 0 !important;
+    text-align: center;
+  }
+  #profiles_show .profile-head .c-brief header.head .aliases {
+    height: 64px;
+    transform: none;
+    animation: none;
+    text-shadow: none;
+  }
+  #profiles_show .profile-head .c-brief header.head .notice {
+    opacity: 1;
+  }
+  #profiles_show .profile-head .c-info,
+  #profiles_show .profile-head .c-info .c-lists-info {
+    display: block;
+    position: static;
+    float: none;
+    width: 100%;
+    height: auto;
+    margin: 0 !important;
+    padding: 0;
+    transform: none;
+  }
+  #profiles_show .profile-head .c-info .c-lists-info .b-stats_bar {
+    display: block;
+    position: static;
+    width: 100%;
+    height: auto;
+    margin: 0 0 12px;
+    padding: 0;
+  }
+  #profiles_show .profile-head .b-stats_bar > .title {
+    position: static;
+    display: block;
+    width: 100%;
+    margin: 0 0 6px;
+    opacity: 1;
+    line-height: 1.4;
+    text-align: left;
+    min-height: 28px;
+  }
+  #profiles_show .profile-head .b-stats_bar .bar {
+    height: 20px !important;
+    line-height: 20px !important;
+    margin: 0;
+  }
+  #profiles_show .profile-head .c-lists-info .b-stats_bar::before {
+    content: none;
+  }
+  #profiles_show .profile-head .c-history {
+    display: block !important;
+    order: 3;
+    position: static;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    transform: none;
+  }
+  #profiles_show .profile-head .c-history > .subheadline {
+    display: flex !important;
+    position: relative;
+    inset: auto !important;
+    width: 100%;
+    margin: 0 0 8px !important;
+    visibility: visible;
+    font-size: 14px;
+    height: auto;
+    background: rgb(var(--block-color)) !important;
+  }
+  #profiles_show .profile-head .c-history > .subheadline a {
+    position: static;
+    font-size: 14px;
+    min-height: 36px;
+    opacity: 1;
+  }
+  #profiles_show .profile-head .c-history > .subheadline a::after,
+  #profiles_show .profile-head .c-history > .subheadline::before,
+  #profiles_show .profile-head .c-history > .subheadline::after {
+    content: none !important;
+  }
+  #profiles_show .profile-head .c-history > div:not(.subheadline) {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  #profiles_show .profile-head .c-history .entry {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    animation: none !important;
+    transform: none;
+  }
+
+  /* TOP: two proportional images per row, with a quiet static border. */
+  .solid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid rgb(var(--hover-color));
+    border-radius: 14px;
+  }
+  .solid::before { content: none; }
+  .solid > a, .solid .b-image {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .solid img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 289 / 163;
+    object-fit: cover;
+  }
+  .solid a, .solid .b-image, .solid img {
+    border-radius: 0 !important;
+  }
+
+  #profiles_show .profile-content > .cc-2 {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  #profiles_show .profile-content > .cc-2 > .c-column,
+  #profiles_show .profile-content > .cc-2 > .c-right > .cc-2a,
+  #profiles_show .profile-content > .cc-2 > .c-right > .block {
+    position: static;
+    float: none;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  #profiles_show .lifetime > .title {
+    position: static;
+    width: 100%;
+    height: auto;
+    margin: 0 0 8px;
+    line-height: 1.5;
+    opacity: 1;
+  }
+  #profiles_show .achievements > .cc-2 > .c-column:nth-child(n) {
+    float: none;
+    width: 100%;
+    margin: 0 0 16px;
+  }
+  #profiles_show .achievements .cc-achievements {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  #profiles_show .achievements .c-column:nth-child(-n + 2) .cc-achievements .b-achievement {
+    width: calc(50% - 4px);
+    margin: 0;
+  }
+  #profiles_show .cc-franchises {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  #profiles_show.p-profiles-show .achievements .cc-franchises .b-badge {
+    aspect-ratio: 2 / 1;
+    min-height: 80px;
+  }
+  #profiles_show .cc-favourites {
+    gap: 8px;
+  }
+  #profiles_show .cc-favourites > .c-column {
+    width: calc(25% - 6px);
+    margin: 0;
+  }
+
+  .subheadline::before, .subheadline::after {
+    animation: none;
+    filter: none;
+    opacity: .6;
+  }
+  .search-marker,
+  .global-search input[type="text"]:focus,
+  .comment_body:focus-within {
+    animation: none;
+  }
+  .b-stats_bar .bar > .first,
+  .b-stats_bar .bar > .second,
+  .b-stats_bar .bar > .third {
+    animation: none;
+  }
+  .comment_body:focus-within {
+    transform: none;
+    padding: 5px;
+    margin: 10px 0;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  #profiles_show .profile-head .c-history > div:not(.subheadline) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media screen and (max-width: 1023px) and (hover: none) {
+  #profiles_show.p-profiles-show .achievements .cc-franchises .b-badge::after {
+    transform: none !important;
+    transition: none !important;
+    font-size: 12px !important;
+    padding: 4px !important;
+  }
+}
+
+/* Respect reduced motion without hiding the original image replacements. */
+@media (prefers-reduced-motion: reduce) {
+  .l-top_menu-v2 .logo-container::before,
+  .l-top_menu-v2 .logo-container::after,
+  .l-top_menu-v2 .menu-dropdown > span span,
+  .l-top_menu-v2 .menu-dropdown > span a,
+  .l-top_menu-v2 .menu-dropdown > span .nickname,
+  .l-top_menu-v2 .menu-dropdown > span span::after,
+  .l-top_menu-v2 .menu-icon.sign_in,
+  .l-top_menu-v2 .menu-icon.sign_in::before,
+  .p-profiles .profile-head .c-brief header.head .aliases,
+  .subheadline::before, .subheadline::after,
+  .solid::before,
+  .p-profiles-show .activity .bar.vertical > .line:nth-child(-n + 34),
+  .p-profiles-show .activity .bar.vertical > .line:nth-child(-n + 34) > .bar-container,
+  .p-profiles-show .activity .bar.vertical > .line:nth-child(-n + 34) > .bar-container::before,
+  .activity .graph.vertical .line .bar,
+  .search-marker,
+  .global-search input[type="text"]:focus,
+  .comment_body:focus-within,
+  .b-stats_bar .bar > .first,
+  .b-stats_bar .bar > .second,
+  .b-stats_bar .bar > .third,
+  .p-profiles .profile-head .c-history .entry,
+  .p-profiles .profile-head .c-history .entry .title,
+  .p-profiles .profile-head .c-history .entry .misc {
+    animation: none !important;
+  }
+  .p-profiles .profile-head .c-brief header.head:hover .aliases {
+    transform: none;
+  }
+  .p-profiles-show .activity .bar.vertical > .line:nth-child(-n + 34) > .bar-container::before {
+    background-color: rgb(var(--very-high-rating));
+    clip-path: inset(35px 0 40px round 14px);
+  }
+  .p-profiles .profile-head .c-brief header.head:hover .notice {
+    opacity: 1;
+  }
+  .comment_body:focus-within {
+    transform: none;
+  }
+  #profiles_show.p-profiles-show .achievements .cc-franchises .b-badge::after {
+    transition: none !important;
+  }
+}
+/* END MOBILE ADAPTATION */
+
+/* Emerald & Scarlet — Zoro left, Shanks right. Independent of the default theme. */
+html:root {
+  --white-color: 242, 247, 244;
+  --light-color: 211, 222, 216;
+  --dark-color: 165, 183, 174;
+  --bright-color: 91, 220, 155;
+  --dull-color: 153, 171, 160;
+  --input-color: 120, 140, 130;
+  --hover-bottoms-1: 19, 39, 30;
+  --buttoms-color: 17, 25, 22;
+  --hover-buttoms-2: 211, 37, 64;
+  --very-high-rating: 109, 239, 158;
+  --high-rating: 44, 174, 112;
+  --average-rating: 32, 120, 84;
+  --small-rating: 21, 66, 48;
+  --time-filled: 44, 174, 112;
+  --time-empty: 21, 30, 25;
+  --anime-inprocess: 21, 66, 48;
+  --anime-complete: 32, 120, 84;
+  --manga-inprocess: 244, 71, 93;
+  --manga-complete: 211, 37, 64;
+  --hover-color: 255, 107, 124;
+  --shadows-color: 0, 0, 0;
+  --block-color: 14, 19, 18;
+  --menu-back: 7, 11, 10;
+  --nick-cover: 62, 20, 28;
+  --popup-color: 92, 28, 40;
+  --hundred: 1;
+
+  /* Hosted animated WebP: Zoro left, Shanks right. */
+  --es-background-left: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793094848/zoro-1440p-compact_wr76ep.webp");
+  --es-background-right: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793127787/shanks-1440p-under10mb_k7lf3t.webp");
+}
+
+body::after {
+  background-color: #000;
+  background-image: none;
+}
+
+/* Keep the existing desktop-only background boundary and image geometry. */
+@media (min-width: 1280px) {
+  body::after {
+    background-image: var(--es-background-left), var(--es-background-right);
+    background-size: contain, contain;
+    background-position: left center, right center;
+    background-repeat: no-repeat, no-repeat;
+  }
+}
+
+.l-footer::after {
+  content: "*Emerald & Scarlet*";
+}
+
+/* Theme-specific assets; leave the default CSS and shared BBCode intact. */
+.p-profiles .profile-head .c-brief header.head .aliases {
+  background-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793092205/ezgif-4aab277404b32afa_wjai7v.webp");
+}
+
+.profile-content .about.block a[href$="tiermaker.com/list/anime/anime--15930092/5902281"] img {
+  content: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793092229/top-tierlist-emerald-scarlet_ejddtw.webp");
+}
+
+.p-profiles .profile-head .avatar::before {
+  background-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793093191/dancing-avatar-emerald-floor_fbuaol.webp");
+}

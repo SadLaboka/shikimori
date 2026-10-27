@@ -11,3 +11,7 @@ css/base/main_code_4mob.css whitespace=-blank-at-eol
 # Source components and deployment output must concatenate identically on Windows.
 css/components/*.css text eol=lf
 styles_optimized.css text eol=lf
+# Theme sources and generated output must also retain their verified byte hashes.
+css/themes/*/*.css text eol=lf
+# Generated themes preserve trailing spaces inherited from the shared legacy CSS.
+css/themes/*/styles.css whitespace=-blank-at-eol

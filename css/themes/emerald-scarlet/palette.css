@@ -1,0 +1,65 @@
+/* Emerald & Scarlet — Zoro left, Shanks right. Independent of the default theme. */
+html:root {
+  --white-color: 242, 247, 244;
+  --light-color: 211, 222, 216;
+  --dark-color: 165, 183, 174;
+  --bright-color: 91, 220, 155;
+  --dull-color: 153, 171, 160;
+  --input-color: 120, 140, 130;
+  --hover-bottoms-1: 19, 39, 30;
+  --buttoms-color: 17, 25, 22;
+  --hover-buttoms-2: 211, 37, 64;
+  --very-high-rating: 109, 239, 158;
+  --high-rating: 44, 174, 112;
+  --average-rating: 32, 120, 84;
+  --small-rating: 21, 66, 48;
+  --time-filled: 44, 174, 112;
+  --time-empty: 21, 30, 25;
+  --anime-inprocess: 21, 66, 48;
+  --anime-complete: 32, 120, 84;
+  --manga-inprocess: 244, 71, 93;
+  --manga-complete: 211, 37, 64;
+  --hover-color: 255, 107, 124;
+  --shadows-color: 0, 0, 0;
+  --block-color: 14, 19, 18;
+  --menu-back: 7, 11, 10;
+  --nick-cover: 62, 20, 28;
+  --popup-color: 92, 28, 40;
+  --hundred: 1;
+
+  /* Hosted animated WebP: Zoro left, Shanks right. */
+  --es-background-left: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793094848/zoro-1440p-compact_wr76ep.webp");
+  --es-background-right: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793127787/shanks-1440p-under10mb_k7lf3t.webp");
+}
+
+body::after {
+  background-color: #000;
+  background-image: none;
+}
+
+/* Keep the existing desktop-only background boundary and image geometry. */
+@media (min-width: 1280px) {
+  body::after {
+    background-image: var(--es-background-left), var(--es-background-right);
+    background-size: contain, contain;
+    background-position: left center, right center;
+    background-repeat: no-repeat, no-repeat;
+  }
+}
+
+.l-footer::after {
+  content: "*Emerald & Scarlet*";
+}
+
+/* Theme-specific assets; leave the default CSS and shared BBCode intact. */
+.p-profiles .profile-head .c-brief header.head .aliases {
+  background-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793092205/ezgif-4aab277404b32afa_wjai7v.webp");
+}
+
+.profile-content .about.block a[href$="tiermaker.com/list/anime/anime--15930092/5902281"] img {
+  content: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793092229/top-tierlist-emerald-scarlet_ejddtw.webp");
+}
+
+.p-profiles .profile-head .avatar::before {
+  background-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793093191/dancing-avatar-emerald-floor_fbuaol.webp");
+}
