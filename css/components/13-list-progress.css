@@ -27,3 +27,8 @@
   }
 }
 
+/* Повторные просмотры: акцент активной цветовой схемы. */
+.p-user_rates-index .list-lines tr td .rewatches {
+  color: rgb(var(--bright-color));
+}
+
