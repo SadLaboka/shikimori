@@ -46,7 +46,9 @@ async function avatarTab(sender) {
   }
   const tab = await browser.tabs.get(sender.tab.id);
   if (!tab.active || !ownProfile(tab.url)) throw new UserError('Вернись на вкладку профиля SadLaboka.');
-  await attach(tab.id);
+  // This trusted message already comes from the installed avatar handler.
+  // bridge.js is loaded before it in the same top-level content-script world.
+  // Reinjecting the running handler adds unnecessary IPC to every click.
   return tab.id;
 }
 async function handle(message, sender = null) {

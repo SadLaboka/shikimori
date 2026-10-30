@@ -2,11 +2,14 @@
 import { firefox } from '../tools/preview/node_modules/playwright/index.mjs';
 import { mkdtemp,mkdir,writeFile,readFile,cp } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import path from 'node:path';
 import { existsSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { connectBidi,freePort,delay } from './helpers/firefox-remote.mjs';
-import { ACCOUNT,schemeCss } from '../extensions/firefox/catalog.mjs';
+const sourceOption=process.argv.find(value=>value.startsWith('--extension-source='))?.slice('--extension-source='.length);
+const sourceDirectory=sourceOption?path.resolve(sourceOption):fileURLToPath(new URL('../extensions/firefox/',import.meta.url));
+const {ACCOUNT,schemeCss}=await import(pathToFileURL(path.join(sourceDirectory,'catalog.mjs')).href);
 const output=new URL('../.preview/firefox-extension/',import.meta.url);await mkdir(output,{recursive:true});
 const performanceLabel=process.argv.find(value=>value.startsWith('--performance-label='))?.split('=')[1];
 if(performanceLabel&&!/^[a-z0-9-]+$/.test(performanceLabel))throw Error('Invalid performance label');
@@ -17,7 +20,7 @@ const profile=await mkdtemp(fileURLToPath(new URL('native-profile-',output)));
 const bidiPort=await freePort();
 const addonId='shikimori-schemes@sadlaboka.local',uuid='7a7bd21c-308b-449d-a683-fb19359c0c28';
 const testRuntime=await mkdtemp(fileURLToPath(new URL('native-runtime-',output)));
-await cp(fileURLToPath(new URL('../extensions/firefox/',import.meta.url)),testRuntime,{recursive:true});
+await cp(sourceDirectory,testRuntime,{recursive:true});
 const manifest=JSON.parse(await readFile(`${testRuntime}/manifest.json`,'utf8'));
 manifest.background.scripts=['test-harness.mjs'];
 await writeFile(`${testRuntime}/manifest.json`,JSON.stringify(manifest));
@@ -148,29 +151,39 @@ try{
   await wait(popup,"browser.storage.local.get('reloadAfter').then(s=>s.reloadAfter===true)");
   await bidi.command('browsingContext.activate',{context:shiki});
   await bidi.command('session.subscribe',{events:['browsingContext.load']});
-  let reloaded;
+  let reloaded,lastLoadAt=0;
   const loaded=new Promise(resolve=>{reloaded=resolve;});
-  bidi.on('browsingContext.load',event=>{if(event.context===shiki)reloaded();});
+  bidi.on('browsingContext.load',event=>{if(event.context===shiki){lastLoadAt=performance.now();reloaded();}});
+  // Compare the two entry points with the same empty second-window budget.
+  if(performanceLabel)await delay(1250);
+  const popupReloadStart=performance.now();
   await evaluate(popup,"document.querySelector('[data-scheme=\"main\"] button').click()");
   let reloadTimeout;
   try{await Promise.race([loaded,new Promise((_,reject)=>{reloadTimeout=setTimeout(()=>reject(Error('Expected active tab reload')),10000);})]);}
   finally{clearTimeout(reloadTimeout);}
+  timings.popupReloadMs=Math.round(lastLoadAt-popupReloadStart);
   assert.equal(await evaluate(shiki,'document.body.dataset.scheme'),'main');
   await wait(popup,"document.querySelector('#current').textContent.includes('Основная')");
   assert.equal(patches,4);
   // The real content script must accept actual user input, not page-generated
   // click events. The active-tab reload exercises a fresh content-script world.
-  const clickAvatar=async(repeat=1)=>{
+  const clickAvatar=async(repeat=1,measure=false)=>{
     await bidi.command('browsingContext.activate',{context:shiki});
     await wait(shiki,"document.querySelector('.avatar')?.getAttribute('role')==='button'");
     const actions=[{type:'pointerMove',x:88,y:88,duration:0,origin:'viewport'}];
     for(let i=0;i<repeat;i++)actions.push({type:'pointerDown',button:0},{type:'pointerUp',button:0});
+    if(measure)timings.avatarInputAt=performance.now();
     await bidi.command('input.performActions',{context:shiki,actions:[{type:'pointer',id:'avatar-mouse',parameters:{pointerType:'mouse'},actions}]});
   };
   await evaluate(shiki,"document.querySelector('.avatar').click()");await delay(100);
   assert.equal(patches,4,'A synthetic page click must not publish');
-  await clickAvatar(2);
+  if(performanceLabel)await delay(1250);
+  const priorLoad=lastLoadAt;
+  await clickAvatar(2,true);
   await wait(shiki,"document.body.dataset.scheme==='emerald-scarlet'");
+  for(let i=0;i<200&&lastLoadAt===priorLoad;i++)await delay(100);
+  assert.ok(lastLoadAt>priorLoad);
+  timings.avatarReloadMs=Math.round(lastLoadAt-timings.avatarInputAt);delete timings.avatarInputAt;
   assert.equal(css,schemeCss('emerald-scarlet'));assert.equal(patches,5,'A double click must cause only one PATCH');
   await clickAvatar();await wait(shiki,"document.body.dataset.scheme==='main'");
   assert.equal(css,schemeCss('main'));assert.equal(patches,6);

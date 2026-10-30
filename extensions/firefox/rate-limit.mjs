@@ -1,9 +1,10 @@
-// Leave headroom below Shikimori's documented 5 rps / 90 rpm.
+// Fit a complete five-request publication into Shikimori's 5 rps budget.
+// Keep a 100 ms second-window margin and headroom below 90 rpm.
 // Count completed requests and all in-flight reservations. A slow response
 // occupies its slot until completion, so persistence/IPC delays cannot cause
 // a burst beyond the limit. Session state survives event-page restarts.
 export const API_WINDOWS = Object.freeze([
-  Object.freeze({ count: 4, period: 1025 }),
+  Object.freeze({ count: 5, period: 1100 }),
   Object.freeze({ count: 80, period: 60025 }),
 ]);
 const STORAGE_KEY = 'apiRateEntries';

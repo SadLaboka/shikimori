@@ -42,7 +42,7 @@ test('page avatar switches without opening the popup and pins its own active tab
   assert.equal(result.pageReloaded, true); assert.deepEqual(f.reloads, [7]);
   assert.equal(f.requests.filter(request => request.method === 'PATCH').length, 1);
   assert.equal(f.data.backups[0].css, schemeCss('main'));
-  assert.ok(f.injections.some(item => item.files.includes('avatar.js')));
+  assert.equal(f.injections.length, 0, 'The running avatar handler must not be reinjected');
 });
 
 test('page channel rejects another profile, iframe, inactive or navigated tab and foreign sender', async () => {

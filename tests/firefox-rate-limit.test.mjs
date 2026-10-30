@@ -15,41 +15,41 @@ function fixture({ persistenceDelay = 0 } = {}) {
 }
 function checkWindows(starts) {
   for (const at of starts) {
-    assert.ok(starts.filter(time => time > at - 1000 && time <= at).length <= 4, 'Second burst limit exceeded');
+    assert.ok(starts.filter(time => time > at - 1000 && time <= at).length <= 5, 'Second burst limit exceeded');
     assert.ok(starts.filter(time => time > at - 60000 && time <= at).length <= 80, 'Minute limit exceeded');
   }
 }
 test('short burst has no fixed delays; subsequent requests obey second and minute budgets', async () => {
   const f = fixture(), limiter = f.make(), starts = [];
-  for (let i = 0; i < 4; i++) await limiter.run(() => starts.push(f.now()));
-  assert.deepEqual(starts, [0, 0, 0, 0]); assert.equal(f.sleeps.length, 0);
-  for (let i = 4; i < 85; i++) await limiter.run(() => starts.push(f.now()));
-  assert.ok(starts[4] >= 1025); assert.ok(starts[80] >= 60025);
+  for (let i = 0; i < 5; i++) await limiter.run(() => starts.push(f.now()));
+  assert.deepEqual(starts, [0, 0, 0, 0, 0]); assert.equal(f.sleeps.length, 0);
+  for (let i = 5; i < 85; i++) await limiter.run(() => starts.push(f.now()));
+  assert.ok(starts[5] >= 1100); assert.ok(starts[80] >= 60025);
   checkWindows(starts);
 });
 test('persisted budget survives background restart', async () => {
   const f = fixture(), first = f.make();
-  for (let i = 0; i < 4; i++) await first.run(() => {});
+  for (let i = 0; i < 5; i++) await first.run(() => {});
   let dispatched;
   await f.make().run(() => { dispatched = f.now(); });
-  assert.ok(dispatched >= 1025);
+  assert.ok(dispatched >= 1100);
 });
 test('unfinished persisted reservations get a fresh conservative window after a crash', async () => {
   const f = fixture(), first = f.make();
-  for (let i = 0; i < 4; i++) await first.reserve();
+  for (let i = 0; i < 5; i++) await first.reserve();
   f.advance(2000); const restartedAt = f.now(); let dispatched;
   await f.make().run(() => { dispatched = f.now(); });
-  assert.ok(dispatched >= restartedAt + 1025);
+  assert.ok(dispatched >= restartedAt + 1100);
 });
 test('concurrent callers cannot exceed the in-flight budget or deadlock completion', async () => {
   const f = fixture(), limiter = f.make(), started = [];
   let release;
   const gate = new Promise(resolve => { release = resolve; });
-  const calls = Array.from({ length: 5 }, (_, index) => limiter.run(async () => { started.push(index); if (index < 4) await gate; }));
+  const calls = Array.from({ length: 6 }, (_, index) => limiter.run(async () => { started.push(index); if (index < 5) await gate; }));
   await new Promise(resolve => setImmediate(resolve));
-  assert.deepEqual(started, [0, 1, 2, 3]);
+  assert.deepEqual(started, [0, 1, 2, 3, 4]);
   release(); await Promise.all(calls);
-  assert.deepEqual(started, [0, 1, 2, 3, 4]); assert.ok(f.now() >= 1025);
+  assert.deepEqual(started, [0, 1, 2, 3, 4, 5]); assert.ok(f.now() >= 1100);
 });
 test('slow persistence and network responses cannot move actual dispatch outside the budget', async () => {
   const f = fixture({ persistenceDelay: 180 }), limiter = f.make(), starts = [];
@@ -58,9 +58,9 @@ test('slow persistence and network responses cannot move actual dispatch outside
 });
 test('failed requests consume their rate slot and are never retried by the scheduler', async () => {
   const f = fixture(), limiter = f.make(); let attempts = 0;
-  for (let i = 0; i < 4; i++) await assert.rejects(limiter.run(() => { attempts++; throw Error('network'); }));
+  for (let i = 0; i < 5; i++) await assert.rejects(limiter.run(() => { attempts++; throw Error('network'); }));
   await limiter.run(() => { attempts++; });
-  assert.equal(attempts, 5); assert.ok(f.now() >= 1025);
+  assert.equal(attempts, 6); assert.ok(f.now() >= 1100);
 });
 test('reservation persistence failure stops dispatch without poisoning the scheduler', async () => {
   const f = fixture(), limiter = f.make(); let attempts = 0;
