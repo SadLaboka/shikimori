@@ -1,0 +1,94 @@
+name: Release Firefox extension
+
+on:
+  push:
+    tags: ['firefox-v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing release tag, for example firefox-v0.2.1; also resumes an AMO review'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firefox-signed-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'SadLaboka/shikimori'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+      - name: Validate release tag and main ancestry
+        id: release
+        run: |
+          node scripts/firefox-release-info.mjs
+          test "$(git rev-parse HEAD)" = "$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")"
+          git merge-base --is-ancestor HEAD origin/main
+          echo "RELEASE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Test extension and CSS builds
+        run: |
+          node --test tests/firefox-extension.test.mjs tests/firefox-rate-limit.test.mjs tests/firefox-avatar.test.mjs tests/build-css.test.mjs tests/firefox-release.test.mjs
+          node scripts/build-css.mjs --check
+          node scripts/build-emerald-scarlet.mjs --check
+          pwsh -NoProfile -File tests/verify-firefox-signed.tests.ps1
+          git diff --check
+      - name: Install pinned release tools
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: '11.25.0'
+          package_json_file: tools/firefox-release/package.json
+          run_install: false
+      - name: Install locked Mozilla tool
+        run: |
+          pnpm --dir tools/firefox-release install --frozen-lockfile --ignore-scripts
+      - name: Package exact allowlist and prepare signing directory
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          ./scripts/package-firefox-extension.ps1
+          Expand-Archive -LiteralPath ".preview/firefox-extension/shikimori-schemes-$env:VERSION.zip" -DestinationPath .preview/firefox-release/staging
+      - name: Validate package with Mozilla linter
+        run: pnpm --dir tools/firefox-release exec web-ext lint --source-dir ../../.preview/firefox-release/staging --self-hosted --no-config-discovery
+      - name: Submit once or resume the existing AMO version
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.AMO_API_KEY }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_API_SECRET }}
+        run: node scripts/sign-firefox.mjs
+      - name: Verify signed payload
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          ./scripts/verify-firefox-signed.ps1 -UnsignedPath ".preview/firefox-extension/shikimori-schemes-$env:VERSION.zip" -SignedPath ".preview/firefox-release/signed/shikimori-schemes-$env:VERSION.xpi"
+      - name: Publish immutable XPI and update feed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/publish-firefox.mjs
+      - name: Save signed release artifacts
+        if: success()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: firefox-${{ steps.release.outputs.version || 'diagnostics' }}
+          path: |
+            .preview/firefox-release/signed/*.xpi
+            .preview/firefox-release/release.json
+            .preview/firefox-release/updates.json
+          if-no-files-found: ignore

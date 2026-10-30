@@ -15,3 +15,10 @@ styles_optimized.css text eol=lf
 css/themes/*/*.css text eol=lf
 # Generated themes preserve trailing spaces inherited from the shared legacy CSS.
 css/themes/*/styles.css whitespace=-blank-at-eol
+# Release payloads must have the same text bytes on Windows and Linux runners.
+extensions/firefox/** text eol=lf
+scripts/*firefox* text eol=lf
+tests/*firefox* text eol=lf
+.github/workflows/*.yml text eol=lf
+tools/firefox-release/*.json text eol=lf
+tools/firefox-release/*.yaml text eol=lf
