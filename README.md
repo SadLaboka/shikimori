@@ -76,9 +76,10 @@ Emerald & Scarlet → Основная». Меню выбора при этом 
 
 Нужен Firefox для компьютера версии 140 или новее.
 
-Для постоянной установки скачай [подписанный XPI 0.2.1](https://github.com/SadLaboka/shikimori/releases/download/firefox-v0.2.1/shikimori-schemes-0.2.1.xpi).
+Для постоянной установки скачай [подписанный XPI 0.2.2](https://github.com/SadLaboka/shikimori/releases/download/firefox-v0.2.2/shikimori-schemes-0.2.2.xpi).
 Открой `about:addons` → ⚙ → «Установить дополнение из файла…» и выбери его.
-Подпись Mozilla и сохранение расширения после перезапуска проверены в Firefox 159.
+Подпись Mozilla, обновление с 0.2.1 до 0.2.2 через канал обновлений и сохранение
+расширения после перезапуска проверены в Firefox 159.
 
 Для временной проверки из исходников:
 
