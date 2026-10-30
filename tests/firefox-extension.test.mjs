@@ -5,6 +5,7 @@ import { execFileSync } from 'node:child_process';
 import vm from 'node:vm';
 import { ACCOUNT, SCHEMES, REVISION, BASE_IMPORTS, schemeCss, schemeImports, sha256, recognize, nextSchemeId } from '../extensions/firefox/catalog.mjs';
 import { AVATAR_HOVER_CSS } from '../extensions/firefox/avatar-hover.mjs';
+import { LEGACY_AVATAR_HOVER_CSS } from '../extensions/firefox/avatar-hover-legacy.mjs';
 import { Publisher } from '../extensions/firefox/publisher.mjs';
 
 function fixture() {
@@ -60,10 +61,24 @@ test('inline hover CSS matches the shared component and both old and new imports
     assert.equal(await recognize(current), scheme.id);
     assert.equal(await recognize(schemeImports(scheme.id)), scheme.id);
     assert.equal(await recognize(schemeCss(scheme.id)), scheme.id);
+    const previous = execFileSync('git', ['show', `firefox-v0.2.1:${scheme.file}`], { encoding: 'utf8' });
+    assert.equal(await sha256(previous), scheme.previousSourceSha256);
+    assert.equal(await recognize(previous), scheme.id);
+    assert.equal(await recognize(`${schemeImports(scheme.id)}\n\n${LEGACY_AVATAR_HOVER_CSS}`), scheme.id);
     assert.equal(schemeCss(scheme.id), `${schemeImports(scheme.id)}\n\n${AVATAR_HOVER_CSS}`);
   }
   assert.equal(nextSchemeId('main'), 'emerald-scarlet'); assert.equal(nextSchemeId('emerald-scarlet'), 'main');
   assert.equal(nextSchemeId(null), null);
+});
+
+test('avatar cycle upgrades the previous inline glow and keeps its exact backup', async () => {
+  const f = fixture(), previous = `${schemeImports('main')}\n\n${LEGACY_AVATAR_HOVER_CSS}`;
+  f.change({ css: previous });
+  const result = await f.publisher.cycle();
+  assert.equal(result.kind, 'success');
+  assert.equal(f.current.css, schemeCss('emerald-scarlet'));
+  assert.equal(f.data.backups[0].css, previous);
+  assert.equal(f.calls.filter(call => call.method === 'PATCH').length, 1);
 });
 
 test('avatar cycle reads fresh state, supports old imports and advances in both directions with one PATCH', async () => {
