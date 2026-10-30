@@ -112,3 +112,20 @@ test('GitHub client never sends its release token to arbitrary upload URLs', asy
   await assert.rejects(api.request('POST', 'https://uploads.github.com/repos/Other/Repo/assets', bytes), /Unexpected/);
   assert.equal(calls, 0);
 });
+test('release creation verifies the existing tag without requesting extra workflow permissions', async () => {
+  const calls = [], commit = 'a'.repeat(40);
+  const api = new GitHubRelease({ token: 'synthetic-token', fetchImpl: async (url, options) => {
+    calls.push({ url: String(url), options });
+    return options.method === 'GET' ? Response.json({ object: { type: 'commit', sha: commit } }) : Response.json({ id: 1 });
+  } });
+  await api.create(info.tag, commit, true);
+  const versionBody = JSON.parse(calls.at(-1).options.body);
+  assert.equal(versionBody.tag_name, info.tag); assert.equal(Object.hasOwn(versionBody, 'target_commitish'), false);
+  await api.create('firefox-updates', commit, false);
+  assert.equal(JSON.parse(calls.at(-1).options.body).target_commitish, 'main');
+  let writes = 0;
+  const wrong = new GitHubRelease({ token: 'synthetic-token', fetchImpl: async (url, options) => {
+    if (options.method !== 'GET') writes++; return Response.json({ object: { type: 'commit', sha: 'b'.repeat(40) } });
+  } });
+  await assert.rejects(wrong.create(info.tag, commit, true), /verified commit/); assert.equal(writes, 0);
+});

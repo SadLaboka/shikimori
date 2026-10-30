@@ -87,7 +87,9 @@ jobs:
       - name: Publish immutable XPI and update feed
         env:
           GH_TOKEN: ${{ github.token }}
-        run: node scripts/publish-firefox.mjs
+        run: |
+          node -e "const fs=require('node:fs'),cp=require('node:child_process');fs.writeFileSync('scripts/publish-firefox.resume.mjs',cp.execFileSync('git',['show',process.env.GITHUB_SHA+':scripts/publish-firefox.mjs']))"
+          node scripts/publish-firefox.resume.mjs
       - name: Save signed release artifacts
         if: always() && steps.sign.outcome == 'success'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

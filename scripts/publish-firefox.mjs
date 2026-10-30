@@ -14,13 +14,26 @@ export class GitHubRelease {
         ...(body === undefined ? {} : { 'Content-Type': type }) },
       ...(body === undefined ? {} : { body: Buffer.isBuffer(body) ? body : JSON.stringify(body) }) });
     if (response.status === 404 && method === 'GET') return null;
-    if (!response.ok) throw Error(`GitHub release request failed (HTTP ${response.status}).`);
+    if (!response.ok) throw Error(`GitHub release request failed (HTTP ${response.status}; ${method} ${url.pathname}).`);
     return response.status === 204 ? null : response.json();
   }
   get(tag) { return this.request('GET', `releases/tags/${encodeURIComponent(tag)}`); }
-  create(tag, commit, draft) { return this.request('POST', 'releases', { tag_name: tag, target_commitish: commit, draft,
-    name: tag === UPDATE_TAG ? 'Firefox auto-update feed' : tag, prerelease: false, make_latest: tag === UPDATE_TAG ? 'false' : 'true',
-    body: tag === UPDATE_TAG ? 'Update metadata for the signed personal Firefox extension.' : 'Signed Shikimori Firefox extension. Install the XPI file to use this version.' }); }
+  async create(tag, commit, draft) {
+    if (tag !== UPDATE_TAG) {
+      let object = (await this.request('GET', `git/ref/tags/${encodeURIComponent(tag)}`))?.object;
+      for (let hop = 0; object?.type === 'tag' && hop < 5; hop++) {
+        if (!/^[a-f0-9]{40}$/.test(object.sha)) throw Error('Unexpected release tag object.');
+        object = (await this.request('GET', `git/tags/${object.sha}`))?.object;
+      }
+      if (object?.type !== 'commit' || object.sha !== commit) throw Error('Release tag does not point to the verified commit.');
+    }
+    // Reuse the verified existing version tag. Sending an older commit SHA as
+    // target_commitish can require workflows:write; that permission is neither
+    // needed nor granted here. The service feed may create its tag at main.
+    return this.request('POST', 'releases', { tag_name: tag, ...(tag === UPDATE_TAG ? { target_commitish: 'main' } : {}), draft,
+      name: tag === UPDATE_TAG ? 'Firefox auto-update feed' : tag, prerelease: false, make_latest: tag === UPDATE_TAG ? 'false' : 'true',
+      body: tag === UPDATE_TAG ? 'Update metadata for the signed personal Firefox extension.' : 'Signed Shikimori Firefox extension. Install the XPI file to use this version.' });
+  }
   async bytes(asset) {
     const response = await this.fetchImpl(`https://api.github.com/repos/${REPOSITORY}/releases/assets/${asset.id}`, {
       redirect: 'manual', signal: AbortSignal.timeout(60000), headers: { Authorization: `Bearer ${this.token}`, Accept: 'application/octet-stream' } });
@@ -83,5 +96,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       new GitHubRelease({ token: process.env.GH_TOKEN }));
     await writeFile(new URL('.preview/firefox-release/updates.json', root), JSON.stringify(update, null, 2) + '\n');
     console.log(`Published signed Firefox ${info.version} and updated its feed.`);
-  } catch { console.error('Release stopped. Check the GitHub release assets before resuming.'); process.exitCode = 1; }
+  } catch (error) {
+    const safe = /^(GitHub release request failed|GitHub asset download failed|An existing release asset|Unexpected |Refusing |This version|Release tag)/.test(error.message);
+    console.error(safe ? error.message : 'Release stopped. Check the GitHub release assets before resuming.'); process.exitCode = 1;
+  }
 }
