@@ -68,6 +68,7 @@ jobs:
       - name: Validate package with Mozilla linter
         run: pnpm --dir tools/firefox-release exec web-ext lint --source-dir ../../.preview/firefox-release/staging --self-hosted --no-config-discovery
       - name: Submit once or resume the existing AMO version
+        id: sign
         env:
           WEB_EXT_API_KEY: ${{ secrets.AMO_API_KEY }}
           WEB_EXT_API_SECRET: ${{ secrets.AMO_API_SECRET }}
@@ -77,13 +78,18 @@ jobs:
         env:
           VERSION: ${{ steps.release.outputs.version }}
         run: |
-          ./scripts/verify-firefox-signed.ps1 -UnsignedPath ".preview/firefox-extension/shikimori-schemes-$env:VERSION.zip" -SignedPath ".preview/firefox-release/signed/shikimori-schemes-$env:VERSION.xpi"
+          # Use the workflow revision's verifier when resuming an older tag.
+          $verifier = Join-Path $env:RUNNER_TEMP 'verify-firefox-signed.ps1'
+          $verifierSource = git show "${env:GITHUB_SHA}:scripts/verify-firefox-signed.ps1" | Out-String
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot load the workflow revision verifier.' }
+          [IO.File]::WriteAllText($verifier, $verifierSource, [Text.UTF8Encoding]::new($false))
+          & $verifier -UnsignedPath ".preview/firefox-extension/shikimori-schemes-$env:VERSION.zip" -SignedPath ".preview/firefox-release/signed/shikimori-schemes-$env:VERSION.xpi"
       - name: Publish immutable XPI and update feed
         env:
           GH_TOKEN: ${{ github.token }}
         run: node scripts/publish-firefox.mjs
       - name: Save signed release artifacts
-        if: success()
+        if: always() && steps.sign.outcome == 'success'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: firefox-${{ steps.release.outputs.version || 'diagnostics' }}
@@ -91,4 +97,5 @@ jobs:
             .preview/firefox-release/signed/*.xpi
             .preview/firefox-release/release.json
             .preview/firefox-release/updates.json
+            .preview/firefox-extension/*.zip
           if-no-files-found: ignore
