@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Shikimori · SadLaboka",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Переключение готовых цветовых схем аккаунта SadLaboka через API Shikimori.",
   "permissions": ["storage", "scripting"],
   "host_permissions": ["https://shikimori.io/*"],
@@ -14,13 +14,14 @@
   "icons": { "48": "icons/schemes.svg", "96": "icons/schemes.svg" },
   "content_scripts": [{
     "matches": ["https://shikimori.io/*"],
-    "js": ["bridge.js"],
+    "js": ["bridge.js", "avatar.js"],
     "run_at": "document_idle"
   }],
   "browser_specific_settings": {
     "gecko": {
       "id": "shikimori-schemes@sadlaboka.local",
       "strict_min_version": "140.0",
+      "update_url": "https://github.com/SadLaboka/shikimori/releases/download/firefox-updates/updates.json",
       "data_collection_permissions": { "required": ["websiteContent"] }
     }
   },

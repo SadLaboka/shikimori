@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import vm from 'node:vm';
-import { ACCOUNT, SCHEMES, REVISION, BASE_IMPORTS, schemeCss, sha256 } from '../extensions/firefox/catalog.mjs';
+import { ACCOUNT, SCHEMES, REVISION, BASE_IMPORTS, schemeCss, schemeImports, sha256, recognize, nextSchemeId } from '../extensions/firefox/catalog.mjs';
+import { AVATAR_HOVER_CSS } from '../extensions/firefox/avatar-hover.mjs';
 import { Publisher } from '../extensions/firefox/publisher.mjs';
 
 function fixture() {
@@ -33,7 +34,7 @@ function fixture() {
     if (controls.patchMode === 'no-response-applied') throw new Error('lost response');
     return { ok: true, value: structuredClone(current) };
   };
-  const make = () => new Publisher({ request, storage, now: () => time, interval: 0 });
+  const make = () => new Publisher({ request, storage, now: () => time, limiter: { run: action => action() } });
   return { publisher: make(), make, data, calls, controls,
     get current() { return current; }, change: value => { current = { ...current, ...value }; }, advance: ms => { time += ms; } };
 }
@@ -47,7 +48,54 @@ test('registry imports exact pinned repository files with the six original depen
     assert.equal(css.match(/@import/g).length, 7);
     assert.ok(css.includes(`/${REVISION}/${scheme.file}`));
   }
-  assert.equal(await sha256(schemeCss('emerald-scarlet')), 'a51c117f1ff6eb1a91e693022dcb1d5d73d44695e4c1059b03fe48220197808d');
+  assert.equal(await sha256(schemeImports('emerald-scarlet')), 'a51c117f1ff6eb1a91e693022dcb1d5d73d44695e4c1059b03fe48220197808d');
+});
+
+test('inline hover CSS matches the shared component and both old and new imports are recognized', async () => {
+  const shared = await readFile(new URL('../css/components/22-avatar-interaction.css', import.meta.url), 'utf8');
+  assert.equal(AVATAR_HOVER_CSS, shared.replaceAll('\r\n', '\n'));
+  for (const scheme of SCHEMES) {
+    const current = await readFile(new URL(`../${scheme.file}`, import.meta.url), 'utf8');
+    assert.equal(await sha256(current), scheme.currentSourceSha256);
+    assert.equal(await recognize(current), scheme.id);
+    assert.equal(await recognize(schemeImports(scheme.id)), scheme.id);
+    assert.equal(await recognize(schemeCss(scheme.id)), scheme.id);
+    assert.equal(schemeCss(scheme.id), `${schemeImports(scheme.id)}\n\n${AVATAR_HOVER_CSS}`);
+  }
+  assert.equal(nextSchemeId('main'), 'emerald-scarlet'); assert.equal(nextSchemeId('emerald-scarlet'), 'main');
+  assert.equal(nextSchemeId(null), null);
+});
+
+test('avatar cycle reads fresh state, supports old imports and advances in both directions with one PATCH', async () => {
+  const f = fixture(); f.change({ css: schemeImports('main') });
+  let result = await f.publisher.cycle();
+  assert.equal(result.kind, 'success'); assert.equal(result.view.schemeId, 'emerald-scarlet');
+  assert.equal(f.data.backups[0].css, schemeImports('main'));
+  assert.equal(f.calls.length, 5); assert.equal(f.calls.filter(call => call.method === 'PATCH').length, 1);
+  result = await f.publisher.cycle();
+  assert.equal(result.view.schemeId, 'main'); assert.equal(f.calls.filter(call => call.method === 'PATCH').length, 2);
+});
+
+test('avatar cycle never guesses unknown CSS, overwrites a conflict or bypasses a pending operation', async () => {
+  const unknown = fixture(); unknown.change({ css: 'body{color:red}' });
+  await assert.rejects(unknown.publisher.cycle(), /не распознан/);
+  assert.equal(unknown.calls.some(call => call.method === 'PATCH'), false);
+  const conflict = fixture(); conflict.controls.conflict = true; conflict.controls.styleReads = 1;
+  await assert.rejects(conflict.publisher.cycle(), /изменился/);
+  assert.equal(conflict.calls.some(call => call.method === 'PATCH'), false);
+  const pending = fixture(); pending.data.pending = { phase: 'sending' };
+  await assert.rejects(pending.publisher.cycle(), /предыдущей/); assert.equal(pending.calls.length, 0);
+  const wrong = fixture(); wrong.controls.wrongUser = true;
+  await assert.rejects(wrong.publisher.cycle(), /нужен аккаунт/);
+  assert.equal(wrong.calls.some(call => call.method === 'PATCH'), false);
+});
+
+test('avatar and popup operations share the same publication lock', async () => {
+  const f = fixture(); const view = await f.publisher.inspect();
+  const operation = f.publisher.cycle();
+  await assert.rejects(f.publisher.apply('main', view.snapshot), /Дождись/);
+  await assert.rejects(f.publisher.cycle(), /Дождись/); await operation;
+  assert.equal(f.calls.filter(call => call.method === 'PATCH').length, 1);
 });
 test('switch persists exact previous CSS before one PATCH and verifies result', async () => {
   const f = fixture(); const view = await f.publisher.inspect();
@@ -179,4 +227,38 @@ test('manifest grants access only to Shikimori and contains no external code', a
   assert.deepEqual(manifest.permissions, ['storage', 'scripting']);
   assert.equal(manifest.web_accessible_resources, undefined); assert.equal(manifest.externally_connectable, undefined);
   assert.equal(manifest.manifest_version, 3);
+});
+test('style GET requires server revalidation while identity and writes bypass cache', async () => {
+  const f = await bridgeFixture();
+  await f.send({ method: 'GET', path: '/api/styles/1343722' });
+  await f.send({ method: 'GET', path: '/api/users/whoami' });
+  await f.send({ method: 'PATCH', path: '/api/styles/1343722', css: 'body{}' });
+  assert.deepEqual(f.calls.map(call => call.options.cache), ['no-cache', 'no-store', 'no-store']);
+});
+test('read-only identity and source requests overlap and a failure waits for both', async () => {
+  let release, started = 0;
+  const gate = new Promise(resolve => { release = resolve; });
+  const publisher = new Publisher({ storage: { get: async () => ({}) }, limiter: { run: action => action() }, request: async message => {
+    started++;
+    if (message.path === '/api/users/whoami') return { ok: false, code: 'login' };
+    await gate;
+    return { ok: true, value: { id: ACCOUNT.styleId, owner_id: ACCOUNT.userId, owner_type: 'User', css: 'body{}',
+      updated_at: 'v1', failed_imports: [], compiledPresent: true } };
+  } });
+  const inspection = publisher.inspect();
+  const failed = assert.rejects(inspection, /Войди/);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(started, 2); assert.equal(publisher.busy, true);
+  release(); await failed; assert.equal(publisher.busy, false);
+});
+test('publication progress does not add requests or block the transaction', async () => {
+  const f = fixture(), stages = [];
+  f.publisher.onStage = stage => { stages.push(stage); };
+  const view = await f.publisher.inspect(); stages.length = 0;
+  await f.publisher.apply('emerald-scarlet', view.snapshot);
+  assert.deepEqual(stages, ['checking', 'backup', 'publishing', 'verifying']);
+  assert.equal(f.calls.length, 7);
+  f.publisher.onStage = () => { throw Error('UI unavailable'); };
+  const current = await f.publisher.inspect();
+  assert.equal((await f.publisher.apply('main', current.snapshot)).kind, 'success');
 });

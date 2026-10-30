@@ -15,7 +15,10 @@
       return { ok: false, code: 'invalid' };
     }
     const headers = { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
-    const options = { method, headers, credentials: 'include', redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(20000) };
+    // Revalidate the large public style response; never reuse an unvalidated
+    // cached value. Identity and writes must always bypass the HTTP cache.
+    const cache = method === 'GET' && path === stylePath ? 'no-cache' : 'no-store';
+    const options = { method, headers, credentials: 'include', redirect: 'error', cache, signal: AbortSignal.timeout(20000) };
     if (method === 'PATCH') {
       if (typeof css !== 'string' || !css.trim() || css.length > 512000) return { ok: false, code: 'invalid' };
       const csrf = document.querySelector('meta[name="csrf-token"]')?.content;

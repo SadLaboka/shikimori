@@ -4,6 +4,14 @@ let view = null;
 let busy = false;
 let retryTimer = null;
 const send = data => browser.runtime.sendMessage({ channel: 'sadlaboka-ui', ...data });
+const stages = Object.freeze({ checking: 'Проверяем аккаунт и CSS…', backup: 'Сохраняем предыдущий CSS…',
+  publishing: 'Публикуем схему…', verifying: 'Проверяем сохранение…' });
+browser.runtime.onMessage.addListener((message, sender) => {
+  if (!busy || sender.id !== browser.runtime.id || !sender.url?.startsWith(browser.runtime.getURL('')) ||
+      message?.channel !== 'sadlaboka-progress' || !Object.hasOwn(stages, message.stage)) return undefined;
+  $('status').dataset.kind = 'loading'; $('status').textContent = stages[message.stage];
+  return undefined;
+});
 for (const scheme of SCHEMES) {
   const card = document.createElement('article'); card.className = `scheme ${scheme.id}`; card.dataset.scheme = scheme.id;
   const content = document.createElement('div');
@@ -23,6 +31,7 @@ function render() {
     card.querySelector('button').disabled = busy || !view?.connected || view.pending;
   }
   $('refresh').disabled = busy;
+  $('schemes').setAttribute('aria-busy', String(busy));
   $('reload').disabled = busy;
   $('restore').disabled = busy || !view?.canRestore;
   $('restore').title = view?.backupName ? `Восстановить: ${view.backupName}` : 'Резервная копия появится после первой публикации';
@@ -35,14 +44,15 @@ async function run(data) {
   clearTimeout(retryTimer);
   let retryInspection = false;
   busy = true; render();
-  $('status').dataset.kind = '';
+  $('status').dataset.kind = 'loading';
   $('status').textContent = data.action === 'inspect' ? 'Проверяем аккаунт и CSS…' : data.action === 'reconcile' ? 'Проверяем сохранённый CSS…' : 'Сохраняем оформление…';
   try {
     const result = await send(data);
     if (!result?.ok) {
       retryInspection = data.action === 'inspect' && result?.code === 'busy';
       if (data.action === 'inspect') view = null;
-      $('status').dataset.kind = 'error'; $('status').textContent = result?.message ?? 'Нет связи с расширением. Открой меню заново.';
+      $('status').dataset.kind = retryInspection ? 'loading' : 'error';
+      $('status').textContent = retryInspection ? 'Переключение ещё выполняется…' : result?.message ?? 'Нет связи с расширением. Открой меню заново.';
       return;
     }
     if (result.view) view = result.view;
@@ -55,7 +65,7 @@ async function run(data) {
     $('status').dataset.kind = 'error'; $('status').textContent = 'Связь прервалась. Обнови состояние перед следующим действием.';
   } finally {
     busy = false; render();
-    if (retryInspection) retryTimer = setTimeout(() => run({ action: 'inspect' }), 1000);
+    if (retryInspection) retryTimer = setTimeout(() => run({ action: 'inspect' }), 150);
   }
 }
 $('refresh').addEventListener('click', () => run({ action: 'inspect' }));

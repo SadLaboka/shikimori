@@ -1,4 +1,5 @@
-import { ACCOUNT, SCHEMES, schemeCss, sha256, recognize } from './catalog.mjs';
+import { ACCOUNT, SCHEMES, schemeCss, sha256, recognize, nextSchemeId } from './catalog.mjs';
+import { ApiRateLimiter } from './rate-limit.mjs';
 
 export class UserError extends Error {
   constructor(message, code = 'error') { super(message); this.code = code; }
@@ -14,9 +15,12 @@ export const SAFE_ERRORS = Object.freeze({
 });
 const STYLE_PATH = `/api/styles/${ACCOUNT.styleId}`;
 export class Publisher {
-  constructor({ request, storage, now = () => Date.now(), sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), interval = 700 }) {
-    Object.assign(this, { request, storage, now, sleep, interval });
-    this.busy = false; this.lastRequest = -Infinity;
+  constructor({ request, storage, now = () => Date.now(), limiter = new ApiRateLimiter({ now }), onStage = () => {} }) {
+    Object.assign(this, { request, storage, now, limiter, onStage });
+    this.busy = false;
+  }
+  stage(value) {
+    try { this.onStage(value); } catch { /* UI feedback never interrupts a transaction. */ }
   }
   async exclusive(action) {
     if (this.busy) throw new UserError('Дождись завершения текущей операции.', 'busy');
@@ -24,11 +28,8 @@ export class Publisher {
     try { return await action(); } finally { this.busy = false; }
   }
   async api(method, path, css) {
-    const delay = this.interval - (this.now() - this.lastRequest);
-    if (delay > 0) await this.sleep(delay);
-    this.lastRequest = this.now();
     let response;
-    try { response = await this.request({ method, path, ...(css === undefined ? {} : { css }) }); }
+    try { response = await this.limiter.run(() => this.request({ method, path, ...(css === undefined ? {} : { css }) })); }
     catch { throw new UserError(SAFE_ERRORS.network); }
     if (!response?.ok) throw new UserError(SAFE_ERRORS[response?.code] ?? SAFE_ERRORS.network);
     return response.value;
@@ -46,6 +47,15 @@ export class Publisher {
       throw new UserError('В этой вкладке нужен аккаунт SadLaboka. Другой аккаунт изменён не будет.');
     }
   }
+  async checkedStyle() {
+    this.stage('checking');
+    // Both GETs are read-only. Wait for both even on error, so the pinned tab
+    // cannot change while a failed transaction still has an outstanding GET.
+    const [identity, style] = await Promise.allSettled([this.identify(), this.readStyle()]);
+    if (identity.status === 'rejected') throw identity.reason;
+    if (style.status === 'rejected') throw style.reason;
+    return style.value;
+  }
   async view(style) {
     const state = await this.storage.get(['backups', 'pending']);
     const hash = await sha256(style.css);
@@ -54,11 +64,22 @@ export class Publisher {
       pending: Boolean(state.pending), canRestore: Boolean(backup) && !state.pending, backupName: backup?.name ?? null };
   }
   inspect() {
-    return this.exclusive(async () => { await this.identify(); return this.view(await this.readStyle()); });
+    return this.exclusive(async () => this.view(await this.checkedStyle()));
   }
   apply(id, expected) {
     if (!SCHEMES.some(scheme => scheme.id === id)) return Promise.reject(new UserError('Неизвестная схема.'));
     return this.exclusive(() => this.write(schemeCss(id), expected, id));
+  }
+  cycle() {
+    return this.exclusive(async () => {
+      const { pending } = await this.storage.get('pending');
+      if (pending) throw new UserError('Сначала проверь результат предыдущей публикации в меню расширения.');
+      const before = await this.checkedStyle();
+      const id = nextSchemeId(await recognize(before.css));
+      if (!id) throw new UserError('Текущий CSS не распознан. Сначала выбери схему в меню расширения.');
+      const expected = { hash: await sha256(before.css), updatedAt: before.updated_at };
+      return this.write(schemeCss(id), expected, id, before);
+    });
   }
   restore(expected) {
     return this.exclusive(async () => {
@@ -70,15 +91,14 @@ export class Publisher {
       return this.write(backup.css, expected, await recognize(backup.css));
     });
   }
-  async write(css, expected, schemeId) {
+  async write(css, expected, schemeId, checkedBefore) {
     const state = await this.storage.get(['pending', 'backups']);
     if (state.pending) throw new UserError('Сначала проверь результат предыдущей публикации.');
     if (!expected || !/^[a-f0-9]{64}$/.test(expected.hash) || typeof expected.updatedAt !== 'string') {
       throw new UserError('Сначала обнови состояние оформления.');
     }
     if (typeof css !== 'string' || !css.trim() || css.length > 512000) throw new UserError('Пустой или слишком большой CSS не отправляется.');
-    await this.identify();
-    const before = await this.readStyle();
+    const before = checkedBefore ?? await this.checkedStyle();
     const beforeHash = await sha256(before.css);
     if (beforeHash !== expected.hash || before.updated_at !== expected.updatedAt) {
       throw new UserError('CSS изменился после открытия меню. Обнови состояние и выбери схему заново.');
@@ -90,6 +110,7 @@ export class Publisher {
       appliedHash: desiredHash, name: SCHEMES.find(item => item.id === previousId)?.name ?? 'Сохранённое оформление',
       savedAt: new Date(this.now()).toISOString() };
     const pending = { beforeHash, desiredHash, schemeId, startedAt: this.now(), phase: 'prepared' };
+    this.stage('backup');
     // Both must be durable before any PATCH; storage failure stops publication.
     await this.storage.set({ backups: [backup, ...(state.backups ?? [])].slice(0, 5), pending });
     const latest = await this.readStyle();
@@ -99,9 +120,11 @@ export class Publisher {
     }
     pending.phase = 'sending';
     await this.storage.set({ pending });
+    this.stage('publishing');
     try { await this.api('PATCH', STYLE_PATH, css); }
     catch { /* A failed response may still mean a successful PATCH. Never repeat it. */ }
     let after;
+    this.stage('verifying');
     try { after = await this.readStyle(); }
     catch { return { kind: 'uncertain', message: 'Ответ потерян. Нажми «Проверить результат»; повторная отправка заблокирована.' }; }
     return this.finish(after, pending, false);
@@ -127,9 +150,8 @@ export class Publisher {
   }
   reconcile() {
     return this.exclusive(async () => {
-      await this.identify();
+      const style = await this.checkedStyle();
       const { pending } = await this.storage.get('pending');
-      const style = await this.readStyle();
       return pending ? this.finish(style, pending, true) : { kind: 'unchanged', message: 'Незавершённых публикаций нет.', view: await this.view(style) };
     });
   }

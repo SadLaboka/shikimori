@@ -1,3 +1,4 @@
+import { AVATAR_HOVER_CSS } from './avatar-hover.mjs';
 export const ACCOUNT = Object.freeze({ nickname: 'SadLaboka', userId: 1408017, styleId: 1343722 });
 export const ORIGIN = 'https://shikimori.io';
 export const REVISION = 'e4f9fe9118d6d81397e069254da91ee4f728d3da';
@@ -11,16 +12,25 @@ export const BASE_IMPORTS = Object.freeze([
 ]);
 export const SCHEMES = Object.freeze([
   Object.freeze({ id: 'main', name: 'Основная', description: 'Индиго и бордовый', file: 'styles_optimized.css',
-    sourceSha256: '7d831865199d403d5bafce8f290ac97c91cee589b25f44b2049f33a8f674e4ac' }),
+    sourceSha256: '7d831865199d403d5bafce8f290ac97c91cee589b25f44b2049f33a8f674e4ac',
+    currentSourceSha256: '612eadae22be9c1d6f1b47418983f3da00d04d82dabb6d1ee584340d11bf895f' }),
   Object.freeze({ id: 'emerald-scarlet', name: 'Emerald & Scarlet', description: 'Зоро и Шанкс', file: 'css/themes/emerald-scarlet/styles.css',
-    sourceSha256: '536db8d921938cf5041858bae76550f1845fd606e29a17e77047bf2146af41e3' }),
+    sourceSha256: '536db8d921938cf5041858bae76550f1845fd606e29a17e77047bf2146af41e3',
+    currentSourceSha256: '63a3556f67d7ab4116f25f6f400264f9ab33617985d8dfceed14958821cc1e64' }),
 ]);
-export function schemeCss(id) {
+// Explicit order: do not silently rearrange it when the popup catalog changes.
+export const CYCLE_ORDER = Object.freeze(['main', 'emerald-scarlet']);
+export function nextSchemeId(current) {
+  const index = CYCLE_ORDER.indexOf(current);
+  return index < 0 ? null : CYCLE_ORDER[(index + 1) % CYCLE_ORDER.length];
+}
+export function schemeImports(id) {
   const scheme = SCHEMES.find(item => item.id === id);
   if (!scheme) throw new Error('Неизвестная схема.');
   const url = `https://raw.githubusercontent.com/SadLaboka/shikimori/${REVISION}/${scheme.file}`;
   return [...BASE_IMPORTS, `@import url("${url}");`].join('\n');
 }
+export function schemeCss(id) { return `${schemeImports(id)}\n\n${AVATAR_HOVER_CSS}`; }
 export async function sha256(text) {
   const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
   return [...new Uint8Array(bytes)].map(value => value.toString(16).padStart(2, '0')).join('');
@@ -28,7 +38,8 @@ export async function sha256(text) {
 export async function recognize(css) {
   const hash = await sha256(css);
   for (const scheme of SCHEMES) {
-    if (hash === scheme.sourceSha256 || hash === await sha256(schemeCss(scheme.id))) return scheme.id;
+    if (hash === scheme.sourceSha256 || hash === scheme.currentSourceSha256 || hash === await sha256(schemeImports(scheme.id)) ||
+        hash === await sha256(schemeCss(scheme.id))) return scheme.id;
   }
   return null;
 }
