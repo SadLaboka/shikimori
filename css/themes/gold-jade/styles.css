@@ -2107,6 +2107,10 @@ html:root {
   background-color: #000;
 }
 
+.p-profiles .profile-head .avatar::before {
+  background-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793546652/dancing-avatar-gold-floor_g3mx0m.webp");
+}
+
 /* Each picture needs its own mask, including when the two pictures overlap.
    The masks mirror with the images, so their transparent edges face inward. */
 @media (min-width: 1280px) {
