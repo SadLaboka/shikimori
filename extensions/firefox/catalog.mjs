@@ -21,9 +21,11 @@ export const SCHEMES = Object.freeze([
     previousSourceSha256: '63a3556f67d7ab4116f25f6f400264f9ab33617985d8dfceed14958821cc1e64',
     currentSourceSha256: '1e4144345c5a5efa26317c08ff5ae6ec1b767410bd6b86d6aac0a404b5d439bf' }),
   Object.freeze({ id: 'gold-jade', name: 'Gold & Jade', description: 'Улькиорра и Йоруичи', file: 'css/themes/gold-jade/styles.css',
-    revision: 'c3eebb1774dc31d9c1bcd7666a64ddf7979d004d',
-    sourceSha256: '2569aaeba25ea5495a179b3a0b3ae834746cc7bbeecbca717e71af9d3426285f',
-    currentSourceSha256: '2569aaeba25ea5495a179b3a0b3ae834746cc7bbeecbca717e71af9d3426285f' }),
+    revision: 'c33c2a42b4a64ada5b02dce9222b370088366ba3',
+    previousRevision: 'c3eebb1774dc31d9c1bcd7666a64ddf7979d004d', previousSourceTag: 'firefox-v0.3.0',
+    sourceSha256: '5170c8d6ee523065aa24cdc8f13b45bfd7b454c50edd98fa7261c460b9ed9cdd',
+    previousSourceSha256: '2569aaeba25ea5495a179b3a0b3ae834746cc7bbeecbca717e71af9d3426285f',
+    currentSourceSha256: '5170c8d6ee523065aa24cdc8f13b45bfd7b454c50edd98fa7261c460b9ed9cdd' }),
 ]);
 // Explicit order: do not silently rearrange it when the popup catalog changes.
 export const CYCLE_ORDER = Object.freeze(['main', 'emerald-scarlet', 'gold-jade']);
@@ -31,10 +33,10 @@ export function nextSchemeId(current) {
   const index = CYCLE_ORDER.indexOf(current);
   return index < 0 ? null : CYCLE_ORDER[(index + 1) % CYCLE_ORDER.length];
 }
-export function schemeImports(id) {
+export function schemeImports(id, revisionOverride) {
   const scheme = SCHEMES.find(item => item.id === id);
   if (!scheme) throw new Error('Неизвестная схема.');
-  const url = `https://raw.githubusercontent.com/SadLaboka/shikimori/${scheme.revision ?? REVISION}/${scheme.file}`;
+  const url = `https://raw.githubusercontent.com/SadLaboka/shikimori/${revisionOverride ?? scheme.revision ?? REVISION}/${scheme.file}`;
   return [...BASE_IMPORTS, `@import url("${url}");`].join('\n');
 }
 export function schemeCss(id) { return `${schemeImports(id)}\n\n${AVATAR_HOVER_CSS}`; }
@@ -45,6 +47,10 @@ export async function sha256(text) {
 export async function recognize(css) {
   const hash = await sha256(css);
   for (const scheme of SCHEMES) {
+    if (scheme.previousRevision) {
+      const previous = schemeImports(scheme.id, scheme.previousRevision);
+      if (hash === await sha256(previous) || hash === await sha256(`${previous}\n\n${AVATAR_HOVER_CSS}`)) return scheme.id;
+    }
     if (hash === scheme.sourceSha256 || hash === scheme.previousSourceSha256 || hash === scheme.currentSourceSha256 ||
         hash === await sha256(`${schemeImports(scheme.id)}\n\n${LEGACY_AVATAR_HOVER_CSS}`) || hash === await sha256(schemeImports(scheme.id)) ||
         hash === await sha256(schemeCss(scheme.id))) return scheme.id;

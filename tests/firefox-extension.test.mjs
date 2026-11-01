@@ -62,7 +62,7 @@ test('inline hover CSS matches the shared component and both old and new imports
     assert.equal(await recognize(schemeImports(scheme.id)), scheme.id);
     assert.equal(await recognize(schemeCss(scheme.id)), scheme.id);
     if (scheme.previousSourceSha256) {
-      const previous = execFileSync('git', ['show', `firefox-v0.2.1:${scheme.file}`], { encoding: 'utf8' });
+      const previous = execFileSync('git', ['show', `${scheme.previousSourceTag ?? 'firefox-v0.2.1'}:${scheme.file}`], { encoding: 'utf8' });
       assert.equal(await sha256(previous), scheme.previousSourceSha256);
       assert.equal(await recognize(previous), scheme.id);
     }
@@ -81,6 +81,19 @@ test('avatar cycle upgrades the previous inline glow and keeps its exact backup'
   assert.equal(f.current.css, schemeCss('emerald-scarlet'));
   assert.equal(f.data.backups[0].css, previous);
   assert.equal(f.calls.filter(call => call.method === 'PATCH').length, 1);
+});
+
+test('Gold and Jade from the previous release remains recognizable and can switch or restore', async () => {
+  const scheme = SCHEMES.find(item => item.id === 'gold-jade');
+  const oldImports = schemeImports(scheme.id, scheme.previousRevision);
+  const previous = `${oldImports}\n\n${AVATAR_HOVER_CSS}`;
+  assert.equal(await recognize(oldImports), 'gold-jade');
+  assert.equal(await recognize(previous), 'gold-jade');
+  const f = fixture(); f.change({ css: previous });
+  const result = await f.publisher.cycle();
+  assert.equal(result.view.schemeId, 'main'); assert.equal(f.data.backups[0].css, previous);
+  const restored = await f.publisher.restore(result.view.snapshot);
+  assert.equal(restored.view.schemeId, 'gold-jade'); assert.equal(f.current.css, previous);
 });
 
 test('avatar cycle reads fresh state, supports old imports and cycles all three schemes with one PATCH', async () => {
