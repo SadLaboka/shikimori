@@ -89,10 +89,11 @@ Workflow также можно запустить вручную, указав �
 Для проверки подписанного пакета нужен PowerShell 7.4 или новее.
 
 ```powershell
-node --test tests/firefox-extension.test.mjs tests/firefox-rate-limit.test.mjs tests/firefox-avatar.test.mjs tests/build-css.test.mjs tests/firefox-release.test.mjs
+node --test tests/firefox-extension.test.mjs tests/firefox-rate-limit.test.mjs tests/firefox-avatar.test.mjs tests/firefox-updates.test.mjs tests/build-css.test.mjs tests/firefox-release.test.mjs tests/gold-jade.test.mjs
 pwsh -NoProfile -File tests/verify-firefox-signed.tests.ps1
 node scripts/build-css.mjs --check
 node scripts/build-emerald-scarlet.mjs --check
+node scripts/build-gold-jade.mjs --check
 pnpm --dir tools/firefox-release install --frozen-lockfile --ignore-scripts
 pnpm --dir tools/firefox-release exec web-ext lint --source-dir ../../extensions/firefox --self-hosted --no-config-discovery
 ```
@@ -108,10 +109,11 @@ Firefox Android 140 и разрешениях сбора данных; рабо�
 ## Демонстрация в README
 
 `docs/images/firefox-theme-switch.webp` — запись настоящего расширения в отдельном
-Firefox 159 на копии публичной страницы. Запись выполнялась с тестовым API:
+Firefox на копии публичной страницы. Запись выполнялась с тестовым API:
 сохранения перехвачены, CSS живого профиля не менялся. Это демонстрация интерфейса,
 не измерение скорости настоящей публикации. В анимации есть соответствующая подпись.
-Исходные кадры и технические отчёты находятся в игнорируемой `.preview/`.
+Три схемы показаны в цикле. Запись экспортируется в WebP с частотой 25 кадров
+в секунду. Исходное видео, кадры и технические отчёты находятся в игнорируемой `.preview/`.
 
 ## Первичные источники
 
