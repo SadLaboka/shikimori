@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { connectBidi,freePort,delay } from './helpers/firefox-remote.mjs';
 const sourceOption=process.argv.find(value=>value.startsWith('--extension-source='))?.slice('--extension-source='.length);
 const sourceDirectory=sourceOption?path.resolve(sourceOption):fileURLToPath(new URL('../extensions/firefox/',import.meta.url));
-const {ACCOUNT,schemeCss}=await import(pathToFileURL(path.join(sourceDirectory,'catalog.mjs')).href);
+const {ACCOUNT,schemeCss,SCHEMES}=await import(pathToFileURL(path.join(sourceDirectory,'catalog.mjs')).href);
 const output=new URL('../.preview/firefox-extension/',import.meta.url);await mkdir(output,{recursive:true});
 const performanceLabel=process.argv.find(value=>value.startsWith('--performance-label='))?.split('=')[1];
 if(performanceLabel&&!/^[a-z0-9-]+$/.test(performanceLabel))throw Error('Invalid performance label');
@@ -46,7 +46,8 @@ try{
   console.log(JSON.stringify({stage:'contexts',contexts:tree.contexts.map(item=>({context:item.context,url:item.url}))}));
   const shiki=tree.contexts[0]?.context??(await bidi.command('browsingContext.create',{type:'tab'})).context;
   let css=schemeCss('main'),revision=1,patches=0,userId=ACCOUNT.userId;
-  const requests=[];
+  const requests=[];let releaseVersion="9.9.9",releaseStatus=200,updateChecks=0;
+  const patchSchemes=["emerald-scarlet","main","emerald-scarlet","main","emerald-scarlet","gold-jade","main","gold-jade"];
   await bidi.command('session.subscribe',{events:['network.beforeRequestSent']});
   await bidi.command('network.addIntercept',{phases:['beforeRequestSent'],urlPatterns:[{type:'pattern',protocol:'https'}]});
   // Intercept all HTTPS traffic before any Shikimori page is opened.
@@ -57,7 +58,10 @@ try{
       const requestHeaders=Object.fromEntries(request.headers.map(header=>[header.name.toLowerCase(),header.value.value]));
       const json=value=>({type:'string',value:JSON.stringify(value)});
       let body,statusCode=200,contentType='application/json';
-      if(url.origin!=='https://shikimori.io'){statusCode=404;body={type:'string',value:''};}
+      if(url.origin==='https://api.github.com'&&url.pathname==='/repos/SadLaboka/shikimori/releases/latest'){
+        updateChecks++;assert.equal(requestHeaders.cookie,undefined);statusCode=releaseStatus;
+        body=json({tag_name:'firefox-v'+releaseVersion,draft:false,prerelease:false,assets:[{name:'shikimori-schemes-'+releaseVersion+'.xpi',state:'uploaded',browser_download_url:'https://github.com/SadLaboka/shikimori/releases/download/firefox-v'+releaseVersion+'/shikimori-schemes-'+releaseVersion+'.xpi'}]});
+      }else if(url.origin!=='https://shikimori.io'){statusCode=404;body={type:'string',value:''};}
       else{
         requests.push({method:request.method,path:url.pathname,atMs:Math.round(performance.now()-measurementStart),
           conditional:!!requestHeaders['if-none-match'],cookieNames:(request.cookies??[]).map(cookie=>cookie.name)});
@@ -69,15 +73,16 @@ try{
             assert.ok(requestHeaders.cookie?.includes('synthetic_session=test-only')||request.cookies?.some(cookie=>cookie.name==='synthetic_session'));
             // Payload bytes are separately asserted in the production bridge's
             // unit test; verification GET must match the chosen scheme hash.
-            css=schemeCss(patches%2===1?'main':'emerald-scarlet');patches++;revision++;
+            css=schemeCss(patchSchemes[patches]);patches++;revision++;
           }
           body=json({id:ACCOUNT.styleId,owner_id:ACCOUNT.userId,owner_type:'User',css,compiled_css:'body{color:white}',updated_at:`v${revision}`,failed_imports:[]});
         }else{
-          const scheme=css===schemeCss('main')?'main':'emerald-scarlet';
+          const scheme=SCHEMES.find(item=>css===schemeCss(item.id))?.id??'unknown';
           contentType='text/html; charset=utf-8';body={type:'string',value:`<!doctype html><html><head><meta name="csrf-token" content="synthetic-csrf-test-only"><title>Isolated Shikimori session</title><style>.avatar{position:relative;width:160px;height:160px}.avatar::before{content:"";position:absolute;inset:0;width:160px;height:160px;border-radius:50%;background-image:linear-gradient(blue,red)}.avatar img{width:160px;height:160px;opacity:0}</style></head><body class="p-profiles" data-scheme="${scheme}"><div class="profile-head"><div class="c-brief"><div class="avatar"><img alt="SadLaboka"></div></div></div><h1>Test session</h1></body></html>`};
         }
       }
       const responseHeaders=[{name:'Content-Type',value:{type:'string',value:contentType}}];
+      if(url.origin==='https://api.github.com')responseHeaders.push({name:'Access-Control-Allow-Origin',value:{type:'string',value:'*'}});
       if(url.pathname===`/api/styles/${ACCOUNT.styleId}`&&request.method==='GET'){
         const etag=`W/"synthetic-style-${revision}"`;
         responseHeaders.push({name:'ETag',value:{type:'string',value:etag}},
@@ -123,6 +128,23 @@ try{
   let popup=await openPopup();
   timings.openMenuMs=Math.round(performance.now()-openStart);
   assert.match(await evaluate(popup,"document.querySelector('#current').textContent"),/Основная/);
+  assert.equal(await evaluate(popup,"document.querySelectorAll('.scheme').length"),3);
+  assert.equal(updateChecks,0,'Opening the popup must not contact GitHub');
+  await evaluate(popup,"document.querySelector('#check-update').click()");
+  await wait(popup,"document.querySelector('#check-update').textContent==='Скачать 9.9.9'");
+  assert.equal(updateChecks,1);
+  await evaluate(popup,"document.querySelector('#check-update').click()");
+  let downloadTab;
+  for(let i=0;i<100&&!downloadTab;i++){downloadTab=(await bidi.command('browsingContext.getTree')).contexts.find(c=>c.url.includes('shikimori-schemes-9.9.9.xpi'));if(!downloadTab)await delay(100);}
+  assert.ok(downloadTab,'The download button must open the validated XPI URL');
+  await bidi.command('browsingContext.close',{context:downloadTab.context});
+  await bidi.command('browsingContext.close',{context:popup});releaseVersion=manifest.version;
+  await bidi.command('browsingContext.reload',{context:shiki,wait:'complete'});
+  popup=await openPopup();await evaluate(popup,"document.querySelector('#check-update').click()");
+  await wait(popup,"document.querySelector('#update-status').textContent==='Установлена актуальная версия.'");
+  releaseStatus=503;await evaluate(popup,"document.querySelector('#check-update').click()");
+  await wait(popup,"document.querySelector('#update-status').textContent.includes('Не удалось')");
+  await bidi.command('browsingContext.activate',{context:shiki});
   await evaluate(popup,"document.querySelector('#reload').click()");
   await wait(popup,"browser.storage.local.get('reloadAfter').then(s=>s.reloadAfter===false)");
   await screenshot(popup,'popup-main.png');
@@ -185,24 +207,29 @@ try{
   assert.ok(lastLoadAt>priorLoad);
   timings.avatarReloadMs=Math.round(lastLoadAt-timings.avatarInputAt);delete timings.avatarInputAt;
   assert.equal(css,schemeCss('emerald-scarlet'));assert.equal(patches,5,'A double click must cause only one PATCH');
+  await clickAvatar();await wait(shiki,"document.body.dataset.scheme==='gold-jade'");
+  assert.equal(css,schemeCss('gold-jade'));assert.equal(patches,6);
   await clickAvatar();await wait(shiki,"document.body.dataset.scheme==='main'");
-  assert.equal(css,schemeCss('main'));assert.equal(patches,6);
+  assert.equal(css,schemeCss('main'));assert.equal(patches,7);
+  await evaluate(popup,"document.querySelector('#refresh').click()");await wait(popup,"document.querySelector('#current').textContent.includes('Основная')&&document.querySelector('#refresh').disabled===false");
+  await evaluate(popup,"document.querySelector('[data-scheme=\"gold-jade\"] button').click()");
+  await wait(shiki,"document.body.dataset.scheme==='gold-jade'");assert.equal(css,schemeCss('gold-jade'));assert.equal(patches,8);
   css='body{color:orange}';const unknownStarted=requests.length;
   await clickAvatar();
   await wait(shiki,"[...document.querySelectorAll('[role=status]')].some(el=>el.textContent.includes('не распознан'))");
-  assert.equal(patches,6);assert.ok(requests.length>unknownStarted);
+  assert.equal(patches,8);assert.ok(requests.length>unknownStarted);
   css=schemeCss('main');userId=1;
   await clickAvatar();
   await wait(shiki,"[...document.querySelectorAll('[role=status]')].some(el=>el.textContent.includes('нужен аккаунт SadLaboka'))");
-  assert.equal(patches,6);
+  assert.equal(patches,8);
   userId=1;await evaluate(popup,"document.querySelector('#refresh').click()");
   await wait(popup,"document.querySelector('#status').textContent.includes('нужен аккаунт SadLaboka')");
-  assert.equal(await evaluate(popup,"document.querySelector('[data-scheme=\"main\"] button').disabled"),true);assert.equal(patches,6);
+  assert.equal(await evaluate(popup,"document.querySelector('[data-scheme=\"main\"] button').disabled"),true);assert.equal(patches,8);
   await bidi.command('browsingContext.close',{context:shiki});
   await evaluate(popup,"document.querySelector('#refresh').click()");
   await wait(popup,"document.querySelector('#status').textContent.includes('Открой Shikimori')");
   await screenshot(popup,'popup-no-tab.png');
-  const report={browser:session.capabilities.browserVersion,extensionVersion:manifest.version,installed:true,sessionAndCsrfVerified:true,switch:true,restore:true,popupClosure:true,settingsPersisted:true,progressStagesVerified:true,activeTabReloadVerified:true,avatarCyclesBothDirections:true,avatarDoubleClickGuard:true,avatarSyntheticClickBlocked:true,avatarUnknownCssBlocked:true,avatarWrongUserBlocked:true,wrongAccountBlocked:true,missingTabHandled:true,patches,timings,requests};
+  const report={browser:session.capabilities.browserVersion,extensionVersion:manifest.version,installed:true,sessionAndCsrfVerified:true,switch:true,restore:true,popupClosure:true,settingsPersisted:true,progressStagesVerified:true,activeTabReloadVerified:true,threeSchemeCycle:true,goldJadePopupApply:true,manualUpdateChecks:true,updateChecks,avatarDoubleClickGuard:true,avatarSyntheticClickBlocked:true,avatarUnknownCssBlocked:true,avatarWrongUserBlocked:true,wrongAccountBlocked:true,missingTabHandled:true,patches,timings,requests};
   if(performanceLabel){await mkdir(new URL('performance/',output),{recursive:true});await writeFile(new URL(`performance/${performanceLabel}.json`,output),JSON.stringify(report,null,2));}
   await writeFile(new URL('browser-results.json',output),JSON.stringify(report,null,2));console.log(JSON.stringify({...report,requests:requests.length}));
 }finally{

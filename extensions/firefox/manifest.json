@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Shikimori · SadLaboka",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Переключение готовых цветовых схем аккаунта SadLaboka через API Shikimori.",
   "permissions": ["storage", "scripting"],
   "host_permissions": ["https://shikimori.io/*"],
@@ -26,6 +26,6 @@
     }
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self'; base-uri 'none'"
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self' https://api.github.com; base-uri 'none'"
   }
 }

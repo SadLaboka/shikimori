@@ -20,9 +20,13 @@ export const SCHEMES = Object.freeze([
     sourceSha256: '536db8d921938cf5041858bae76550f1845fd606e29a17e77047bf2146af41e3',
     previousSourceSha256: '63a3556f67d7ab4116f25f6f400264f9ab33617985d8dfceed14958821cc1e64',
     currentSourceSha256: '1e4144345c5a5efa26317c08ff5ae6ec1b767410bd6b86d6aac0a404b5d439bf' }),
+  Object.freeze({ id: 'gold-jade', name: 'Gold & Jade', description: 'Улькиорра и Йоруичи', file: 'css/themes/gold-jade/styles.css',
+    revision: 'c3eebb1774dc31d9c1bcd7666a64ddf7979d004d',
+    sourceSha256: '2569aaeba25ea5495a179b3a0b3ae834746cc7bbeecbca717e71af9d3426285f',
+    currentSourceSha256: '2569aaeba25ea5495a179b3a0b3ae834746cc7bbeecbca717e71af9d3426285f' }),
 ]);
 // Explicit order: do not silently rearrange it when the popup catalog changes.
-export const CYCLE_ORDER = Object.freeze(['main', 'emerald-scarlet']);
+export const CYCLE_ORDER = Object.freeze(['main', 'emerald-scarlet', 'gold-jade']);
 export function nextSchemeId(current) {
   const index = CYCLE_ORDER.indexOf(current);
   return index < 0 ? null : CYCLE_ORDER[(index + 1) % CYCLE_ORDER.length];
@@ -30,7 +34,7 @@ export function nextSchemeId(current) {
 export function schemeImports(id) {
   const scheme = SCHEMES.find(item => item.id === id);
   if (!scheme) throw new Error('Неизвестная схема.');
-  const url = `https://raw.githubusercontent.com/SadLaboka/shikimori/${REVISION}/${scheme.file}`;
+  const url = `https://raw.githubusercontent.com/SadLaboka/shikimori/${scheme.revision ?? REVISION}/${scheme.file}`;
   return [...BASE_IMPORTS, `@import url("${url}");`].join('\n');
 }
 export function schemeCss(id) { return `${schemeImports(id)}\n\n${AVATAR_HOVER_CSS}`; }

@@ -1,4 +1,5 @@
 import { SCHEMES } from './catalog.mjs';
+import { checkUpdate } from './updates.mjs';
 const $ = id => document.getElementById(id);
 let view = null;
 let busy = false;
@@ -76,5 +77,24 @@ $('reload').addEventListener('change', async () => {
   const value = $('reload').checked;
   try { const result = await send({ action: 'settings', reload: value }); if (!result?.ok) throw new Error(); }
   catch { $('reload').checked = !value; $('status').textContent = 'Не удалось сохранить настройку.'; }
+});
+const extensionVersion = browser.runtime.getManifest().version;
+$('extension-version').textContent = `Расширение ${extensionVersion}`;
+let availableUpdate = null;
+$('check-update').addEventListener('click', async () => {
+  const button = $('check-update'), status = $('update-status');
+  button.disabled = true;
+  try {
+    if (availableUpdate) {
+      await browser.tabs.create({ url: availableUpdate.url });
+      status.textContent = 'Подтверди установку в Firefox. Если файл скачан, установи этот XPI через «Установить дополнение из файла…».';
+      return;
+    }
+    status.textContent = 'Проверяем выпуск…';
+    availableUpdate = await checkUpdate(extensionVersion);
+    status.textContent = availableUpdate ? `Доступна версия ${availableUpdate.version}. Нажми «Скачать» для установки.` : 'Установлена актуальная версия.';
+    if (availableUpdate) button.textContent = `Скачать ${availableUpdate.version}`;
+  } catch { status.textContent = 'Не удалось проверить обновление. Попробуй позже.'; }
+  finally { button.disabled = false; }
 });
 run({ action: 'inspect' });

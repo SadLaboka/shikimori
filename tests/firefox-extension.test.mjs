@@ -42,12 +42,12 @@ function fixture() {
 
 test('registry imports exact pinned repository files with the six original dependencies', async () => {
   for (const scheme of SCHEMES) {
-    const bytes = execFileSync('git', ['show', `${REVISION}:${scheme.file}`]);
+    const bytes = execFileSync('git', ['show', `${scheme.revision ?? REVISION}:${scheme.file}`]);
     assert.equal(await sha256(bytes.toString('utf8')), scheme.sourceSha256);
     assert.deepEqual(bytes.toString('utf8').match(/^@import[^\r\n]+;/gm), BASE_IMPORTS);
     const css = schemeCss(scheme.id);
     assert.equal(css.match(/@import/g).length, 7);
-    assert.ok(css.includes(`/${REVISION}/${scheme.file}`));
+    assert.ok(css.includes(`/${scheme.revision ?? REVISION}/${scheme.file}`));
   }
   assert.equal(await sha256(schemeImports('emerald-scarlet')), 'a51c117f1ff6eb1a91e693022dcb1d5d73d44695e4c1059b03fe48220197808d');
 });
@@ -61,13 +61,15 @@ test('inline hover CSS matches the shared component and both old and new imports
     assert.equal(await recognize(current), scheme.id);
     assert.equal(await recognize(schemeImports(scheme.id)), scheme.id);
     assert.equal(await recognize(schemeCss(scheme.id)), scheme.id);
-    const previous = execFileSync('git', ['show', `firefox-v0.2.1:${scheme.file}`], { encoding: 'utf8' });
-    assert.equal(await sha256(previous), scheme.previousSourceSha256);
-    assert.equal(await recognize(previous), scheme.id);
+    if (scheme.previousSourceSha256) {
+      const previous = execFileSync('git', ['show', `firefox-v0.2.1:${scheme.file}`], { encoding: 'utf8' });
+      assert.equal(await sha256(previous), scheme.previousSourceSha256);
+      assert.equal(await recognize(previous), scheme.id);
+    }
     assert.equal(await recognize(`${schemeImports(scheme.id)}\n\n${LEGACY_AVATAR_HOVER_CSS}`), scheme.id);
     assert.equal(schemeCss(scheme.id), `${schemeImports(scheme.id)}\n\n${AVATAR_HOVER_CSS}`);
   }
-  assert.equal(nextSchemeId('main'), 'emerald-scarlet'); assert.equal(nextSchemeId('emerald-scarlet'), 'main');
+  assert.equal(nextSchemeId('main'), 'emerald-scarlet'); assert.equal(nextSchemeId('emerald-scarlet'), 'gold-jade'); assert.equal(nextSchemeId('gold-jade'), 'main');
   assert.equal(nextSchemeId(null), null);
 });
 
@@ -81,14 +83,16 @@ test('avatar cycle upgrades the previous inline glow and keeps its exact backup'
   assert.equal(f.calls.filter(call => call.method === 'PATCH').length, 1);
 });
 
-test('avatar cycle reads fresh state, supports old imports and advances in both directions with one PATCH', async () => {
+test('avatar cycle reads fresh state, supports old imports and cycles all three schemes with one PATCH', async () => {
   const f = fixture(); f.change({ css: schemeImports('main') });
   let result = await f.publisher.cycle();
   assert.equal(result.kind, 'success'); assert.equal(result.view.schemeId, 'emerald-scarlet');
   assert.equal(f.data.backups[0].css, schemeImports('main'));
   assert.equal(f.calls.length, 5); assert.equal(f.calls.filter(call => call.method === 'PATCH').length, 1);
   result = await f.publisher.cycle();
-  assert.equal(result.view.schemeId, 'main'); assert.equal(f.calls.filter(call => call.method === 'PATCH').length, 2);
+  assert.equal(result.view.schemeId, 'gold-jade'); assert.equal(f.calls.filter(call => call.method === 'PATCH').length, 2);
+  result = await f.publisher.cycle();
+  assert.equal(result.view.schemeId, 'main'); assert.equal(f.calls.filter(call => call.method === 'PATCH').length, 3);
 });
 
 test('avatar cycle never guesses unknown CSS, overwrites a conflict or bypasses a pending operation', async () => {

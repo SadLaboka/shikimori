@@ -44,9 +44,10 @@ jobs:
           echo "RELEASE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Test extension and CSS builds
         run: |
-          node --test tests/firefox-extension.test.mjs tests/firefox-rate-limit.test.mjs tests/firefox-avatar.test.mjs tests/build-css.test.mjs tests/firefox-release.test.mjs
+          node --test tests/firefox-extension.test.mjs tests/firefox-rate-limit.test.mjs tests/firefox-avatar.test.mjs tests/firefox-updates.test.mjs tests/build-css.test.mjs tests/firefox-release.test.mjs tests/gold-jade.test.mjs
           node scripts/build-css.mjs --check
           node scripts/build-emerald-scarlet.mjs --check
+          node scripts/build-gold-jade.mjs --check
           pwsh -NoProfile -File tests/verify-firefox-signed.tests.ps1
           git diff --check
       - name: Install pinned release tools
