@@ -39,7 +39,7 @@ html:root {
     left: auto;
     right: 0;
     width: min(100vw, calc(100vh * 720 / 1280));
-    background-image: url("https://files.catbox.moe/un6nmk.webp");
+    background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/fb5a29b76c26de5b3a2568e8294a848dd3b57c0a/css/themes/gold-jade/assets/yoruichi.webp");
     -webkit-mask-image: linear-gradient(to left, transparent, #000 var(--gj-edge-fade));
     mask-image: linear-gradient(to left, transparent, #000 var(--gj-edge-fade));
   }

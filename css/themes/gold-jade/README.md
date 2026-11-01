@@ -28,7 +28,7 @@ Gold & Jade доступна полным CSS и в [Firefox-переключа�
 акцент, Вход / меню профиля справа — бирюзовый. Цвет свечения следует той же
 стороне; тайминги анимаций и геометрия блоков сохранены.
 
-- Йоруичи: <https://files.catbox.moe/un6nmk.webp>.
+- Йоруичи: [исходный WebP](assets/yoruichi.webp), [прямая ссылка](https://raw.githubusercontent.com/SadLaboka/shikimori/fb5a29b76c26de5b3a2568e8294a848dd3b57c0a/css/themes/gold-jade/assets/yoruichi.webp).
 - Улькиорра: <https://res.cloudinary.com/dostk7gvx/image/upload/v1793533871/ulquiorra-v12-10mb_qilfw7.webp>.
 - SadLaboka v2: <https://res.cloudinary.com/dostk7gvx/image/upload/v1793540958/sadlaboka-gold-jade-v2_h02zoe.webp>.
 - TOP/TIERLIST: <https://res.cloudinary.com/dostk7gvx/image/upload/v1793540775/top-tierlist-gold-jade_znyitc.webp>.
@@ -43,10 +43,9 @@ SadLaboka и TOP/TIERLIST перекрашены покадрово с сохр�
 TOP/TIERLIST использует точные акценты темы. [Готовые файлы и параметры](assets/README.md).
 Аватар и остальные изображения сохранены.
 
-Файлы Cloudinary побайтно совпали с проверенными локальными. Catbox при проверке
-1 ноября 2026 года не ответил вовремя: доступность и идентичность размещённой
-Йоруичи не подтверждены. Её предпросмотр выполнен на прикреплённом пользователем
-локальном WebP; предоставленный URL в CSS сохранён.
+Файлы Cloudinary и GitHub побайтно совпадают с проверенными локальными.
+Йоруичи сохранена без перекодирования: 720 × 1280, 200 кадров по 40 мс,
+бесконечный цикл длительностью 8 секунд. Ссылка на файл закреплена коммитом.
 
 ## Сборка
 

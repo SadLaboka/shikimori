@@ -37,7 +37,7 @@ body::after {
    in pair 2 Ulquiorra is left, Yoruichi is right. */
 @media (min-width: 1280px) {
   body::after {
-    background-image: url("https://files.catbox.moe/un6nmk.webp"), url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793533871/ulquiorra-v12-10mb_qilfw7.webp");
+    background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/fb5a29b76c26de5b3a2568e8294a848dd3b57c0a/css/themes/gold-jade/assets/yoruichi.webp"), url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793533871/ulquiorra-v12-10mb_qilfw7.webp");
     background-position: var(--gj-positions);
     background-size: contain, contain;
     background-repeat: no-repeat, no-repeat;
