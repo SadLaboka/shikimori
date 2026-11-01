@@ -1,0 +1,77 @@
+/* Gold & Jade: shared palette, original assets and layout retained. */
+html:root {
+  --white-color: 247, 248, 239;
+  --light-color: 216, 225, 219;
+  --dark-color: 169, 185, 175;
+  --bright-color: var(--gj-left);
+  --dull-color: 145, 160, 151;
+  --input-color: 127, 145, 134;
+  --hover-bottoms-1: 28, 38, 31;
+  --buttoms-color: 20, 27, 23;
+  --hover-buttoms-2: var(--gj-right-deep);
+  --very-high-rating: 255, 231, 132;
+  --high-rating: 218, 181, 57;
+  --average-rating: 126, 115, 52;
+  --small-rating: 65, 63, 35;
+  --time-filled: var(--gj-left);
+  --time-empty: 28, 35, 30;
+  --anime-inprocess: var(--gj-left-dark);
+  --anime-complete: var(--gj-left-deep);
+  --manga-inprocess: var(--gj-right);
+  --manga-complete: var(--gj-right-deep);
+  --hover-color: var(--gj-right);
+  --shadows-color: 0, 0, 0;
+  --block-color: 17, 21, 19;
+  --menu-back: 6, 10, 8;
+  --nick-cover: 35, 45, 29;
+  --popup-color: 28, 46, 36;
+  --hundred: 1;
+}
+
+body::after {
+  background-color: #000;
+  background-image: none;
+}
+
+/* One transform mirrors BOTH layers and swaps their visible sides:
+   in pair 2 Ulquiorra is left, Yoruichi is right. */
+@media (min-width: 1280px) {
+  body::after {
+    background-image: url("https://files.catbox.moe/un6nmk.webp"), url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793533871/ulquiorra-v12-10mb_qilfw7.webp");
+    background-position: var(--gj-positions);
+    background-size: contain, contain;
+    background-repeat: no-repeat, no-repeat;
+    transform: scaleX(var(--gj-mirror));
+  }
+}
+
+/* Follow the actual columns without moving any blocks. Full-width animated
+   borders retain their two colors, animation paths, duration and alpha. */
+.profile-content > .cc-2 > .c-left,
+.profile-head .c-brief,
+.profile-head .c-info,
+.l-top_menu-v2 .logo-container,
+.l-top_menu-v2 .menu-dropdown.main {
+  --bright-color: var(--gj-left);
+  --hover-color: var(--gj-left);
+}
+.profile-content > .cc-2 > .c-right > .cc-2a,
+.profile-head .c-history,
+.l-top_menu-v2 .menu-dropdown.profile,
+.l-top_menu-v2 .menu-icon.sign_in {
+  --bright-color: var(--gj-right);
+  --hover-color: var(--gj-right);
+}
+
+.l-footer::after {
+  content: "*Gold & Jade*";
+}
+
+/* Set these image variables to verified hosted URLs after uploading the assets.
+   Local review supplies them through a separate preview-only stylesheet. */
+.p-profiles .profile-head .c-brief header.head .aliases {
+  background-image: var(--gj-logo-image, url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781560382/ezgif-2b7144768c04a2ad_podvfl.webp"));
+}
+.profile-content .about.block a[href$="tiermaker.com/list/anime/anime--15930092/5902281"] img {
+  content: var(--gj-tier-image, normal);
+}

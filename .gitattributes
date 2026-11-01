@@ -15,6 +15,9 @@ styles_optimized.css text eol=lf
 css/themes/*/*.css text eol=lf
 # Generated themes preserve trailing spaces inherited from the shared legacy CSS.
 css/themes/*/styles.css whitespace=-blank-at-eol
+# Gold & Jade keeps the four reviewed variants alongside its selected full CSS.
+css/themes/gold-jade/variants/*/*.css text eol=lf
+css/themes/gold-jade/variants/*/styles.css whitespace=-blank-at-eol
 # Release payloads must have the same text bytes on Windows and Linux runners.
 extensions/firefox/** text eol=lf
 scripts/*firefox* text eol=lf

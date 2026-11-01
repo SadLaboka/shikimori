@@ -1,0 +1,46 @@
+/* BEGIN GOLD & JADE 2.2 — hosted assets and narrow inner-edge fades. */
+html:root {
+  --gj-logo-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793540958/sadlaboka-gold-jade-v2_h02zoe.webp");
+  --gj-tier-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793540775/top-tierlist-gold-jade_znyitc.webp");
+  --gj-edge-fade: clamp(24px, 4.5vh, 64px);
+  background-color: #000;
+}
+
+/* Each picture needs its own mask, including when the two pictures overlap.
+   The masks mirror with the images, so their transparent edges face inward. */
+@media (min-width: 1280px) {
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    background-color: transparent;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    transform: scaleX(-1);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+
+  body::before {
+    left: 0;
+    right: auto;
+    width: min(100vw, calc(100vh * 941 / 1671));
+    background-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793533871/ulquiorra-v12-10mb_qilfw7.webp");
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--gj-edge-fade));
+    mask-image: linear-gradient(to right, transparent, #000 var(--gj-edge-fade));
+  }
+
+  body::after {
+    left: auto;
+    right: 0;
+    width: min(100vw, calc(100vh * 720 / 1280));
+    background-image: url("https://files.catbox.moe/un6nmk.webp");
+    -webkit-mask-image: linear-gradient(to left, transparent, #000 var(--gj-edge-fade));
+    mask-image: linear-gradient(to left, transparent, #000 var(--gj-edge-fade));
+  }
+}
