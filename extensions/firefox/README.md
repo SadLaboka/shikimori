@@ -10,14 +10,14 @@
 
 Нужен Firefox для компьютера версии 140 или новее.
 
-Для постоянной установки скачай [подписанный XPI](https://github.com/SadLaboka/shikimori/releases/download/firefox-v0.3.1/shikimori-schemes-0.3.1.xpi)
+Для постоянной установки скачай [подписанный XPI](https://github.com/SadLaboka/shikimori/releases/download/firefox-v0.3.2/shikimori-schemes-0.3.2.xpi)
 и установи через `about:addons` → ⚙ → «Установить дополнение из файла…».
 
 Временная установка исходников для разработки:
 
 1. Открой `about:debugging#/runtime/this-firefox` в адресной строке Firefox.
 2. Нажми «Загрузить временное дополнение…» и выбери `manifest.json` из этой папки
-   либо подготовленный `shikimori-schemes-0.3.1.zip`.
+   либо подготовленный `shikimori-schemes-0.3.2.zip`.
 3. Открой `https://shikimori.io/`, войди как SadLaboka и нажми значок расширения
    в меню дополнений Firefox. При необходимости закрепи его на панели.
 
