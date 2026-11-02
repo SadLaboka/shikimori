@@ -3,6 +3,7 @@ html:root {
   --gj-logo-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/efd31130be6feaeb015cb617711aeb27a2eedca34496f631a63b6b01019d0de1.webp");
   --gj-tier-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/b9d54c941e3305d28f02f424eec3ceaab26bb5e2409c1bdacc19b7eacf9f3075.webp");
   --gj-edge-fade: clamp(24px, 4.5vh, 64px);
+  --gj-bridge-page-width: 1200px;
   background-color: #000;
 }
 
@@ -15,12 +16,12 @@ html:root {
 @media (min-width: 1280px) {
   /* Behind both side pictures: overlap their inward fades and dissolve into
      the black centre below, without changing the page or navigation layout. */
-  .l-page::before {
+  html::before {
     content: "";
     position: fixed;
     top: 0;
     left: 50%;
-    width: min(100%, calc(var(--wide-page-width) + 2 * var(--gj-edge-fade)));
+    width: min(100%, calc(var(--gj-bridge-page-width) + 2 * var(--gj-edge-fade)));
     aspect-ratio: 1180 / 100;
     z-index: -2;
     pointer-events: none;
@@ -68,5 +69,13 @@ html:root {
     transform: none;
     -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--gj-edge-fade));
     mask-image: linear-gradient(to right, transparent, #000 var(--gj-edge-fade));
+  }
+}
+
+/* Match the profile's shared wide layout without putting the bridge inside
+   .l-page's stacking context: the side pictures must always paint above it. */
+@media (min-width: 2560px) {
+  html:has(body#profiles_show) {
+    --gj-bridge-page-width: clamp(1200px, 46.875vw, 1800px);
   }
 }
