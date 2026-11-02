@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import vm from 'node:vm';
-import { ACCOUNT, SCHEMES, REVISION, BASE_IMPORTS, schemeCss, schemeImports, sha256, recognize, nextSchemeId } from '../extensions/firefox/catalog.mjs';
+import { ACCOUNT, SCHEMES, REVISION, BASE_IMPORTS, LEGACY_BASE_IMPORTS, schemeCss, schemeImports, sha256, recognize, nextSchemeId } from '../extensions/firefox/catalog.mjs';
 import { AVATAR_HOVER_CSS } from '../extensions/firefox/avatar-hover.mjs';
 import { LEGACY_AVATAR_HOVER_CSS } from '../extensions/firefox/avatar-hover-legacy.mjs';
 import { Publisher } from '../extensions/firefox/publisher.mjs';
@@ -49,7 +49,23 @@ test('registry imports exact pinned repository files with the six original depen
     assert.equal(css.match(/@import/g).length, 7);
     assert.ok(css.includes(`/${scheme.revision ?? REVISION}/${scheme.file}`));
   }
-  assert.equal(await sha256(schemeImports('emerald-scarlet')), 'a51c117f1ff6eb1a91e693022dcb1d5d73d44695e4c1059b03fe48220197808d');
+  assert.equal(await sha256(schemeImports('emerald-scarlet')), '5443fc5805dc7d62468ceae94d44d1fcbcf2a1e9d6f8d95c21738ee9766f31d3');
+});
+
+test('schemes saved before the image migration remain recognizable with their original base imports', async () => {
+  for (const scheme of SCHEMES) {
+    for (const source of scheme.historicalSources) {
+      const imports = schemeImports(scheme.id, source.revision, LEGACY_BASE_IMPORTS);
+      for (const previous of [imports, `${imports}\n\n${AVATAR_HOVER_CSS}`, `${imports}\n\n${LEGACY_AVATAR_HOVER_CSS}`]) {
+        assert.equal(await recognize(previous), scheme.id);
+        const f = fixture(); f.change({ css: previous });
+        const result = await f.publisher.cycle();
+        assert.equal(result.kind, 'success');
+        assert.equal(result.view.schemeId, nextSchemeId(scheme.id));
+        assert.equal(f.data.backups[0].css, previous);
+      }
+    }
+  }
 });
 
 test('inline hover CSS matches the shared component and both old and new imports are recognized', async () => {
