@@ -70,7 +70,7 @@ Emerald & Scarlet → Gold & Jade → Основная». Меню выбора 
 
 Нужен Firefox для компьютера версии 140 или новее.
 
-Для постоянной установки скачай [подписанный XPI](https://github.com/SadLaboka/shikimori/releases/download/firefox-v0.3.6/shikimori-schemes-0.3.6.xpi).
+Для постоянной установки скачай [подписанный XPI](https://github.com/SadLaboka/shikimori/releases/download/firefox-v0.3.7/shikimori-schemes-0.3.7.xpi).
 Открой `about:addons` → ⚙ → «Установить дополнение из файла…» и выбери его.
 
 Для временной проверки из исходников:
