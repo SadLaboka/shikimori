@@ -13,6 +13,25 @@ html:root {
 /* Each picture needs its own mask, including when the two pictures overlap.
    Each mask keeps the transparent edge facing inward. */
 @media (min-width: 1280px) {
+  /* Behind both side pictures: overlap their inward fades and dissolve into
+     the black centre below, without changing the page or navigation layout. */
+  .l-page::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 50%;
+    width: min(100%, calc(var(--wide-page-width) + 2 * var(--gj-edge-fade)));
+    aspect-ratio: 1180 / 100;
+    z-index: -2;
+    pointer-events: none;
+    transform: translateX(-50%);
+    background: url("https://raw.githubusercontent.com/SadLaboka/shikimori/10285d94bd3e6a09b25c939a8f053f80c5bac27d/css/themes/gold-jade/assets/header-bridge-1180x100-optimized.webp") center top / 100% 100% no-repeat;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--gj-edge-fade), #000 calc(100% - var(--gj-edge-fade)), transparent), linear-gradient(to bottom, #000 60%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 var(--gj-edge-fade), #000 calc(100% - var(--gj-edge-fade)), transparent), linear-gradient(to bottom, #000 60%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+
   body::before,
   body::after {
     content: "";

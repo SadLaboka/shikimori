@@ -30,7 +30,7 @@ for (const variant of variants) test(`variant ${variant}: imports, assets, timin
     actual = actual.replaceAll(`rgb(${rgb}`, 'rgb(<rgb>').replaceAll(`rgba(${rgb}`, 'rgba(<rgb>');
   }
   assert.equal(actual, expected);
-  assert.equal(urls(css).length, urls(base).length + (variant === '2-2' ? 8 : 3));
+  assert.equal(urls(css).length, urls(base).length + (variant === '2-2' ? 9 : 3));
   assert.ok(!css.includes('file:///'));
 });
 test('reflection swaps characters; same accents occur in cross-paired variants', async () => {
