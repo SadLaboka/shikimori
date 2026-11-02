@@ -7,10 +7,10 @@
 /* AUTO=sticky_menu */ @media screen and (min-width: 1025px) { .l-top_menu-v2 { position: sticky; top: 0; } .l-top_menu-v2 .active .submenu { max-height: calc(100vh - var(--top-menu-height)); overflow-y: auto; } }
 @import url('https://fonts.googleapis.com/css2?family=Rubik+Spray+Paint&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap');
-@import url("https://raw.githubusercontent.com/SadLaboka/shikimori/9c8e3373f0d65490823e609f56472fc168a9b8a7/css/base/main_code_1.css");
+@import url("https://raw.githubusercontent.com/SadLaboka/shikimori/2d919a08e191c50b9293c73f7cc6504f59e4b51a/css/base/main_code_1.css");
 @import url("https://raw.githubusercontent.com/SadLaboka/shikimori/a96dc9d93e8ae8edb76912f8f3ca970a96241c8b/css/base/main_code_2.css");
-@import url("https://raw.githubusercontent.com/SadLaboka/shikimori/8fc0b68fa3578b6e8a3884dbb23651d86d885f73/css/base/main_code_3.css");
-@import url("https://raw.githubusercontent.com/SadLaboka/shikimori/8912ca67ab5e4915c6ba9ea065f9ee609481ccd3/css/base/main_code_4mob.css");
+@import url("https://raw.githubusercontent.com/SadLaboka/shikimori/2d919a08e191c50b9293c73f7cc6504f59e4b51a/css/base/main_code_3.css");
+@import url("https://raw.githubusercontent.com/SadLaboka/shikimori/2d919a08e191c50b9293c73f7cc6504f59e4b51a/css/base/main_code_4mob.css");
 
 
 
@@ -429,7 +429,7 @@ background-color: black;
 }
 @media (min-width: 1280px) {
 body:after {
-  background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781461880/ezgif-4c18dc226bcfa80a_croiuj.webp), url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781508170/ezgif-3665fe919cd9a076_stw83p.webp);
+  background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/92c0c93bec1c20708184ebfb87d47de565a68e3d81d4443d867236133d6870a2.webp), url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/66fbb46e247ac62f750044acf7852bdc8978a7c6527091f1cc106526cd0e511a.webp);
   background-size: contain, contain;
   background-position: left center, right center;
   background-color: black;
@@ -914,14 +914,14 @@ a {
   inset: 0;
   max-width: 160px;
   max-height: 160px;
-  background: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462729/ezgif-68bfaf998569b54e_fz0j2z.webp") center / cover;
+  background: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/be7fd81ba850a22fcfed7a7ffd759ce4f4acb655dd6622f11668a514b123b62e.webp") center / cover;
   border-radius: 50%;
   object-fit: cover;
 }
 
 .p-user_rates-index .l-menu .avatar::before {
   margin-left: 48px;
-  background: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-7-234e06a3f3_ggpnpq.webp") center / cover;
+  background: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/1392f3fdee11075d3cf8d87543e341ad5c4f391ce08a4f2c6c28e171a4b703bf.webp") center / cover;
 }
 
 .p-profiles .profile-head .avatar img, .p-user_rates-index .l-menu .avatar img {
@@ -941,7 +941,7 @@ a {
 /*---------------------------------------------------------------------------sadlaboka-----------------------------------------------------------------*/
 .p-profiles .profile-head .c-brief header.head .aliases {
   font-size: 0 !important;
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781560382/ezgif-2b7144768c04a2ad_podvfl.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/06a4be554d285f819fbfb5691f57794688e07eb4dd33e8fbf22379f68416670c.webp);
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -1206,85 +1206,85 @@ order: 3;
 .p-profiles .b-achievement[data-hint^='300 просмотренных аниме'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='300 просмотренных аниме'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='300 просмотренных аниме'] .inner:after {
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-2-a2a0a28bec_slif4g.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/aec9ec311fb76d7e69bb6c0b3deb35b9c41adc6e7c8b1f5fc3b928e47e759b36.webp);
 }
 
 .p-profiles .b-achievement[data-hint^='400 просмотренных аниме'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='400 просмотренных аниме'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='400 просмотренных аниме'] .inner:after {
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-2-a2a0a28bec_slif4g.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/aec9ec311fb76d7e69bb6c0b3deb35b9c41adc6e7c8b1f5fc3b928e47e759b36.webp);
 }
 
 .p-profiles .b-achievement[data-hint^='500 просмотренных аниме'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='500 просмотренных аниме'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='500 просмотренных аниме'] .inner:after {
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-2-a2a0a28bec_slif4g.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/aec9ec311fb76d7e69bb6c0b3deb35b9c41adc6e7c8b1f5fc3b928e47e759b36.webp);
 }
 
 .p-profiles .b-achievement[data-hint^='Длиннотайтлы'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='Длиннотайтлы'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='Длиннотайтлы'] .inner:after {
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462093/ezgif-6-bc535ef564_jotcxf.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/2d3fe96869ed8207d61c38d8e69837a01f9560ef191e15860237d84b389d7f55.webp);
 }
 
 .p-profiles .b-achievement[data-hint^='Генки'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='Генки'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='Генки'] .inner:after {
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462102/ezgif-2500addbd95a964c_gyxeki.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/bea2d37aadd562ee607db7951602545cc015c500a7b3a9a3ace1473542d2680b.webp);
 }
 
 .p-profiles .b-achievement[data-hint^='Комедия'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='Комедия'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='Комедия'] .inner:after {
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462089/ezgif-3-46249482d0_rhmgyi.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/8dd59e6417783ce1e2d589f4e432f5ad7b3a7d5723bafac30864ccb9b13e9aac.webp);
 }
 
 .p-profiles .b-achievement[data-hint^='Историческое'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='Историческое'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='Историческое'] .inner:after {
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462089/ezgif-5-c63124b016_nnldxb.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/4058d3b80e8651b362df0c867a9087f5a1116d4dc8bc689869312e94eaf82eb8.webp);
 }
 
 .p-profiles .b-achievement[data-hint^='Фэнтези'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='Фэнтези'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='Фэнтези'] .inner:after {
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462100/ezgif-2aafa23ddde327f8_hqkspy.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/678b9edaef13548aaff828b65a7d07d397371d89c259d361f516bd82d9de4ee7.webp);
 }
 
 .p-profiles .b-achievement[data-hint^='Военное'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='Военное'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='Военное'] .inner:after {
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462092/ezgif-24a49b8ba1f73140_vqoz8q.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/0ef6ea2978b72c220511427d1a1201d662cd30a83fc8fd25ab5fba02eeb01d27.webp);
 }
 
 .p-profiles .b-achievement[data-hint^='Фантастика'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='Фантастика'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='Фантастика'] .inner:after {
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462101/ezgif-2793fb783ff3af19_w5sosw.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/ffb31bb9699b12a5ebb0b486e8ae37b05df3940e0e3e16110339f3b63ca3ea56.webp);
 }
 
 .p-profiles .b-achievement[data-hint^='Хоррор'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='Хоррор'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='Хоррор'] .inner:after {
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-5-c585253462_uxintc.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/1b85b813aae04f8cc60552c92ba787e31a1203145ae2b77b7499ff1e00cd2592.webp);
 }
 
 .p-profiles .b-achievement[data-hint^='Романтика'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='Романтика'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='Романтика'] .inner:after {
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462096/ezgif-5-5b1d32ae00_o3vprz.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/eba110e7ba0eacd27ec880db8f5c2faa78c140c046e8340403660a282f2cd4aa.webp);
 }
 
 .p-profiles .b-achievement[data-hint^='Драма'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='Драма'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='Драма'] .inner:after {
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462093/ezgif-5-64cdf8728a_nudzfi.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/644d7c316b7ba437f74c7d45b1657381db3732259396a92805c45d545a7c6c65.webp);
 }
 
 .p-profiles .b-achievement[data-hint^='Безумие / Психологическое'] .inner img {visibility: hidden;}
 .p-profiles .b-achievement[data-hint^='Безумие / Психологическое'] .inner .border {border-color: black !important}
 .p-profiles .b-achievement[data-hint^='Безумие / Психологическое'] .inner:after {
-  background: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462097/ezgif-228c209b4af243_rcxisr.webp);
+  background: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/2fb96b5081aeb41012f14562675baf3f8fe5a69862794771dd7eed7cc4f083d0.webp);
 }
 
 
@@ -1357,19 +1357,19 @@ order: 3;
 }
 
 /* 6. Привязываем ФОНОВЫЕ КАРТИНКИ к уникальному URL каждой франшизы */
-#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mob_psycho"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462100/ezgif-2fb6b6e6e1c264f1_fhjs8z.webp) !important; }
-#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="overlord"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781644102/ezgif-296258fb46ef33f9_rgj8hp.webp) !important; }
-#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mushoku_tensei"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462102/ezgif-24d3525415e5aaa7_ucewg6.webp) !important; }
-#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="kaguya_sama"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781642843/ezgif-83c6562aba12d4e6_xlhdes.webp) !important; }
-#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="danmachi"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781643791/ezgif-2bfefb29c69512bc_ggqnmu.webp) !important; }
-#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="gintama"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462094/ezgif-225799239b961b02_w9dsg7.webp) !important; }
-#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="hajime_no_ippo"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781643916/ezgif-201c95d9c469f304_sqxmyw.webp) !important; }
-#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="kingdom"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462095/ezgif-1-46d69f5544_yrnxdi.webp) !important; }
-#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mushishi"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462090/ezgif-5-6373b1c81e_prtthi.webp) !important; }
-#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="konosuba"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462097/ezgif-5-ce8fac38a3_saabib.webp) !important; }
-#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="bleach"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462094/ezgif-243d112cb0d1e5e2_phxvaj.webp) !important; }
-#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="bakuman"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781462099/ezgif-5-fafca6e508_eohezg.webp) !important; }
-#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="quanzhi_fashi"]::before { background-image: url(https://res.cloudinary.com/dostk7gvx/image/upload/v1781644837/ezgif-8522f1b6635790c4_sozf3b.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mob_psycho"]::before { background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/78209eae61918a887712814e7f63577e847d7c8671dc3f27f6866567ee54ad28.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="overlord"]::before { background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/e4a47806359786da3ad69ffbff2d2c8ebcdd843eba9c391289608a8dc381edea.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mushoku_tensei"]::before { background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/25ef87e55511150e14cdfeceba6cf71563c9f68f6dfc5dfda1f6a6757fb0b537.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="kaguya_sama"]::before { background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/5ad9a11d0765ee155eb31423a476740ac01bdbdc343f5b9f33a56c7c180dda24.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="danmachi"]::before { background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/12500701014704d39fce86026d9d016bb6e63fc045d50a81019745e171965b7c.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="gintama"]::before { background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/7bbafd4375fa29db5412c3037d3dcedb86aef81b6f9f2eaa582142d1bf9ac3b8.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="hajime_no_ippo"]::before { background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/1e10e16e474e13bbd3cc627f1419ff0e1c81eec0a237f7495e984f836d46243f.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="kingdom"]::before { background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/4673d6e81219178262a45ea06e85d72388bbd56ef3404c418d7bbf9b395b9fee.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="mushishi"]::before { background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/f7b27f9e75a0dfa78a70531f23799251732e7ca6aa1dd423c0999e4a57d18b18.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="konosuba"]::before { background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/c982d16aacf267a111b82be54e4027243f1147e207982cac61b7d3c039cd4847.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="bleach"]::before { background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/1fa24ab024c5740d1dba703e57cb97e0f9bd63c03670646cbe1aebf1f428570c.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="bakuman"]::before { background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/4d787785acdac0b5449599b3b01c0b6717cb7f90a72a20328943a652911c0c0b.webp) !important; }
+#profiles_show.p-profiles-show .achievements .cc-franchises .b-badge[href*="quanzhi_fashi"]::before { background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/54b935ba8e8cb4652f46ab62ae10a63e19ab87af01edabb53a5a264cf6bb8158.webp) !important; }
 
 
 /* 7. Привязываем ТЕКСТ для шторки по уникальному URL */
@@ -1392,52 +1392,52 @@ order: 3;
 /*-----------------------------------------------------------------Постеры избранное--------------------------------------------------------------------*/
 [href*="characters/184947-frieren"] {
   --show-default: 0;
-  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462101/ezgif-2c61b2b2a03ef635_sdaqmy.webp");
+  --custom-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/d4dc34839a1a3c1cad0b82e3a614fcabf12e26c066683db2bde94929875f406f.webp");
 }
 
 [href*="characters/13020-askeladd"] {
   --show-default: 0;
-  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462102/ezgif-2b723cbfb6b28ed9_gtdxwd.webp");
+  --custom-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/bbcd42e94c4876cdb384f1e3464ad5654419d4f5c8929f27e0361551cdc25ce0.webp");
 }
 
 [href*="characters/62-zoro-roronoa"] {
   --show-default: 0;
-  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462099/ezgif-5-fb72c53f55_codurj.webp");
+  --custom-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/607e6ecaa471499afd43ed91f94cd1d752649d5dc2ec367c3daa040c0a8c1977.webp");
 }
 
 [href*="characters/31-hisoka-morow"] {
   --show-default: 0;
-  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462092/ezgif-5-d4a1b0ff0c_i5m6hj.webp");
+  --custom-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/dfa82865ed9b0e0cf0c04574ba8f3ed20a5fd9acb6d9ea4cba551d44e590de49.webp");
 }
 
 [href*="characters/111335-eris-boreas-greyrat"] {
   --show-default: 0;
-  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462094/ezgif-24c4dc6a0b22a66e_yetdmu.webp");
+  --custom-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/fc163eef378c68ce5aa9de3e121410c1699dd4f406a33c676c86b7941798f71a.webp");
 }
 
 [href*="characters/164473-kento-nanami"] {
   --show-default: 0;
-  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462094/ezgif-5-853ef6953f_eusoee.webp");
+  --custom-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/ab555deb8e7a76c345b5935d6c2177117af229c157a7cc7ee66be6910e7c061b.webp");
 }
 
 [href*="characters/85-kakashi-hatake"] {
   --show-default: 0;
-  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462089/ezgif-5-d5bf925312_ktpop1.webp");
+  --custom-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/6a9a2940fc7aba259b0db24bba722e8ff7801c4fa9788f6497cfbfb5997a9cf6.webp");
 }
 
 [href*="characters/147-kenshin-himura"] {
   --show-default: 0;
-  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462100/ezgif-2e80d71a42d4f506_hdz6y6.webp");
+  --custom-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/986147b4c4fd2e86cd0c944d2cab2678470f526f1fa3510a2b98fae8f83f3f3c.webp");
 }
 
 [href*="characters/2910-obito-uchiha"] {
   --show-default: 0;
-  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462088/ezgif-5-ecc85c1f4d_fafycw.webp");
+  --custom-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/34cf342838e90b83571176707a0dd3e9a570ba33877c9f9207826af511334e82.webp");
 }
 
 [href*="characters/13045-bruno-bucciarati"] {
   --show-default: 0;
-  --custom-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462099/ezgif-21a5b52600bf16d5_bkcswo.webp");
+  --custom-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/3ef0ff5e73f8d8d4a8dcdf981ae3e2e10ce240d3f8ac83a2e8a960dfb9416592.webp");
 }
 
 /* Отложенная отрисовка избранного и содержимого достижений на компьютере.

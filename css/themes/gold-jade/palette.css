@@ -37,7 +37,7 @@ body::after {
    in pair 2 Ulquiorra is left, Yoruichi is right. */
 @media (min-width: 1280px) {
   body::after {
-    background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/fb5a29b76c26de5b3a2568e8294a848dd3b57c0a/css/themes/gold-jade/assets/yoruichi.webp"), url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793533871/ulquiorra-v12-10mb_qilfw7.webp");
+    background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/fb5a29b76c26de5b3a2568e8294a848dd3b57c0a/css/themes/gold-jade/assets/yoruichi.webp"), url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/ebc59a473be28eee531ad4f8ca8196950c3d7e46fb0279df63aa92bf185ea893.webp");
     background-position: var(--gj-positions);
     background-size: contain, contain;
     background-repeat: no-repeat, no-repeat;
@@ -70,7 +70,7 @@ body::after {
 /* Set these image variables to verified hosted URLs after uploading the assets.
    Local review supplies them through a separate preview-only stylesheet. */
 .p-profiles .profile-head .c-brief header.head .aliases {
-  background-image: var(--gj-logo-image, url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781560382/ezgif-2b7144768c04a2ad_podvfl.webp"));
+  background-image: var(--gj-logo-image, url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/06a4be554d285f819fbfb5691f57794688e07eb4dd33e8fbf22379f68416670c.webp"));
 }
 .profile-content .about.block a[href$="tiermaker.com/list/anime/anime--15930092/5902281"] img {
   content: var(--gj-tier-image, normal);

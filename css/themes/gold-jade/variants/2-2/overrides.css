@@ -1,13 +1,13 @@
 /* BEGIN GOLD & JADE 2.2 — hosted assets and narrow inner-edge fades. */
 html:root {
-  --gj-logo-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793540958/sadlaboka-gold-jade-v2_h02zoe.webp");
-  --gj-tier-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793540775/top-tierlist-gold-jade_znyitc.webp");
+  --gj-logo-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/efd31130be6feaeb015cb617711aeb27a2eedca34496f631a63b6b01019d0de1.webp");
+  --gj-tier-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/b9d54c941e3305d28f02f424eec3ceaab26bb5e2409c1bdacc19b7eacf9f3075.webp");
   --gj-edge-fade: clamp(24px, 4.5vh, 64px);
   background-color: #000;
 }
 
 .p-profiles .profile-head .avatar::before {
-  background-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793546652/dancing-avatar-gold-floor_g3mx0m.webp");
+  background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/17007be88b5b69707f0bb9dcfdd58d52503f9c4fcbd3bb8ac2feaf51d02cfe4a.webp");
 }
 
 /* Each picture needs its own mask, including when the two pictures overlap.
@@ -34,7 +34,7 @@ html:root {
     left: 0;
     right: auto;
     width: min(100vw, calc(100vh * 941 / 1671));
-    background-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793533871/ulquiorra-v12-10mb_qilfw7.webp");
+    background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/ebc59a473be28eee531ad4f8ca8196950c3d7e46fb0279df63aa92bf185ea893.webp");
     -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--gj-edge-fade));
     mask-image: linear-gradient(to right, transparent, #000 var(--gj-edge-fade));
   }

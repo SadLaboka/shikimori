@@ -28,8 +28,8 @@ html:root {
   --hundred: 1;
 
   /* Hosted animated WebP: Zoro left, Shanks right. */
-  --es-background-left: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793094848/zoro-1440p-compact_wr76ep.webp");
-  --es-background-right: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793127787/shanks-1440p-under10mb_k7lf3t.webp");
+  --es-background-left: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/91d9237f57bf279f562768c7b4306dade8c419d279461dad57c87f7d58377685.webp");
+  --es-background-right: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/7b9d9cc4ac7d33b723c01b404d29bf34ab323fa63a12e09264bfd130965e9735.webp");
 }
 
 body::after {
@@ -53,13 +53,13 @@ body::after {
 
 /* Theme-specific assets; leave the default CSS and shared BBCode intact. */
 .p-profiles .profile-head .c-brief header.head .aliases {
-  background-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793092205/ezgif-4aab277404b32afa_wjai7v.webp");
+  background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/f3e7cb62cec892b7712246533e1c41d74fe629e865697d313c9128742c8cdd11.webp");
 }
 
 .profile-content .about.block a[href$="tiermaker.com/list/anime/anime--15930092/5902281"] img {
-  content: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793092229/top-tierlist-emerald-scarlet_ejddtw.webp");
+  content: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/ddb751792f6285658f76520ced51d179e7e4ae98c70861d589aa07e2fb19d22d.webp");
 }
 
 .p-profiles .profile-head .avatar::before {
-  background-image: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1793093191/dancing-avatar-emerald-floor_fbuaol.webp");
+  background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/ea307ec5da174e7a7c386bebdffc5029780e4452f63356bf90e756fbf85531c1.webp");
 }

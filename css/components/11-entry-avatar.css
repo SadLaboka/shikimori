@@ -27,14 +27,14 @@
   inset: 0;
   max-width: 160px;
   max-height: 160px;
-  background: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462729/ezgif-68bfaf998569b54e_fz0j2z.webp") center / cover;
+  background: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/be7fd81ba850a22fcfed7a7ffd759ce4f4acb655dd6622f11668a514b123b62e.webp") center / cover;
   border-radius: 50%;
   object-fit: cover;
 }
 
 .p-user_rates-index .l-menu .avatar::before {
   margin-left: 48px;
-  background: url("https://res.cloudinary.com/dostk7gvx/image/upload/v1781462091/ezgif-7-234e06a3f3_ggpnpq.webp") center / cover;
+  background: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/1392f3fdee11075d3cf8d87543e341ad5c4f391ce08a4f2c6c28e171a4b703bf.webp") center / cover;
 }
 
 .p-profiles .profile-head .avatar img, .p-user_rates-index .l-menu .avatar img {
