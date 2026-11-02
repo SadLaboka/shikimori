@@ -39,7 +39,8 @@ body::after {
   body::after {
     background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/fb5a29b76c26de5b3a2568e8294a848dd3b57c0a/css/themes/gold-jade/assets/yoruichi.webp"), url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/ebc59a473be28eee531ad4f8ca8196950c3d7e46fb0279df63aa92bf185ea893.webp");
     background-position: var(--gj-positions);
-    background-size: contain, contain;
+    background-size: max(calc(100vh * 720 / 1280), calc((100vw - var(--wide-page-width)) / 2)) auto,
+                     max(calc(100vh * 941 / 1671), calc((100vw - var(--wide-page-width)) / 2)) auto;
     background-repeat: no-repeat, no-repeat;
     transform: scaleX(var(--gj-mirror));
   }

@@ -430,7 +430,9 @@ background-color: black;
 @media (min-width: 1280px) {
 body:after {
   background-image: url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/92c0c93bec1c20708184ebfb87d47de565a68e3d81d4443d867236133d6870a2.webp), url(https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/66fbb46e247ac62f750044acf7852bdc8978a7c6527091f1cc106526cd0e511a.webp);
-  background-size: contain, contain;
+  /* Preserve aspect ratios and fill each side up to the central page. */
+  background-size: max(calc(100vh * 801 / 1440), calc((100vw - var(--wide-page-width)) / 2)) auto,
+                   max(calc(100vh * 801 / 1440), calc((100vw - var(--wide-page-width)) / 2)) auto;
   background-position: left center, right center;
   background-color: black;
 }
@@ -2009,6 +2011,45 @@ body#profiles_show .tipsy,
     transform: none;
   }
 }
+/* Shared by all schemes: widen the profile from QHD to 4K. Keep the existing
+   BBCode and its twenty links; image dimensions are overridden only on wide screens. */
+body {
+  --wide-page-width: 1200px;
+}
+
+@media (min-width: 2560px) {
+  body#profiles_show {
+    --wide-page-width: clamp(1200px, 46.875vw, 1800px);
+  }
+
+  #profiles_show .l-page {
+    max-width: var(--wide-page-width);
+  }
+
+  #profiles_show .about .solid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  #profiles_show .about .solid > a,
+  #profiles_show .about .solid .b-image {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  #profiles_show .about .solid img {
+    display: block;
+    width: 100%;
+    /* Shikimori caps BBCode images at 235px with !important. */
+    max-width: 100% !important;
+    height: auto;
+    max-height: none !important;
+    aspect-ratio: 289 / 163;
+    object-fit: cover;
+  }
+}
 
 /* Variant 2.2: mirrored and swapped images; opposite accents. */
 html:root {
@@ -2062,7 +2103,8 @@ body::after {
   body::after {
     background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/fb5a29b76c26de5b3a2568e8294a848dd3b57c0a/css/themes/gold-jade/assets/yoruichi.webp"), url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/ebc59a473be28eee531ad4f8ca8196950c3d7e46fb0279df63aa92bf185ea893.webp");
     background-position: var(--gj-positions);
-    background-size: contain, contain;
+    background-size: max(calc(100vh * 720 / 1280), calc((100vw - var(--wide-page-width)) / 2)) auto,
+                     max(calc(100vh * 941 / 1671), calc((100vw - var(--wide-page-width)) / 2)) auto;
     background-repeat: no-repeat, no-repeat;
     transform: scaleX(var(--gj-mirror));
   }
@@ -2123,7 +2165,9 @@ html:root {
     z-index: -1;
     pointer-events: none;
     background-color: transparent;
-    background-size: contain;
+    /* Fill wide side gutters without stretching the characters. The extra
+       fade width places the transparent inner edge behind the page. */
+    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     transform: scaleX(-1);
@@ -2134,7 +2178,7 @@ html:root {
   body::before {
     left: 0;
     right: auto;
-    width: min(100vw, calc(100vh * 941 / 1671));
+    width: min(100vw, max(calc(100vh * 941 / 1671), calc((100vw - var(--wide-page-width)) / 2 + var(--gj-edge-fade))));
     background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/ebc59a473be28eee531ad4f8ca8196950c3d7e46fb0279df63aa92bf185ea893.webp");
     -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--gj-edge-fade));
     mask-image: linear-gradient(to right, transparent, #000 var(--gj-edge-fade));
@@ -2143,7 +2187,7 @@ html:root {
   body::after {
     left: auto;
     right: 0;
-    width: min(100vw, calc(100vh * 720 / 1280));
+    width: min(100vw, max(calc(100vh * 720 / 1280), calc((100vw - var(--wide-page-width)) / 2 + var(--gj-edge-fade))));
     background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/52eeaee3410b000f7b6a66f8a96686ce141c5523/css/themes/gold-jade/assets/yoruichi-claw-discharges-no-vapor.webp");
     transform: none;
     -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--gj-edge-fade));

@@ -22,7 +22,9 @@ html:root {
     z-index: -1;
     pointer-events: none;
     background-color: transparent;
-    background-size: contain;
+    /* Fill wide side gutters without stretching the characters. The extra
+       fade width places the transparent inner edge behind the page. */
+    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     transform: scaleX(-1);
@@ -33,7 +35,7 @@ html:root {
   body::before {
     left: 0;
     right: auto;
-    width: min(100vw, calc(100vh * 941 / 1671));
+    width: min(100vw, max(calc(100vh * 941 / 1671), calc((100vw - var(--wide-page-width)) / 2 + var(--gj-edge-fade))));
     background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/20cabc8b7165ed2189b2194ce8cc814246a83995/assets/images/ebc59a473be28eee531ad4f8ca8196950c3d7e46fb0279df63aa92bf185ea893.webp");
     -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--gj-edge-fade));
     mask-image: linear-gradient(to right, transparent, #000 var(--gj-edge-fade));
@@ -42,7 +44,7 @@ html:root {
   body::after {
     left: auto;
     right: 0;
-    width: min(100vw, calc(100vh * 720 / 1280));
+    width: min(100vw, max(calc(100vh * 720 / 1280), calc((100vw - var(--wide-page-width)) / 2 + var(--gj-edge-fade))));
     background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/52eeaee3410b000f7b6a66f8a96686ce141c5523/css/themes/gold-jade/assets/yoruichi-claw-discharges-no-vapor.webp");
     transform: none;
     -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--gj-edge-fade));

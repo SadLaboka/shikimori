@@ -23,6 +23,7 @@
     "components/19-filters.css",
     "components/20-tooltips.css",
     "components/21-mobile.css",
-    "components/22-avatar-interaction.css"
+    "components/22-avatar-interaction.css",
+    "components/23-wide-layout.css"
   ]
 }

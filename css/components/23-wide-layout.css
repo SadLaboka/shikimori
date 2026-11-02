@@ -1,0 +1,39 @@
+/* Shared by all schemes: widen the profile from QHD to 4K. Keep the existing
+   BBCode and its twenty links; image dimensions are overridden only on wide screens. */
+body {
+  --wide-page-width: 1200px;
+}
+
+@media (min-width: 2560px) {
+  body#profiles_show {
+    --wide-page-width: clamp(1200px, 46.875vw, 1800px);
+  }
+
+  #profiles_show .l-page {
+    max-width: var(--wide-page-width);
+  }
+
+  #profiles_show .about .solid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  #profiles_show .about .solid > a,
+  #profiles_show .about .solid .b-image {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  #profiles_show .about .solid img {
+    display: block;
+    width: 100%;
+    /* Shikimori caps BBCode images at 235px with !important. */
+    max-width: 100% !important;
+    height: auto;
+    max-height: none !important;
+    aspect-ratio: 289 / 163;
+    object-fit: cover;
+  }
+}
