@@ -49,7 +49,7 @@ test('registry imports exact pinned repository files with the six original depen
     assert.equal(css.match(/@import/g).length, 7);
     assert.ok(css.includes(`/${scheme.revision ?? REVISION}/${scheme.file}`));
   }
-  assert.equal(await sha256(schemeImports('emerald-scarlet')), '5443fc5805dc7d62468ceae94d44d1fcbcf2a1e9d6f8d95c21738ee9766f31d3');
+  assert.equal(await sha256(schemeImports('emerald-scarlet')), 'cea12243a7a2fed0c345353ef0373e6c77ad271a4b9968d6bf7615a527ee4b35');
 });
 
 test('schemes saved before the image migration remain recognizable with their original base imports', async () => {

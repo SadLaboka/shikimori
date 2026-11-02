@@ -2,7 +2,7 @@ import { AVATAR_HOVER_CSS } from './avatar-hover.mjs';
 import { LEGACY_AVATAR_HOVER_CSS } from './avatar-hover-legacy.mjs';
 export const ACCOUNT = Object.freeze({ nickname: 'SadLaboka', userId: 1408017, styleId: 1343722 });
 export const ORIGIN = 'https://shikimori.io';
-export const REVISION = '2f87c1be8a3c3800d1eeca859ec4e79594fdec35';
+export const REVISION = '178429b453a7a5fb3ebf6d63bc666d2e8cf83b1c';
 export const BASE_IMPORTS = Object.freeze([
   "@import url('https://fonts.googleapis.com/css2?family=Rubik+Spray+Paint&display=swap');",
   "@import url('https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap');",
@@ -25,10 +25,14 @@ export const SCHEMES = Object.freeze([
     "name": "Основная",
     "description": "Индиго и бордовый",
     "file": "styles_optimized.css",
-    "sourceSha256": "773c0f9d0a7aaca7469ead910b755a1b3c7389782f3c37bdb0cd935813c61af2",
+    "sourceSha256": "900530e4dc7d73c9599be8bcb069ed167a73369f320c43b3610f4204aa151f62",
     "previousSourceSha256": "612eadae22be9c1d6f1b47418983f3da00d04d82dabb6d1ee584340d11bf895f",
-    "currentSourceSha256": "773c0f9d0a7aaca7469ead910b755a1b3c7389782f3c37bdb0cd935813c61af2",
+    "currentSourceSha256": "900530e4dc7d73c9599be8bcb069ed167a73369f320c43b3610f4204aa151f62",
     "historicalSources": [
+      {
+        "revision": "2f87c1be8a3c3800d1eeca859ec4e79594fdec35",
+        "sourceSha256": "773c0f9d0a7aaca7469ead910b755a1b3c7389782f3c37bdb0cd935813c61af2"
+      },
       {
         "revision": "e4f9fe9118d6d81397e069254da91ee4f728d3da",
         "sourceSha256": "7d831865199d403d5bafce8f290ac97c91cee589b25f44b2049f33a8f674e4ac"
@@ -44,10 +48,14 @@ export const SCHEMES = Object.freeze([
     "name": "Emerald & Scarlet",
     "description": "Зоро и Шанкс",
     "file": "css/themes/emerald-scarlet/styles.css",
-    "sourceSha256": "9a11fe7fcb12da54fe27284b704b100e7215e71243fe17d1b11acaa414d188cf",
+    "sourceSha256": "fe50ed06eb1023099f8ce9d3546947c9ecf03622237956812cfbf4c6fb407548",
     "previousSourceSha256": "63a3556f67d7ab4116f25f6f400264f9ab33617985d8dfceed14958821cc1e64",
-    "currentSourceSha256": "9a11fe7fcb12da54fe27284b704b100e7215e71243fe17d1b11acaa414d188cf",
+    "currentSourceSha256": "fe50ed06eb1023099f8ce9d3546947c9ecf03622237956812cfbf4c6fb407548",
     "historicalSources": [
+      {
+        "revision": "2f87c1be8a3c3800d1eeca859ec4e79594fdec35",
+        "sourceSha256": "9a11fe7fcb12da54fe27284b704b100e7215e71243fe17d1b11acaa414d188cf"
+      },
       {
         "revision": "e4f9fe9118d6d81397e069254da91ee4f728d3da",
         "sourceSha256": "536db8d921938cf5041858bae76550f1845fd606e29a17e77047bf2146af41e3"
@@ -67,6 +75,10 @@ export const SCHEMES = Object.freeze([
     "previousSourceTag": "firefox-v0.3.2",
     "historicalSources": [
       {
+        "revision": "2f87c1be8a3c3800d1eeca859ec4e79594fdec35",
+        "sourceSha256": "a09eeab9331e990e22caee1d42534a1969d611727237c177f2335f18cc7d6e6b"
+      },
+      {
         "revision": "c3eebb1774dc31d9c1bcd7666a64ddf7979d004d",
         "sourceSha256": "2569aaeba25ea5495a179b3a0b3ae834746cc7bbeecbca717e71af9d3426285f"
       },
@@ -79,9 +91,9 @@ export const SCHEMES = Object.freeze([
         "sourceSha256": "5a108c3f1e27190d62432f889846bfda99cc19ddaeba39053dc165c521c398e5"
       }
     ],
-    "sourceSha256": "a09eeab9331e990e22caee1d42534a1969d611727237c177f2335f18cc7d6e6b",
+    "sourceSha256": "a7f25b1c8bc45e8e1881ba41351dd40b19b6c1803997f44d52f42508f9c94a6a",
     "previousSourceSha256": "db4b0a10ee5523ba8c4fad7ce85932386c7b579c56844a38c45ec5e1d04454bc",
-    "currentSourceSha256": "a09eeab9331e990e22caee1d42534a1969d611727237c177f2335f18cc7d6e6b"
+    "currentSourceSha256": "a7f25b1c8bc45e8e1881ba41351dd40b19b6c1803997f44d52f42508f9c94a6a"
   })
 ]);
 // Explicit order: do not silently rearrange it when the popup catalog changes.
