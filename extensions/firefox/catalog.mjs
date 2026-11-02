@@ -71,9 +71,14 @@ export const SCHEMES = Object.freeze([
     "name": "Gold & Jade",
     "description": "Улькиорра и Йоруичи",
     "file": "css/themes/gold-jade/styles.css",
+    "revision": "3b23783249af954943741a37b317a121c1623ad6",
     "previousRevision": "ed4ab4191c58f9ebdfe4f1a8293195d27d9498d5",
     "previousSourceTag": "firefox-v0.3.2",
     "historicalSources": [
+      {
+        "revision": "178429b453a7a5fb3ebf6d63bc666d2e8cf83b1c",
+        "sourceSha256": "a7f25b1c8bc45e8e1881ba41351dd40b19b6c1803997f44d52f42508f9c94a6a"
+      },
       {
         "revision": "2f87c1be8a3c3800d1eeca859ec4e79594fdec35",
         "sourceSha256": "a09eeab9331e990e22caee1d42534a1969d611727237c177f2335f18cc7d6e6b"
@@ -91,9 +96,9 @@ export const SCHEMES = Object.freeze([
         "sourceSha256": "5a108c3f1e27190d62432f889846bfda99cc19ddaeba39053dc165c521c398e5"
       }
     ],
-    "sourceSha256": "a7f25b1c8bc45e8e1881ba41351dd40b19b6c1803997f44d52f42508f9c94a6a",
+    "sourceSha256": "fe7e8afd281490f99a9e16a1d6bd1626972417035318582e7015c5f9a5d9230b",
     "previousSourceSha256": "db4b0a10ee5523ba8c4fad7ce85932386c7b579c56844a38c45ec5e1d04454bc",
-    "currentSourceSha256": "a7f25b1c8bc45e8e1881ba41351dd40b19b6c1803997f44d52f42508f9c94a6a"
+    "currentSourceSha256": "fe7e8afd281490f99a9e16a1d6bd1626972417035318582e7015c5f9a5d9230b"
   })
 ]);
 // Explicit order: do not silently rearrange it when the popup catalog changes.
