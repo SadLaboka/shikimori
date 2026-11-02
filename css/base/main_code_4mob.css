@@ -4251,7 +4251,7 @@ div.Ssylki-anime-v-1-standard:hover .Fon-standard {
 .Ssylki-anime-v-1-standard .Fon-standard::after {
     position: absolute;
     content: "";
-    background-image: url("//moe.shikimori.one/system/user_images/original/208335/1426717.jpg");
+    background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/6692f5044d13d5a72a15bed15d159fa2816fff7d/assets/images/ac755b88a6c53701c2782b42b8cc1f3c3eaa306ec31fb56edea19297e7e28e5b.jpg");
     width: 100%;
     height: 100%;
     filter: blur(4px) contrast(105%) grayscale(50%);
@@ -4531,7 +4531,7 @@ div.Ssylki-anime-v-1:hover .Fon {
 .Ssylki-anime-v-1 .Fon::after {
     position: absolute;
     content: "";
-    background-image: url("//moe.shikimori.one/system/user_images/original/208335/1426717.jpg");
+    background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/6692f5044d13d5a72a15bed15d159fa2816fff7d/assets/images/ac755b88a6c53701c2782b42b8cc1f3c3eaa306ec31fb56edea19297e7e28e5b.jpg");
     width: 100%;
     height: 100%;
     filter: blur(4px) contrast(105%) grayscale(50%);
@@ -4629,7 +4629,7 @@ div.Ssylki-anime-v-1:hover .progress {
     padding: 0.7%;
     overflow: hidden;
     background-color: rgba(var(--block-color), 0.4);
-    background-image: url("/\x/dere.shikimori.one/system/images/original/113449.gif?1614959521");
+    background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/6692f5044d13d5a72a15bed15d159fa2816fff7d/assets/images/a9300bb561229982fc2701e82b20e28d5e4f283cb2f9468b816a0d49968a8ed6.gif");
     background-size: contain;
     pointer-events: all;
     transform: rotate(360deg);
@@ -4638,7 +4638,7 @@ div.Ssylki-anime-v-1:hover .progress {
 
 div.Ssylki-Characters:hover {
     transform: rotate(-360deg);
-    background-image: url("/\x/dere.shikimori.one/system/images/original/111569.gif?1610135594");
+    background-image: url("https://raw.githubusercontent.com/SadLaboka/shikimori/6692f5044d13d5a72a15bed15d159fa2816fff7d/assets/images/70304e0d0fbdd0255b41abe9a0777b14355125d70761e638859289c5c11a452b.gif");
 }
 
 .Ssylki-Characters .b-link {
