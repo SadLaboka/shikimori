@@ -18,6 +18,7 @@ import {MAIN1_SPEC,DUPLICATE_BUTTON_BLOCK,verifyMain1ButtonCandidate,applyMain1B
 import {checkButtonStates} from './button-states.mjs';
 import {MAIN1_OPTIMIZATION,optimizedMain1Revision} from './css.mjs';
 import {MAIN3_SPEC,RADIUS_BEFORE,RADIUS_AFTER,verifyRadiusCandidate,applyRadiusCandidate,verifyRadiusDelta,sampleRadiusMargins,MAIN3_RELEASE,planRadiusRelease,radiusReleaseRevision} from './main3-radius.mjs';
+import {planImageAssets} from './image-assets.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const timing = createTimings();
@@ -332,7 +333,9 @@ try {
   const original = values['baseline-compiled']
     ? await readFile(path.resolve(root, values['baseline-compiled']), 'utf8') : liveOriginal;
   const { foundation, user } = splitCompiled(original);
-  const planned = radiusRelease?planRadiusRelease(local,publishedSource,foundation):planFoundation(local, publishedSource, foundation);
+  const imagePlan=await planImageAssets(local,publishedSource,foundation,{signature:css=>signature(page,css),getSource:url=>getSource(context,url)});
+  const planned = imagePlan ?? (radiusRelease?planRadiusRelease(local,publishedSource,foundation):planFoundation(local, publishedSource, foundation));
+  if(imagePlan)report.imageAssets=imagePlan.imageAssets;
   const expectedBaseline = joinCompiled(foundation, prepareUser(publishedSource));
   const actualRules = await signature(page, original);
   const modelRules = await signature(page, expectedBaseline);

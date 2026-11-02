@@ -6,6 +6,16 @@ import {chromium} from 'playwright';
 import {OWNED_IMPORTS,ownedImportRevision,planFoundation,assertVersionPinBytes,prepareUser,joinCompiled} from './css.mjs';
 import {verifyMain1ButtonCandidate,verifyMain1ButtonCssomDelta,DUPLICATE_BUTTON_BLOCK} from './main1-button-pilot.mjs';
 import {verifyRadiusCandidate,verifyRadiusDelta,RADIUS_BEFORE,RADIUS_AFTER} from './main3-radius.mjs';
+import {verifyImageReplacement} from '../../scripts/verify-image-assets.mjs';
+const imageAssets=JSON.parse(await readFile(new URL('../../css/image-assets.json',import.meta.url),'utf8'));
+async function beforeImageMigration(file){
+  const bytes=await readFile(new URL('../../'+file,import.meta.url));
+  const spec=imageAssets.modules.find(row=>row.file===file);
+  if(!spec)return bytes;
+  const original=execFileSync('git',['show',`${imageAssets.sourceRevision}:${file}`],{maxBuffer:2*1024*1024});
+  verifyImageReplacement(original,bytes,spec);
+  return original;
+}
 for(const spec of OWNED_IMPORTS) {
 
 test(`${spec.local}: owned-source relocation only changes an approved URL label at the same cascade position`,()=>{
@@ -21,7 +31,7 @@ test(`${spec.local}: owned-source relocation only changes an approved URL label 
 test(`${spec.local}: owned baseline and approved working version are bound to safe paths and exact bytes`,async()=>{
   const revision=ownedImportRevision(spec);
   const snapshot=await readFile(new URL('../../'+spec.snapshot,import.meta.url));
-  const working=await readFile(new URL('../../'+spec.local,import.meta.url));
+  const working=await beforeImageMigration(spec.local);
   const committed=execFileSync('git',['show',`${revision}:${spec.local}`],{maxBuffer:2*1024*1024});
   if(spec.local==='css/base/main_code_1.css')verifyMain1ButtonCandidate(snapshot,working);
   else if(spec.local==='css/base/main_code_3.css'&&!snapshot.equals(working))verifyRadiusCandidate(snapshot,working);
@@ -34,7 +44,7 @@ test(`${spec.local}: owned baseline and approved working version are bound to sa
 
 test(`${spec.local}: real module preserves CSSOM except its explicitly approved optimization`,async()=>{
   const snapshot=await readFile(new URL('../../'+spec.snapshot,import.meta.url),'utf8');
-  const module=await readFile(new URL('../../'+spec.local,import.meta.url),'utf8');
+  const module=(await beforeImageMigration(spec.local)).toString('utf8');
   const source=`@import "${spec.source}";@media(min-width:1025px){.menu{position:sticky}}`;
   const local=source.replace(spec.source,spec.target),prefix=`/* ${spec.source} */${snapshot}`;
   const planned=planFoundation(local,source,prefix);

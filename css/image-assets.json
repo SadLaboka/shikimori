@@ -15,7 +15,9 @@
           "from": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTG-2yy4R8Xi5mO1N_ZurIpznxCgpOuDzpRZGu-K9dUBwrClokYAg",
           "to": "https://raw.githubusercontent.com/SadLaboka/shikimori/6692f5044d13d5a72a15bed15d159fa2816fff7d/assets/images/ce567d8e9e78eed1fbac5cebccb5acdbb5a0318e75b9e6f7093384190472635c.jpg"
         }
-      ]
+      ],
+      "source": "https://raw.githubusercontent.com/SadLaboka/shikimori/9c8e3373f0d65490823e609f56472fc168a9b8a7/css/base/main_code_1.css",
+      "target": "https://raw.githubusercontent.com/SadLaboka/shikimori/2d919a08e191c50b9293c73f7cc6504f59e4b51a/css/base/main_code_1.css"
     },
     {
       "file": "css/base/main_code_3.css",
@@ -30,7 +32,9 @@
           "from": "https://i.ibb.co/QX6hgbQ/image.png",
           "to": "https://raw.githubusercontent.com/SadLaboka/shikimori/6692f5044d13d5a72a15bed15d159fa2816fff7d/assets/images/bd415a3e4471e65188ef9b9cab679b6ed53cc02da11d053edfb0a13d092ab136.png"
         }
-      ]
+      ],
+      "source": "https://raw.githubusercontent.com/SadLaboka/shikimori/8fc0b68fa3578b6e8a3884dbb23651d86d885f73/css/base/main_code_3.css",
+      "target": "https://raw.githubusercontent.com/SadLaboka/shikimori/2d919a08e191c50b9293c73f7cc6504f59e4b51a/css/base/main_code_3.css"
     },
     {
       "file": "css/base/main_code_4mob.css",
@@ -49,7 +53,9 @@
           "from": "/\\x/dere.shikimori.one/system/images/original/111569.gif?1610135594",
           "to": "https://raw.githubusercontent.com/SadLaboka/shikimori/6692f5044d13d5a72a15bed15d159fa2816fff7d/assets/images/70304e0d0fbdd0255b41abe9a0777b14355125d70761e638859289c5c11a452b.gif"
         }
-      ]
+      ],
+      "source": "https://raw.githubusercontent.com/SadLaboka/shikimori/8912ca67ab5e4915c6ba9ea065f9ee609481ccd3/css/base/main_code_4mob.css",
+      "target": "https://raw.githubusercontent.com/SadLaboka/shikimori/2d919a08e191c50b9293c73f7cc6504f59e4b51a/css/base/main_code_4mob.css"
     }
   ]
 }

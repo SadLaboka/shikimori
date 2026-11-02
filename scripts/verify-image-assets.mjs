@@ -22,7 +22,7 @@ export function verifyImageReplacement(before,after,spec){
 export async function verifyImageAssets(){
   const assets=JSON.parse(await readFile(path.join(root,'assets/images/manifest.json'),'utf8'));
   const migration=JSON.parse(await readFile(path.join(root,'css/image-assets.json'),'utf8'));
-  if(migration.version!==1||!/^\w{40}$/.test(migration.sourceRevision))throw new Error('Invalid source revision.');
+  if(migration.version!==1||! /^[a-f0-9]{40}$/.test(migration.sourceRevision))throw new Error('Invalid source revision.');
   for(const image of assets.images){
     if(!new RegExp(`^assets/images/${image.sha256}\\.(webp|gif|png|jpg)$`).test(image.file))throw new Error('Invalid image path.');
     const bytes=await readFile(path.join(root,image.file));
@@ -32,6 +32,16 @@ export async function verifyImageAssets(){
     if(!/^css\/base\/main_code_(1|3|4mob)\.css$/.test(spec.file))throw new Error('Invalid module.');
     const before=execFileSync('git',['show',`${migration.sourceRevision}:${spec.file}`],{cwd:root});
     verifyImageReplacement(before,await readFile(path.join(root,spec.file)),spec);
+    if(spec.target){
+      const prefix='https://raw.githubusercontent.com/SadLaboka/shikimori/';
+      if(!spec.target.startsWith(prefix)||!spec.source.startsWith(prefix))throw new Error('Invalid module origin.');
+      for(const url of [spec.source,spec.target]){
+        const suffix=url.slice(prefix.length);
+        if(!new RegExp(`^[a-f0-9]{40}/${spec.file.replaceAll('.','\\.')}$`).test(suffix))throw new Error('Invalid module URL.');
+      }
+      const revision=spec.target.slice(prefix.length).split('/')[0];
+      if(hash(execFileSync('git',['show',`${revision}:${spec.file}`],{cwd:root,maxBuffer:2*1024*1024}))!==spec.sha256)throw new Error('Pinned CSS module hash differs.');
+    }
     for(const {to}of spec.replacements){
       const parts=new URL(to).pathname.split('/'),revision=parts[3],file=parts.slice(4).join('/');
       const entry=assets.images.find(e=>e.file===file);
