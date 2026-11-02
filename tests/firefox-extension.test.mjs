@@ -85,15 +85,22 @@ test('avatar cycle upgrades the previous inline glow and keeps its exact backup'
 
 test('Gold and Jade from the previous release remains recognizable and can switch or restore', async () => {
   const scheme = SCHEMES.find(item => item.id === 'gold-jade');
-  const oldImports = schemeImports(scheme.id, scheme.previousRevision);
-  const previous = `${oldImports}\n\n${AVATAR_HOVER_CSS}`;
-  assert.equal(await recognize(oldImports), 'gold-jade');
-  assert.equal(await recognize(previous), 'gold-jade');
-  const f = fixture(); f.change({ css: previous });
-  const result = await f.publisher.cycle();
-  assert.equal(result.view.schemeId, 'main'); assert.equal(f.data.backups[0].css, previous);
-  const restored = await f.publisher.restore(result.view.snapshot);
-  assert.equal(restored.view.schemeId, 'gold-jade'); assert.equal(f.current.css, previous);
+  for (const source of [{ revision: scheme.previousRevision }, ...scheme.historicalSources]) {
+    const oldImports = schemeImports(scheme.id, source.revision);
+    if (source.sourceSha256) {
+      const full = execFileSync('git', ['show', `${source.revision}:${scheme.file}`], { encoding: 'utf8' });
+      assert.equal(await sha256(full), source.sourceSha256);
+      assert.equal(await recognize(full), 'gold-jade');
+    }
+    const previous = `${oldImports}\n\n${AVATAR_HOVER_CSS}`;
+    assert.equal(await recognize(oldImports), 'gold-jade');
+    assert.equal(await recognize(previous), 'gold-jade');
+    const f = fixture(); f.change({ css: previous });
+    const result = await f.publisher.cycle();
+    assert.equal(result.view.schemeId, 'main'); assert.equal(f.data.backups[0].css, previous);
+    const restored = await f.publisher.restore(result.view.snapshot);
+    assert.equal(restored.view.schemeId, 'gold-jade'); assert.equal(f.current.css, previous);
+  }
 });
 
 test('avatar cycle reads fresh state, supports old imports and cycles all three schemes with one PATCH', async () => {

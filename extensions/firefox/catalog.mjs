@@ -21,11 +21,13 @@ export const SCHEMES = Object.freeze([
     previousSourceSha256: '63a3556f67d7ab4116f25f6f400264f9ab33617985d8dfceed14958821cc1e64',
     currentSourceSha256: '1e4144345c5a5efa26317c08ff5ae6ec1b767410bd6b86d6aac0a404b5d439bf' }),
   Object.freeze({ id: 'gold-jade', name: 'Gold & Jade', description: 'Улькиорра и Йоруичи', file: 'css/themes/gold-jade/styles.css',
-    revision: 'ed4ab4191c58f9ebdfe4f1a8293195d27d9498d5',
-    previousRevision: 'c3eebb1774dc31d9c1bcd7666a64ddf7979d004d', previousSourceTag: 'firefox-v0.3.0',
-    sourceSha256: 'db4b0a10ee5523ba8c4fad7ce85932386c7b579c56844a38c45ec5e1d04454bc',
-    previousSourceSha256: '2569aaeba25ea5495a179b3a0b3ae834746cc7bbeecbca717e71af9d3426285f',
-    currentSourceSha256: 'db4b0a10ee5523ba8c4fad7ce85932386c7b579c56844a38c45ec5e1d04454bc' }),
+    revision: 'c2254b7f25250de7bf5f7924691595e909f50779',
+    previousRevision: 'ed4ab4191c58f9ebdfe4f1a8293195d27d9498d5', previousSourceTag: 'firefox-v0.3.2',
+    historicalSources: Object.freeze([Object.freeze({ revision: 'c3eebb1774dc31d9c1bcd7666a64ddf7979d004d',
+      sourceSha256: '2569aaeba25ea5495a179b3a0b3ae834746cc7bbeecbca717e71af9d3426285f' })]),
+    sourceSha256: '5a108c3f1e27190d62432f889846bfda99cc19ddaeba39053dc165c521c398e5',
+    previousSourceSha256: 'db4b0a10ee5523ba8c4fad7ce85932386c7b579c56844a38c45ec5e1d04454bc',
+    currentSourceSha256: '5a108c3f1e27190d62432f889846bfda99cc19ddaeba39053dc165c521c398e5' }),
 ]);
 // Explicit order: do not silently rearrange it when the popup catalog changes.
 export const CYCLE_ORDER = Object.freeze(['main', 'emerald-scarlet', 'gold-jade']);
@@ -47,9 +49,12 @@ export async function sha256(text) {
 export async function recognize(css) {
   const hash = await sha256(css);
   for (const scheme of SCHEMES) {
-    if (scheme.previousRevision) {
-      const previous = schemeImports(scheme.id, scheme.previousRevision);
-      if (hash === await sha256(previous) || hash === await sha256(`${previous}\n\n${AVATAR_HOVER_CSS}`)) return scheme.id;
+    const historicalSources = [...(scheme.historicalSources ?? []),
+      ...(scheme.previousRevision ? [{ revision: scheme.previousRevision, sourceSha256: scheme.previousSourceSha256 }] : [])];
+    for (const source of historicalSources) {
+      const previous = schemeImports(scheme.id, source.revision);
+      if (hash === source.sourceSha256 || hash === await sha256(previous) ||
+          hash === await sha256(`${previous}\n\n${AVATAR_HOVER_CSS}`)) return scheme.id;
     }
     if (hash === scheme.sourceSha256 || hash === scheme.previousSourceSha256 || hash === scheme.currentSourceSha256 ||
         hash === await sha256(`${schemeImports(scheme.id)}\n\n${LEGACY_AVATAR_HOVER_CSS}`) || hash === await sha256(schemeImports(scheme.id)) ||
