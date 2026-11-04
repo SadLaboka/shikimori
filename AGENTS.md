@@ -50,6 +50,9 @@ https://github.com/SadLaboka/shikimori, ветка `main`. Общайся по-�
   обязательные проверки эквивалентности не сокращать ради экономии.
 - Для изменений deploy запускай `tests/deploy.tests.ps1` с подставным API;
   реальные токены не заменяют тестовые данные. Нужен PowerShell 7+.
+- Для общего каталога Firefox, автосмены GitHub Actions и подключения готовых
+  схем — `.agents/skills/shikimori-scheme-rotation/SKILL.md`;
+  настройка и восстановление — [scheme-rotation](docs/scheme-rotation.md).
 - Перед завершением: `git diff --check`, краткий результат, ограничения проверок.
   Не обещай ускорение без измерений и PASS без покрытия компонента.
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Автосмена схем Shikimori"
+  short_description: "Общий каталог Firefox, расписание и обновление схем"
+  default_prompt: "Используй $shikimori-scheme-rotation, чтобы подключить готовую схему к Firefox и GitHub Actions и проверить совместимость обновления."
