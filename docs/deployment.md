@@ -57,6 +57,13 @@ pwsh -NoProfile -File .\scripts\deploy.ps1 -Authorize -ConfigPath .\deploy.local
 Он привязан к пользователю Windows; это не переносимая резервная копия.
 Секреты расшифровываются только в памяти процесса; скрипт не выводит их значения.
 
+Для отдельной авторизации GitHub Actions существует `-CredentialProfile rotation`:
+он использует подкаталог `ShikimoriCssDeploy/rotation` и не заменяет локальную пару.
+Все операции с этим профилем требуют того же явного выбора профиля.
+[Настройка и обновление облачных credentials](scheme-rotation.md).
+Параметр `-AutomationContextPath` предназначен только для подготовленного workflow:
+вне GitHub Actions он запрещён; обычное подтверждение публикации остаётся прежним.
+
 ## Проверка и публикация
 
 ```powershell

@@ -1,0 +1,97 @@
+name: Rotate Shikimori schemes
+
+on:
+  schedule:
+    # Away from the hourly peak. GitHub may delay or skip scheduled runs.
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'dry-run: GET only; publish: next scheme; reconcile: verify a pending write'
+        default: dry-run
+        required: true
+        type: choice
+        options: [dry-run, publish, reconcile]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: shikimori-scheme-rotation
+  cancel-in-progress: false
+
+jobs:
+  rotate:
+    if: >-
+      github.repository == 'SadLaboka/shikimori' && github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' || vars.SHIKIMORI_ROTATION_ENABLED == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      ROTATION_MODE: ${{ github.event_name == 'schedule' && 'publish' || inputs.mode }}
+      ROTATION_APPLICATION_NAME: ${{ vars.SHIKIMORI_ROTATION_APPLICATION_NAME }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+      - name: Check rotation, publisher and CSS builds without credentials
+        run: |
+          node --test tests/rotation.test.mjs tests/firefox-extension.test.mjs tests/firefox-avatar.test.mjs
+          node scripts/build-css.mjs --check
+          node scripts/build-emerald-scarlet.mjs --check
+          node scripts/build-gold-jade.mjs --check
+          pwsh -NoProfile -File tests/deploy.tests.ps1
+          pwsh -NoProfile -File tests/rotation-deploy.tests.ps1
+          pwsh -NoProfile -File tests/rotation-upload.tests.ps1
+          git diff --check
+      - name: Prepare and inspect the next scheme
+        id: prepare
+        env:
+          ROTATION_ADMIN_TOKEN: ${{ secrets.SHIKIMORI_ROTATION_ADMIN_TOKEN }}
+          ROTATION_CREDENTIALS: ${{ secrets.SHIKIMORI_ROTATION_CREDENTIALS }}
+        run: node scripts/rotate-schemes.mjs prepare
+      - name: Save the original CSS before any publication
+        if: steps.prepare.outputs.ready == 'true'
+        id: backup
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: shikimori-css-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            .preview/rotation/before.css
+            .preview/rotation/candidate.css
+            .preview/rotation/backup.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+      - name: Persist the pending operation
+        if: steps.prepare.outputs.ready == 'true' && env.ROTATION_MODE == 'publish'
+        id: arm
+        env:
+          ROTATION_ADMIN_TOKEN: ${{ secrets.SHIKIMORI_ROTATION_ADMIN_TOKEN }}
+          BACKUP_ARTIFACT_ID: ${{ steps.backup.outputs.artifact-id }}
+        run: node scripts/rotate-schemes.mjs arm
+      - name: Show diff and run the checked deployment
+        if: steps.prepare.outputs.ready == 'true'
+        shell: pwsh
+        run: ./scripts/run-rotation-deploy.ps1
+      - name: Verify publication and close the pending operation
+        if: always() && steps.arm.outcome == 'success'
+        env:
+          ROTATION_ADMIN_TOKEN: ${{ secrets.SHIKIMORI_ROTATION_ADMIN_TOKEN }}
+          ROTATION_CREDENTIALS: ${{ secrets.SHIKIMORI_ROTATION_CREDENTIALS }}
+        run: node scripts/rotate-schemes.mjs settle
+      - name: Remove temporary credentials
+        if: always()
+        shell: pwsh
+        run: |
+          $rotationTemp = Join-Path $env:RUNNER_TEMP 'shikimori-rotation'
+          if (Test-Path -LiteralPath $rotationTemp) {
+            # Only named files inside the runner's own temporary directory.
+            foreach ($name in @('credentials.local.json', 'plan.local.json', 'config.local.json')) {
+              $rotationFile = Join-Path $rotationTemp $name
+              if (Test-Path -LiteralPath $rotationFile) { Remove-Item -LiteralPath $rotationFile }
+            }
+          }

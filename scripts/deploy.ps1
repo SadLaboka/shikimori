@@ -8,7 +8,9 @@ param(
     [Parameter(ParameterSetName = 'Inspect')][string]$Baseline,
     [Parameter(ParameterSetName = 'Inspect')][Parameter(ParameterSetName = 'Publish')][switch]$CompactDiff,
     [Parameter(ParameterSetName = 'Inspect')][Parameter(ParameterSetName = 'Publish')][string]$ExpectedCssSha256,
+    [Parameter(ParameterSetName = 'Inspect')][Parameter(ParameterSetName = 'Publish')][string]$AutomationContextPath,
     [switch]$Timings,
+    [ValidateSet('local', 'rotation')][string]$CredentialProfile = 'local',
     [string]$CssPath = (Join-Path (Split-Path $PSScriptRoot -Parent) 'styles_optimized.css'),
     [string]$ConfigPath = (Join-Path (Split-Path $PSScriptRoot -Parent) 'deploy.config.json')
 )
@@ -35,6 +37,13 @@ function Read-PrivateValue([string]$Prompt) {
 }
 
 function Confirm-Action([string]$Phrase) {
+    if ($script:Automation) {
+        if (-not $Publish -or $Phrase -cne "PUBLISH $($script:Config.expectedNickname) $($script:Config.styleId)") {
+            throw 'Недопустимое подтверждение автоматического режима.'
+        }
+        Write-Host 'Автосмена: разрешён только подготовленный снимок и проверенный исходный CSS.'
+        return
+    }
     $clock = [Diagnostics.Stopwatch]::StartNew()
     try {
     Write-Host "Для подтверждения введите: $Phrase"
@@ -43,8 +52,10 @@ function Confirm-Action([string]$Phrase) {
 }
 
 function Get-PrivateDirectory {
+    if ($script:Automation) { return $script:Automation.backupDirectory }
     if (-not $IsWindows) { throw 'Хранилище DPAPI поддерживается только в Windows.' }
     $directory = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'ShikimoriCssDeploy'
+    if ($CredentialProfile -eq 'rotation') { $directory = Join-Path $directory 'rotation' }
     [void][IO.Directory]::CreateDirectory($directory)
     return $directory
 }
@@ -65,6 +76,10 @@ function Save-Credentials($Credentials) {
 }
 
 function Read-Credentials {
+    if ($script:Automation) {
+        try { return ConvertFrom-Json ([IO.File]::ReadAllText($script:Automation.credentialsPath)) }
+        catch { throw 'Не удалось прочитать временные credentials автосмены.' }
+    }
     $target = Join-Path (Get-PrivateDirectory) 'credentials.dpapi'
     if (-not (Test-Path -LiteralPath $target)) { throw 'Нет локальных credentials. Настройте OAuth отдельно через -Authorize.' }
     try {
@@ -255,6 +270,12 @@ function Invoke-Deployment {
             throw 'Авторизован другой аккаунт. Публикация запрещена.'
         }
         $before = Read-Style $credentials.accessToken
+        if ($script:Automation) {
+            if ((Get-TextHash ([string]$before.css)) -ine $script:Automation.beforeHash -or
+                [DateTimeOffset]$before.updated_at -ne [DateTimeOffset]$script:Automation.beforeUpdatedAt) {
+                throw 'CSS изменился после подготовки автосмены. Запись запрещена.'
+            }
+        }
         $backup = Save-Backup $before
         Show-CssDiff $backup $temporary
         if ([string]$before.css -ceq $css) { Write-Host 'CSS уже совпадает. Публикация не нужна.'; return }
@@ -280,7 +301,24 @@ function Invoke-Deployment {
 }
 
 try {
+    $script:Automation = $null
+    if ($AutomationContextPath) {
+        # This mode is opt-in for the dedicated workflow, never for OAuth/refresh.
+        if ($env:GITHUB_ACTIONS -cne 'true' -or $env:GITHUB_REPOSITORY -cne 'SadLaboka/shikimori' -or
+            -not $ExpectedCssSha256 -or $Baseline) { throw 'Автоматический режим доступен только подготовленному workflow.' }
+        try { $script:Automation = Get-Content -LiteralPath $AutomationContextPath -Raw | ConvertFrom-Json }
+        catch { throw 'Некорректный контекст автосмены.' }
+        if ($script:Automation.version -ne 1 -or $script:Automation.cssHash -ine $ExpectedCssSha256 -or
+            $script:Automation.beforeHash -notmatch '^[a-fA-F0-9]{64}$' -or
+            [DateTimeOffset]$script:Automation.preparedAt -lt [DateTimeOffset]::UtcNow.AddMinutes(-10) -or
+            [DateTimeOffset]$script:Automation.preparedAt -gt [DateTimeOffset]::UtcNow.AddMinutes(1) -or
+            ($Publish -and $script:Automation.armed -ne $true)) { throw 'Контекст автосмены устарел или не подготовлен.' }
+    }
     $script:Config = Get-Content -LiteralPath $ConfigPath -Raw -Encoding utf8 | ConvertFrom-Json
+    if ($script:Automation -and ($script:Config.expectedNickname -cne 'SadLaboka' -or
+        $script:Config.expectedUserId -ne 1408017 -or $script:Config.styleId -ne 1343722)) {
+        throw 'Автосмена разрешена только для закреплённого аккаунта и стиля.'
+    }
     if (-not $Baseline -and [string]::IsNullOrWhiteSpace($script:Config.applicationName)) {
         throw 'Заполните applicationName: точное название OAuth-приложения для User-Agent.'
     }
