@@ -9,3 +9,6 @@ $parameters = @{
 }
 if ($plan.mode -eq 'publish') { $parameters.Publish = $true } else { $parameters.DryRun = $true }
 & (Join-Path $PSScriptRoot 'deploy.ps1') @parameters
+# Expected differences leave git's exit code at 1. A successful deployment must
+# return 0 to the workflow; terminating deployment errors never reach this line.
+exit 0

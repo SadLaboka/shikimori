@@ -6,6 +6,8 @@ $work = Join-Path ([IO.Path]::GetTempPath()) ('shiki-rotation-deploy-' + [guid]:
 $global:ShikiRotationFixtureState = @{ scenario = ''; patches = 0; reads = 0; sent = ''; remote = '' }
 $savedActions = $env:GITHUB_ACTIONS
 $savedRepository = $env:GITHUB_REPOSITORY
+$savedRunnerTemp = $env:RUNNER_TEMP
+$savedRotationMode = $env:ROTATION_MODE
 [void][IO.Directory]::CreateDirectory($work)
 try {
     $env:GITHUB_ACTIONS = 'true'
@@ -84,11 +86,42 @@ try {
     }
     $backups = @(Get-ChildItem -LiteralPath (Join-Path $work 'backups') -Filter '*.css')
     if ($backups.Count -lt 1 -or [IO.File]::ReadAllText($backups[0].FullName) -cne $original) { throw 'Missing original CSS backup' }
+    # Match the workflow entry point: an expected git diff exit code must not
+    # become a failed PowerShell job after a successful read-only deployment.
+    $runnerDirectory = Join-Path $work 'shikimori-rotation'
+    [void][IO.Directory]::CreateDirectory($runnerDirectory)
+    $env:RUNNER_TEMP = $work
+    $env:ROTATION_MODE = 'dry-run'
+    $plan = @{
+        version = 1; mode = 'dry-run'; cssPath = $cssPath; configPath = $configPath
+        cssHash = (& $hash $candidate); beforeHash = (& $hash $original)
+        beforeUpdatedAt = '2026-11-04T10:00:00Z'; preparedAt = [DateTimeOffset]::UtcNow.ToString('o')
+        credentialsPath = $credentialsPath; backupDirectory = $work; armed = $false
+    }
+    $planPath = Join-Path $runnerDirectory 'plan.local.json'
+    [IO.File]::WriteAllText($planPath, (ConvertTo-Json $plan))
+    $global:ShikiRotationFixtureState.scenario = 'dry-run'
+    $global:ShikiRotationFixtureState.remote = $original
+    $global:ShikiRotationFixtureState.reads = 0
+    $global:ShikiRotationFixtureState.patches = 0
+    & (Join-Path $repository 'scripts/run-rotation-deploy.ps1')
+    if ($LASTEXITCODE -ne 0 -or $global:ShikiRotationFixtureState.patches -ne 0) {
+        throw 'Workflow wrapper reports a successful dry-run as failed, or published CSS'
+    }
+    Write-Host 'PASS: workflow dry-run returns success when git diff finds expected changes'
+    # Successful exit handling must not hide a real source-conflict exception.
+    $global:ShikiRotationFixtureState.remote = 'external edit'
+    $failed = $false
+    try { & (Join-Path $repository 'scripts/run-rotation-deploy.ps1') } catch { $failed = $true }
+    if (-not $failed -or $global:ShikiRotationFixtureState.patches -ne 0) { throw 'Workflow wrapper hides a real deployment error' }
+    Write-Host 'PASS: workflow wrapper preserves actual deployment errors'
     Write-Host 'All automated deployment tests passed (mock API only).'
 } finally {
     Remove-Variable -Name ShikiRotationFixtureState -Scope Global -ErrorAction SilentlyContinue
     $env:GITHUB_ACTIONS = $savedActions
     $env:GITHUB_REPOSITORY = $savedRepository
+    $env:RUNNER_TEMP = $savedRunnerTemp
+    $env:ROTATION_MODE = $savedRotationMode
     $resolved = [IO.Path]::GetFullPath($work)
     $tempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
     if ($resolved.StartsWith($tempRoot, [StringComparison]::OrdinalIgnoreCase) -and
