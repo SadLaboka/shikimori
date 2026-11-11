@@ -38,7 +38,34 @@
   browser.runtime.onMessage.addListener((message, sender) => {
     if (sender.id !== browser.runtime.id || message?.channel !== 'sadlaboka-api') return undefined;
     if (message.operation === 'ping') return Promise.resolve({ ok: true, pong: true });
+    if (message.operation === 'recompile-fetch') return recompileFetch(message);
     if (message.operation !== 'request') return undefined;
     return request(message);
   });
+  async function recompileFetch(message) {
+    const cachePath = '/tests/reset_styles_cache';
+    if (location.origin !== 'https://shikimori.io' ||
+        !(message.method === 'GET' && [cachePath, '/SadLaboka'].includes(message.path) ||
+          message.method === 'POST' && message.path === cachePath)) return { ok: false };
+    const options = { method: message.method, credentials: 'include', redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(20000) };
+    if (message.method === 'POST') {
+      if (typeof message.body !== 'string' || message.body.length > 4096) return { ok: false };
+      const fields = new URLSearchParams(message.body);
+      const sources = [
+        'https://cdn.jsdelivr.net/gh/SadLaboka/shikimori@2d919a08e191c50b9293c73f7cc6504f59e4b51a/css/base/main_code_3.css',
+        'https://raw.githubusercontent.com/SadLaboka/shikimori/2d919a08e191c50b9293c73f7cc6504f59e4b51a/css/base/main_code_3.css',
+      ];
+      // Firefox content-script Xrays do not expose iterable URLSearchParams
+      // iterators consistently. forEach works across that boundary.
+      let fieldCount = 0;
+      fields.forEach(() => { fieldCount++; });
+      if (fieldCount !== 2 || !fields.get('authenticity_token') || !sources.includes(fields.get('url'))) return { ok: false };
+      options.body = message.body;
+      options.headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+    }
+    try {
+      const response = await fetch(message.path, options);
+      return { ok: response.ok, text: await response.text() };
+    } catch { return { ok: false }; }
+  }
 })();

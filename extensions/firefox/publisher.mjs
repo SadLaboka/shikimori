@@ -1,5 +1,6 @@
 import { ACCOUNT, SCHEMES, schemeCss, sha256, recognize, nextSchemeId } from './catalog.mjs';
 import { ApiRateLimiter } from './rate-limit.mjs';
+import { cacheSource, needsCompilation } from './recompile.mjs';
 
 export class UserError extends Error {
   constructor(message, code = 'error') { super(message); this.code = code; }
@@ -138,6 +139,14 @@ export class Publisher {
   async finish(style, pending, reconciliation) {
     const currentHash = await sha256(style.css);
     if (currentHash === pending.desiredHash) {
+      if (needsCompilation(style) && cacheSource(style.css) && !pending.compilationAttempted) {
+        pending.compilationAttempted = true;
+        await this.storage.set({ pending });
+        this.stage('compiling');
+        try { await this.api('RECOMPILE', STYLE_PATH, style.css); } catch { /* Verify even if the reset response was lost. */ }
+        try { return this.finish(await this.readStyle(), pending, reconciliation); }
+        catch { return { kind: 'uncertain', message: 'CSS сохранён; пересборка пока не подтверждена. Нажми «Проверить результат».' }; }
+      }
       await this.storage.remove('pending');
       const warning = compilationWarning(style);
       return { kind: warning ? 'warning' : 'success',

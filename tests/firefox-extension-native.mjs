@@ -8,6 +8,7 @@ import { existsSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { connectBidi,freePort,delay } from './helpers/firefox-remote.mjs';
 const sourceOption=process.argv.find(value=>value.startsWith('--extension-source='))?.slice('--extension-source='.length);
+const failApiCompilation=process.argv.includes('--fail-api-compilation');
 const sourceDirectory=sourceOption?path.resolve(sourceOption):fileURLToPath(new URL('../extensions/firefox/',import.meta.url));
 const {ACCOUNT,schemeCss,SCHEMES}=await import(pathToFileURL(path.join(sourceDirectory,'catalog.mjs')).href);
 const output=new URL('../.preview/firefox-extension/',import.meta.url);await mkdir(output,{recursive:true});
@@ -21,6 +22,11 @@ const bidiPort=await freePort();
 const addonId='shikimori-schemes@sadlaboka.local',uuid='7a7bd21c-308b-449d-a683-fb19359c0c28';
 const testRuntime=await mkdtemp(fileURLToPath(new URL('native-runtime-',output)));
 await cp(sourceDirectory,testRuntime,{recursive:true});
+if(failApiCompilation){
+  const background=await readFile(`${testRuntime}/background.mjs`,'utf8');
+  await writeFile(`${testRuntime}/background.mjs`,background.replace("} catch { return { ok: false, code: 'server' }; }",
+    "} catch (error) { await browser.storage.local.set({nativeCompileError:error.message}); return { ok: false, code: 'server' }; }"));
+}
 const manifest=JSON.parse(await readFile(`${testRuntime}/manifest.json`,'utf8'));
 manifest.background.scripts=['test-harness.mjs'];
 await writeFile(`${testRuntime}/manifest.json`,JSON.stringify(manifest));
@@ -45,7 +51,7 @@ try{
   const tree=await bidi.command('browsingContext.getTree');
   console.log(JSON.stringify({stage:'contexts',contexts:tree.contexts.map(item=>({context:item.context,url:item.url}))}));
   const shiki=tree.contexts[0]?.context??(await bidi.command('browsingContext.create',{type:'tab'})).context;
-  let css=schemeCss('main'),revision=1,patches=0,userId=ACCOUNT.userId;
+  let css=schemeCss('main'),revision=1,patches=0,userId=ACCOUNT.userId,compilationFailed=false,compilations=0;
   const requests=[];let releaseVersion="9.9.9",releaseStatus=200,updateChecks=0;
   const patchSchemes=["emerald-scarlet","main","emerald-scarlet","main","emerald-scarlet","gold-jade","main","gold-jade"];
   await bidi.command('session.subscribe',{events:['network.beforeRequestSent']});
@@ -73,9 +79,13 @@ try{
             assert.ok(requestHeaders.cookie?.includes('synthetic_session=test-only')||request.cookies?.some(cookie=>cookie.name==='synthetic_session'));
             // Payload bytes are separately asserted in the production bridge's
             // unit test; verification GET must match the chosen scheme hash.
-            css=schemeCss(patchSchemes[patches]);patches++;revision++;
+            css=schemeCss(patchSchemes[patches]);patches++;revision++;compilationFailed=failApiCompilation;
           }
-          body=json({id:ACCOUNT.styleId,owner_id:ACCOUNT.userId,owner_type:'User',css,compiled_css:'body{color:white}',updated_at:`v${revision}`,failed_imports:[]});
+          body=json({id:ACCOUNT.styleId,owner_id:ACCOUNT.userId,owner_type:'User',css,compiled_css:compilationFailed?'':'body{color:white}',updated_at:`v${revision}`,failed_imports:compilationFailed?['https://example.invalid/unavailable.css']:[]});
+        }else if(url.pathname==='/tests/reset_styles_cache'){
+          contentType='text/html; charset=utf-8';
+          if(request.method==='POST'){compilationFailed=false;compilations++;revision++;}
+          body={type:'string',value:request.method==='GET'?'<form action="https://shikimori.io/tests/reset_styles_cache" method="post"><input name="authenticity_token" value="synthetic-form-token-test-only"></form>':'Success. Url is used in 1 style'};
         }else{
           const scheme=SCHEMES.find(item=>css===schemeCss(item.id))?.id??'unknown';
           contentType='text/html; charset=utf-8';body={type:'string',value:`<!doctype html><html><head><meta name="csrf-token" content="synthetic-csrf-test-only"><title>Isolated Shikimori session</title><style>.avatar{position:relative;width:160px;height:160px}.avatar::before{content:"";position:absolute;inset:0;width:160px;height:160px;border-radius:50%;background-image:linear-gradient(blue,red)}.avatar img{width:160px;height:160px;opacity:0}</style></head><body class="p-profiles" data-scheme="${scheme}"><div class="profile-head"><div class="c-brief"><div class="avatar"><img alt="SadLaboka"></div></div></div><h1>Test session</h1></body></html>`};
@@ -110,7 +120,7 @@ try{
     return result.result.value;
   };
   assert.ok((await evaluate(shiki,'document.cookie')).includes('synthetic_session=test-only'));
-  const wait=async(context,expression)=>{for(let i=0;i<200;i++){if(networkErrors.length)throw Error(networkErrors.join('; '));if(await evaluate(context,expression))return;await delay(100);}throw Error('UI wait timed out: '+expression+'; requests='+JSON.stringify(requests));};
+  const wait=async(context,expression)=>{for(let i=0;i<200;i++){if(networkErrors.length)throw Error(networkErrors.join('; '));if(await evaluate(context,expression))return;await delay(100);}let diagnostic='';try{diagnostic=await evaluate(context,"browser.storage.local.get('nativeCompileError').then(s=>s.nativeCompileError??'')");}catch{}throw Error('UI wait timed out: '+expression+'; compile='+diagnostic+'; requests='+JSON.stringify(requests));};
   const openPopup=async()=>{
     let context;
     for(let i=0;i<200&&!context;i++){
@@ -202,18 +212,18 @@ try{
   if(performanceLabel)await delay(1250);
   const priorLoad=lastLoadAt;
   await clickAvatar(2,true);
-  await wait(shiki,"document.body.dataset.scheme==='emerald-scarlet'");
+  await wait(shiki,"document.body?.dataset.scheme==='emerald-scarlet'");
   for(let i=0;i<200&&lastLoadAt===priorLoad;i++)await delay(100);
   assert.ok(lastLoadAt>priorLoad);
   timings.avatarReloadMs=Math.round(lastLoadAt-timings.avatarInputAt);delete timings.avatarInputAt;
   assert.equal(css,schemeCss('emerald-scarlet'));assert.equal(patches,5,'A double click must cause only one PATCH');
-  await clickAvatar();await wait(shiki,"document.body.dataset.scheme==='gold-jade'");
+  await clickAvatar();await wait(shiki,"document.body?.dataset.scheme==='gold-jade'");
   assert.equal(css,schemeCss('gold-jade'));assert.equal(patches,6);
-  await clickAvatar();await wait(shiki,"document.body.dataset.scheme==='main'");
+  await clickAvatar();await wait(shiki,"document.body?.dataset.scheme==='main'");
   assert.equal(css,schemeCss('main'));assert.equal(patches,7);
   await evaluate(popup,"document.querySelector('#refresh').click()");await wait(popup,"document.querySelector('#current').textContent.includes('Основная')&&document.querySelector('#refresh').disabled===false");
   await evaluate(popup,"document.querySelector('[data-scheme=\"gold-jade\"] button').click()");
-  await wait(shiki,"document.body.dataset.scheme==='gold-jade'");assert.equal(css,schemeCss('gold-jade'));assert.equal(patches,8);
+  await wait(shiki,"document.body?.dataset.scheme==='gold-jade'");assert.equal(css,schemeCss('gold-jade'));assert.equal(patches,8);
   css='body{color:orange}';const unknownStarted=requests.length;
   await clickAvatar();
   await wait(shiki,"[...document.querySelectorAll('[role=status]')].some(el=>el.textContent.includes('не распознан'))");
@@ -229,7 +239,8 @@ try{
   await evaluate(popup,"document.querySelector('#refresh').click()");
   await wait(popup,"document.querySelector('#status').textContent.includes('Открой Shikimori')");
   await screenshot(popup,'popup-no-tab.png');
-  const report={browser:session.capabilities.browserVersion,extensionVersion:manifest.version,installed:true,sessionAndCsrfVerified:true,switch:true,restore:true,popupClosure:true,settingsPersisted:true,progressStagesVerified:true,activeTabReloadVerified:true,threeSchemeCycle:true,goldJadePopupApply:true,manualUpdateChecks:true,updateChecks,avatarDoubleClickGuard:true,avatarSyntheticClickBlocked:true,avatarUnknownCssBlocked:true,avatarWrongUserBlocked:true,wrongAccountBlocked:true,missingTabHandled:true,patches,timings,requests};
+  if(failApiCompilation)assert.equal(compilations,patches,'Every failed API compilation must be repaired once without another PATCH');
+  const report={browser:session.capabilities.browserVersion,extensionVersion:manifest.version,installed:true,sessionAndCsrfVerified:true,switch:true,restore:true,popupClosure:true,settingsPersisted:true,progressStagesVerified:true,activeTabReloadVerified:true,threeSchemeCycle:true,goldJadePopupApply:true,manualUpdateChecks:true,updateChecks,avatarDoubleClickGuard:true,avatarSyntheticClickBlocked:true,avatarUnknownCssBlocked:true,avatarWrongUserBlocked:true,wrongAccountBlocked:true,missingTabHandled:true,patches,failApiCompilation,compilations,timings,requests};
   if(performanceLabel){await mkdir(new URL('performance/',output),{recursive:true});await writeFile(new URL(`performance/${performanceLabel}.json`,output),JSON.stringify(report,null,2));}
   await writeFile(new URL('browser-results.json',output),JSON.stringify(report,null,2));console.log(JSON.stringify({...report,requests:requests.length}));
 }finally{

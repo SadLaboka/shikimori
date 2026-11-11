@@ -40,7 +40,7 @@ jobs:
           node-version: '22'
       - name: Check rotation, publisher and CSS builds without credentials
         run: |
-          node --test tests/rotation.test.mjs tests/firefox-extension.test.mjs tests/firefox-avatar.test.mjs
+          node --test tests/rotation.test.mjs tests/recompile.test.mjs tests/firefox-extension.test.mjs tests/firefox-avatar.test.mjs
           node scripts/build-css.mjs --check
           node scripts/build-emerald-scarlet.mjs --check
           node scripts/build-gold-jade.mjs --check

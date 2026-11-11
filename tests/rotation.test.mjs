@@ -4,7 +4,7 @@ import { mkdtemp, rm, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { ACCOUNT, CYCLE_ORDER, SCHEMES, schemeCss, sha256, recognize } from '../extensions/firefox/catalog.mjs';
-import { INTERVAL, validateState, validateStyle, planRotation, ensureCredentials, armRotation, main } from '../scripts/rotate-schemes.mjs';
+import { INTERVAL, validateState, validateStyle, planRotation, ensureCredentials, armRotation, verifyCompilation, main } from '../scripts/rotate-schemes.mjs';
 
 const now = Date.parse('2026-11-04T12:00:00Z');
 const style = (id = 'main', age = INTERVAL + 1000) => ({ id: ACCOUNT.styleId, owner_id: ACCOUNT.userId,
@@ -83,6 +83,24 @@ test('a lost PATCH is only reconciled: desired CSS clears pending without a seco
   await assert.rejects(planRotation(state, style('main'), now), /повторного PATCH нет/);
   await assert.rejects(planRotation(state, style('gold-jade'), now), /приостановлена/);
   assert.equal(state.pending, pending);
+});
+
+test('rotation persists one compilation attempt, verifies source and imports, and never repairs in read-only modes', async () => {
+  const current = { ...style('emerald-scarlet'), failed_imports: ['missing'], compiled_css: '' };
+  const state = { version: 1, pending: { desiredHash: await sha256(current.css), beforeHash: await sha256(style().css), artifactId: '1', startedAt: new Date(now).toISOString() } };
+  let saved, repairs = 0;
+  const good = { ...current, failed_imports: [], compiled_css: 'body{}' };
+  const args = { state, style: current, allowRepair: true, saveState: async value => { saved = structuredClone(value); },
+    recompile: async css => { assert.equal(saved.pending.compilationAttempted, true); assert.equal(css, current.css); repairs++; throw Error('lost response'); },
+    readStyle: async () => good };
+  assert.deepEqual((await verifyCompilation(args)).style, good); assert.equal(repairs, 1);
+  await assert.rejects(verifyCompilation({ ...args, state: saved }), /повторного PATCH/);
+  await assert.rejects(verifyCompilation({ ...args, allowRepair: false }), /повторного PATCH/);
+  assert.equal(repairs, 1);
+  assert.deepEqual((await verifyCompilation({ ...args, state: saved, style: good })).style, good);
+  for (const after of [current, { ...good, css: 'outside' }]) {
+    await assert.rejects(verifyCompilation({ ...args, readStyle: async () => after }), /Пересборка не подтверждена/);
+  }
 });
 
 test('OAuth refresh persists a stop marker before exchange and the entire secret before clearing it', async () => {

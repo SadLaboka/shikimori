@@ -3,6 +3,7 @@ import { resolve, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { ACCOUNT, ORIGIN, recognize, nextSchemeId, schemeCss, sha256 } from '../extensions/firefox/catalog.mjs';
+import { recompileStyle, needsCompilation } from '../extensions/firefox/recompile.mjs';
 
 class RotationError extends Error {}
 
@@ -24,6 +25,9 @@ export function validateState(state) {
     if (!hashPattern.test(state.pending.desiredHash) || !hashPattern.test(state.pending.beforeHash) ||
         !/^\d+$/.test(String(state.pending.artifactId))) throw new RotationError('Повреждён журнал незавершённой записи.');
     stamp(state.pending.startedAt);
+    if (state.pending.compilationAttempted !== undefined && typeof state.pending.compilationAttempted !== 'boolean') {
+      throw new RotationError('Повреждена отметка пересборки оформления.');
+    }
   }
   if (state.lastAuto) {
     if (!hashPattern.test(state.lastAuto.hash)) throw new RotationError('Повреждена отметка последней автосмены.');
@@ -114,6 +118,21 @@ export async function armRotation({ plan, state, enabled, artifactId, saveState,
   return { ...plan, armed: true };
 }
 
+export async function verifyCompilation({ state, style, readStyle, recompile, saveState, allowRepair }) {
+  if (!state.pending || await sha256(style.css) !== state.pending.desiredHash || !needsCompilation(style)) return { state, style };
+  if (!allowRepair || state.pending.compilationAttempted) {
+    throw new RotationError('CSS сохранён, но сборка оформления не подтверждена. Журнал сохранён; повторного PATCH и сброса кэша нет.');
+  }
+  const nextState = { ...state, pending: { ...state.pending, compilationAttempted: true } };
+  await saveState(nextState);
+  try { await recompile(style.css); } catch { /* A lost response can still mean a completed compilation. */ }
+  const after = await readStyle();
+  if (await sha256(after.css) !== state.pending.desiredHash || needsCompilation(after)) {
+    throw new RotationError('Пересборка не подтверждена или CSS изменён. Журнал сохранён; повторной отправки нет.');
+  }
+  return { state: nextState, style: after };
+}
+
 function mask(values) {
   for (const [key, value] of Object.entries(values)) {
     if (/token|secret/i.test(key) && typeof value === 'string') {
@@ -198,6 +217,21 @@ export async function main(command) {
     if (user.id !== ACCOUNT.userId || user.nickname !== ACCOUNT.nickname) throw new RotationError('Авторизован другой аккаунт.');
     return validateStyle(await api(`/api/styles/${ACCOUNT.styleId}`));
   };
+  const recompile = async css => {
+    const cookies = new Map();
+    await recompileStyle(css, async (path, options) => {
+      const response = await fetch(ORIGIN + path, { ...options, signal: AbortSignal.timeout(60000),
+        headers: { ...options.headers, 'User-Agent': applicationName,
+          ...(cookies.size ? { Cookie: [...cookies.values()].join('; ') } : {}) } });
+      for (const header of response.headers.getSetCookie()) {
+        const pair = header.split(';')[0];
+        cookies.set(pair.slice(0, pair.indexOf('=')), pair);
+      }
+      return response;
+    });
+  };
+  const verify = (state, style) => verifyCompilation({ state, style, readStyle, recompile,
+    saveState: store.saveState, allowRepair: mode === 'publish' });
   if (command === 'settle') {
     const plan = JSON.parse(await readFile(planPath, 'utf8'));
     credentials = JSON.parse(await readFile(plan.credentialsPath, 'utf8'));
@@ -205,7 +239,8 @@ export async function main(command) {
     if (!state.pending || state.pending.desiredHash !== plan.cssHash || state.pending.beforeHash !== plan.beforeHash) {
       throw new RotationError('Журнал записи изменился. Нужна проверка.');
     }
-    const result = await planRotation(state, await readStyle());
+    const verified = await verify(state, await readStyle());
+    const result = await planRotation(verified.state, verified.style);
     if (result.kind !== 'reconciled') throw new RotationError('Запись не подтверждена.');
     await store.saveState(result.state);
     console.log('Сохранение подтверждено. Журнал незавершённой операции закрыт.');
@@ -220,8 +255,9 @@ export async function main(command) {
       grant_type: 'refresh_token', client_id: item.clientId, client_secret: item.clientSecret, refresh_token: item.refreshToken,
     }, applicationName) });
   credentials = ensured.credentials;
-  const style = await readStyle();
-  const result = await planRotation(ensured.state, style);
+  const verified = await verify(ensured.state, await readStyle());
+  const style = verified.style;
+  const result = await planRotation(verified.state, style);
   if (result.kind === 'reconciled') {
     if (mode !== 'dry-run') await store.saveState(result.state);
     console.log('Предыдущая запись подтверждена. Нового переключения в этом запуске нет.');

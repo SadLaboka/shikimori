@@ -1,6 +1,7 @@
 import { ORIGIN } from './catalog.mjs';
 import { Publisher, UserError } from './publisher.mjs';
 import { ApiRateLimiter } from './rate-limit.mjs';
+import { recompileStyle } from './recompile.mjs';
 
 let selectedTabId = null;
 let reloadAfter = true;
@@ -15,6 +16,16 @@ const publisher = new Publisher({ storage: browser.storage.local,
   },
   request: async request => {
   if (selectedTabId === null) return { ok: false, code: 'network' };
+  if (request.method === 'RECOMPILE') {
+    try {
+      await recompileStyle(request.css, async (path, options) => {
+        const response = await browser.tabs.sendMessage(selectedTabId,
+          { channel: 'sadlaboka-api', operation: 'recompile-fetch', path, ...options }, { frameId: 0 });
+        return { ok: response?.ok === true, text: async () => response?.text ?? '' };
+      });
+      return { ok: true };
+    } catch { return { ok: false, code: 'server' }; }
+  }
   return browser.tabs.sendMessage(selectedTabId, { channel: 'sadlaboka-api', operation: 'request', ...request }, { frameId: 0 });
 } });
 

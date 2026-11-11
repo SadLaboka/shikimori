@@ -4,7 +4,7 @@
   globalThis.__sadlabokaAvatarSwitch = true;
   const selector = '.p-profiles .profile-head .c-brief .avatar';
   const stages = { checking: 'Проверяем аккаунт и CSS…', backup: 'Сохраняем предыдущий CSS…',
-    publishing: 'Переключаем цветовую схему…', verifying: 'Проверяем сохранение…' };
+    publishing: 'Переключаем цветовую схему…', verifying: 'Проверяем сохранение…', compiling: 'Собираем оформление на сайте…' };
   let busy = false, notice = null, noticeTimer;
   function ownAvatar() {
     if (location.origin !== 'https://shikimori.io' || !/^\/SadLaboka\/?$/.test(location.pathname)) return null;

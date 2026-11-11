@@ -12,7 +12,7 @@ function fixture() {
   let current = { id: ACCOUNT.styleId, owner_id: ACCOUNT.userId, owner_type: 'User', css: schemeCss('main'),
     updated_at: 'v1', failed_imports: [], compiledPresent: true };
   const data = {}; const calls = []; let revision = 1; let time = 10000;
-  const controls = { wrongUser: false, wrongOwner: false, failStorage: false, patchMode: 'ok', conflict: false, styleReads: 0, failVerification: false };
+  const controls = { wrongUser: false, wrongOwner: false, failStorage: false, patchMode: 'ok', conflict: false, styleReads: 0, failVerification: false, compilation: 'fail' };
   const storage = {
     async get(keys) { return Object.fromEntries((Array.isArray(keys) ? keys : [keys]).filter(key => key in data).map(key => [key, structuredClone(data[key])])); },
     async set(value) { if (controls.failStorage) throw new Error('storage unavailable'); Object.assign(data, structuredClone(value)); },
@@ -21,6 +21,14 @@ function fixture() {
   const request = async message => {
     calls.push(structuredClone(message));
     if (message.path === '/api/users/whoami') return { ok: true, value: { id: controls.wrongUser ? 1 : ACCOUNT.userId, nickname: 'SadLaboka' } };
+    if (message.method === 'RECOMPILE') {
+      assert.equal(data.pending.compilationAttempted, true);
+      if (controls.compilation === 'conflict') current = { ...current, css: 'body{color:red}', updated_at: 'outside' };
+      if (['ok', 'lost-response', 'lost-verification'].includes(controls.compilation)) current = { ...current, failed_imports: [], compiledPresent: true, updated_at: 'compiled' };
+      if (controls.compilation === 'lost-response') throw Error('lost cache response');
+      if (controls.compilation === 'lost-verification') controls.failVerification = true;
+      return { ok: controls.compilation !== 'fail', code: 'server' };
+    }
     if (message.method === 'GET') {
       controls.styleReads++;
       if (controls.conflict && controls.styleReads === 3) current = { ...current, css: 'body{color:blue}', updated_at: 'outside' };
@@ -267,6 +275,33 @@ test('failed imports report partial save and allow manual restoration', async ()
   const result = await f.publisher.apply('emerald-scarlet', view.snapshot);
   assert.equal(result.kind, 'warning'); assert.equal(result.view.canRestore, true);
 });
+
+test('failed API compilation is repaired once after exact save, including a lost reset response', async () => {
+  for (const mode of ['ok', 'lost-response']) {
+    const f = fixture(); f.controls.patchMode = 'failed-import'; f.controls.compilation = mode;
+    const view = await f.publisher.inspect();
+    const result = await f.publisher.apply('emerald-scarlet', view.snapshot);
+    assert.equal(result.kind, 'success'); assert.equal(f.data.pending, undefined);
+    assert.equal(f.calls.filter(call => call.method === 'PATCH').length, 1);
+    assert.equal(f.calls.filter(call => call.method === 'RECOMPILE').length, 1);
+    assert.equal(f.current.css, schemeCss('emerald-scarlet'));
+  }
+});
+test('a restart never repeats an attempted cache reset, and outside CSS is never overwritten', async () => {
+  const f = fixture(); f.controls.patchMode = 'failed-import'; f.controls.compilation = 'lost-verification';
+  const view = await f.publisher.inspect();
+  assert.equal((await f.publisher.apply('emerald-scarlet', view.snapshot)).kind, 'uncertain');
+  assert.equal(f.data.pending.compilationAttempted, true);
+  f.controls.failVerification = false;
+  assert.equal((await f.make().reconcile()).kind, 'success');
+  assert.equal(f.calls.filter(call => call.method === 'RECOMPILE').length, 1);
+  const conflict = fixture(); conflict.controls.patchMode = 'failed-import'; conflict.controls.compilation = 'conflict';
+  const prior = await conflict.publisher.inspect();
+  assert.equal((await conflict.publisher.apply('emerald-scarlet', prior.snapshot)).kind, 'uncertain');
+  assert.equal((await conflict.make().reconcile()).kind, 'warning');
+  assert.equal(conflict.current.css, 'body{color:red}');
+  assert.equal(conflict.calls.filter(call => call.method === 'PATCH').length, 1);
+});
 test('already installed CSS does not create a backup or PATCH', async () => {
   const f = fixture(); const view = await f.publisher.inspect();
   assert.equal((await f.publisher.apply('main', view.snapshot)).kind, 'unchanged');
@@ -315,11 +350,12 @@ test('parallel clicks cannot create two PATCH requests', async () => {
 async function bridgeFixture() {
   const source = await readFile(new URL('../extensions/firefox/bridge.js', import.meta.url), 'utf8');
   let listener; const calls = []; let listens = 0;
-  const context = vm.createContext({ location: { origin: 'https://shikimori.io' }, AbortSignal,
+  class ContentParams extends URLSearchParams { keys() { throw Error('Firefox Xray iterator is not iterable'); } }
+  const context = vm.createContext({ location: { origin: 'https://shikimori.io' }, AbortSignal, URLSearchParams: ContentParams,
     document: { querySelector: () => ({ content: 'synthetic-csrf-test-only' }) },
     browser: { runtime: { id: 'test-addon', onMessage: { addListener(value) { listener = value; listens++; } } } },
     fetch: async (path, options) => { calls.push({ path, options }); return { ok: true, json: async () => ({ id: 1343722,
-      owner_id: 1408017, owner_type: 'User', css: 'body{}', updated_at: 'v1', failed_imports: [], compiled_css: 'body{}', private_field: 'synthetic-private-field' }) }; },
+      owner_id: 1408017, owner_type: 'User', css: 'body{}', updated_at: 'v1', failed_imports: [], compiled_css: 'body{}', private_field: 'synthetic-private-field' }), text: async () => 'synthetic-public-page' }; },
   });
   vm.runInContext(source, context); vm.runInContext(source, context);
   assert.equal(listens, 1);
@@ -347,6 +383,22 @@ test('manifest grants access only to Shikimori and contains no external code', a
   assert.deepEqual(manifest.permissions, ['storage', 'scripting']);
   assert.equal(manifest.web_accessible_resources, undefined); assert.equal(manifest.externally_connectable, undefined);
   assert.equal(manifest.manifest_version, 3);
+});
+
+test('bridge restricts compilation to fixed public paths and one owned import without forwarding headers', async () => {
+  const f = await bridgeFixture();
+  const send = (data, sender) => f.send({ operation: 'recompile-fetch', ...data }, sender);
+  for (const data of [{ method: 'PATCH', path: '/api/styles/1343722' }, { method: 'GET', path: 'https://example.invalid' },
+    { method: 'POST', path: '/tests/reset_styles_cache', body: new URLSearchParams({ authenticity_token: 'test', url: 'https://fonts.googleapis.com/' }).toString() }]) {
+    assert.equal((await send(data)).ok, false);
+  }
+  assert.equal(send({ method: 'GET', path: '/SadLaboka' }, { id: 'foreign' }), undefined);
+  assert.equal(f.calls.length, 0);
+  for (const path of ['/tests/reset_styles_cache', '/SadLaboka']) assert.equal((await send({ method: 'GET', path })).ok, true);
+  const body = new URLSearchParams({ authenticity_token: 'synthetic-form-token-test-only', url: IMPORT_MIRRORS[0].url }).toString();
+  assert.equal((await send({ method: 'POST', path: '/tests/reset_styles_cache', body, headers: { Authorization: 'must-not-forward' } })).ok, true);
+  assert.equal(f.calls[2].options.headers.Authorization, undefined);
+  assert.equal(f.calls[2].options.credentials, 'include'); assert.equal(f.calls[2].options.redirect, 'error');
 });
 test('style GET requires server revalidation while identity and writes bypass cache', async () => {
   const f = await bridgeFixture();

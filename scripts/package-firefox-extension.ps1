@@ -9,7 +9,7 @@ $destination = Join-Path $root '.preview/firefox-extension'
 $manifest = Get-Content -LiteralPath (Join-Path $source 'manifest.json') -Raw | ConvertFrom-Json
 if ($manifest.version -notmatch '^\d+\.\d+\.\d+$') { throw 'Invalid extension version.' }
 $files = @('manifest.json', 'background.mjs', 'bridge.js', 'avatar.js', 'avatar-hover.mjs', 'avatar-hover-legacy.mjs', 'catalog.mjs', 'publisher.mjs', 'rate-limit.mjs', 'updates.mjs',
-    'popup.html', 'popup.mjs', 'popup.css', 'icons/schemes.svg', 'README.md')
+    'recompile.mjs', 'popup.html', 'popup.mjs', 'popup.css', 'icons/schemes.svg', 'README.md')
 [void][IO.Directory]::CreateDirectory($destination)
 $archivePath = Join-Path $destination ('shikimori-schemes-' + $manifest.version + '.zip')
 $stream = [IO.File]::Open($archivePath, [IO.FileMode]::Create, [IO.FileAccess]::ReadWrite)

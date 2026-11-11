@@ -6,7 +6,7 @@ let busy = false;
 let retryTimer = null;
 const send = data => browser.runtime.sendMessage({ channel: 'sadlaboka-ui', ...data });
 const stages = Object.freeze({ checking: 'Проверяем аккаунт и CSS…', backup: 'Сохраняем предыдущий CSS…',
-  publishing: 'Публикуем схему…', verifying: 'Проверяем сохранение…' });
+  publishing: 'Публикуем схему…', verifying: 'Проверяем сохранение…', compiling: 'Собираем оформление на сайте…' });
 browser.runtime.onMessage.addListener((message, sender) => {
   if (!busy || sender.id !== browser.runtime.id || !sender.url?.startsWith(browser.runtime.getURL('')) ||
       message?.channel !== 'sadlaboka-progress' || !Object.hasOwn(stages, message.stage)) return undefined;
