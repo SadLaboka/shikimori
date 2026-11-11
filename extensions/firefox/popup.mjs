@@ -59,8 +59,8 @@ async function run(data) {
     if (result.view) view = result.view;
     if (result.kind === 'uncertain') view = { ...view, pending: true, canRestore: false };
     if (typeof result.reloadAfter === 'boolean') $('reload').checked = result.reloadAfter;
-    $('status').dataset.kind = result.kind ?? '';
-    $('status').textContent = result.message ?? (view?.pending ? 'Есть незавершённая публикация. Сначала проверь её результат.' : 'Выбери оформление.');
+    $('status').dataset.kind = result.kind ?? (view?.warning && !view.pending ? 'warning' : '');
+    $('status').textContent = result.message ?? (view?.pending ? 'Есть незавершённая публикация. Сначала проверь её результат.' : view?.warning ?? 'Выбери оформление.');
   } catch {
     view = { ...view, connected: false };
     $('status').dataset.kind = 'error'; $('status').textContent = 'Связь прервалась. Обнови состояние перед следующим действием.';

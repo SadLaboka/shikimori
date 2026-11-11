@@ -14,6 +14,10 @@ export const SAFE_ERRORS = Object.freeze({
   invalid: 'Получен неподдерживаемый запрос.',
 });
 const STYLE_PATH = `/api/styles/${ACCOUNT.styleId}`;
+function compilationWarning(style) {
+  if (style.failed_imports.length) return `CSS сохранён, но Shikimori не загрузил импортов: ${style.failed_imports.length}. Оформление неполное.`;
+  return style.compiledPresent ? null : 'CSS сохранён, но Shikimori не подготовил оформление.';
+}
 export class Publisher {
   constructor({ request, storage, now = () => Date.now(), limiter = new ApiRateLimiter({ now }), onStage = () => {} }) {
     Object.assign(this, { request, storage, now, limiter, onStage });
@@ -61,6 +65,7 @@ export class Publisher {
     const hash = await sha256(style.css);
     const backup = (state.backups ?? []).find(item => item.appliedHash === hash && item.styleId === ACCOUNT.styleId);
     return { connected: true, schemeId: await recognize(style.css), snapshot: { hash, updatedAt: style.updated_at },
+      warning: compilationWarning(style),
       pending: Boolean(state.pending), canRestore: Boolean(backup) && !state.pending, backupName: backup?.name ?? null };
   }
   inspect() {
@@ -104,7 +109,8 @@ export class Publisher {
       throw new UserError('CSS изменился после открытия меню. Обнови состояние и выбери схему заново.');
     }
     const desiredHash = await sha256(css);
-    if (beforeHash === desiredHash) return { kind: 'unchanged', message: 'Эта схема уже установлена.', view: await this.view(before) };
+    if (beforeHash === desiredHash) return { kind: compilationWarning(before) ? 'warning' : 'unchanged',
+      message: compilationWarning(before) ?? 'Эта схема уже установлена.', view: await this.view(before) };
     const previousId = await recognize(before.css);
     const backup = { id: crypto.randomUUID(), styleId: ACCOUNT.styleId, css: before.css, sha256: beforeHash,
       appliedHash: desiredHash, name: SCHEMES.find(item => item.id === previousId)?.name ?? 'Сохранённое оформление',
@@ -133,9 +139,9 @@ export class Publisher {
     const currentHash = await sha256(style.css);
     if (currentHash === pending.desiredHash) {
       await this.storage.remove('pending');
-      const warning = style.failed_imports.length > 0 || !style.compiledPresent;
+      const warning = compilationWarning(style);
       return { kind: warning ? 'warning' : 'success',
-        message: warning ? 'CSS сохранён, но Shikimori не загрузил всё оформление. Можно вернуть предыдущий CSS.' : 'Оформление сохранено.',
+        message: warning ? `${warning} Можно вернуть предыдущий CSS.` : 'Оформление сохранено.',
         view: await this.view(style) };
     }
     if (reconciliation && currentHash !== pending.beforeHash) {

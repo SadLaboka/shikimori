@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import vm from 'node:vm';
-import { ACCOUNT, SCHEMES, REVISION, BASE_IMPORTS, LEGACY_BASE_IMPORTS, schemeCss, schemeImports, sha256, recognize, nextSchemeId } from '../extensions/firefox/catalog.mjs';
+import { ACCOUNT, SCHEMES, REVISION, BASE_IMPORTS, LEGACY_BASE_IMPORTS, IMPORT_MIRRORS, schemeCss, schemeImports, sha256, recognize, nextSchemeId } from '../extensions/firefox/catalog.mjs';
 import { AVATAR_HOVER_CSS } from '../extensions/firefox/avatar-hover.mjs';
 import { LEGACY_AVATAR_HOVER_CSS } from '../extensions/firefox/avatar-hover-legacy.mjs';
 import { Publisher } from '../extensions/firefox/publisher.mjs';
@@ -47,9 +47,33 @@ test('registry imports exact pinned repository files with the six original depen
     assert.deepEqual(bytes.toString('utf8').match(/^@import[^\r\n]+;/gm), BASE_IMPORTS);
     const css = schemeCss(scheme.id);
     assert.equal(css.match(/@import/g).length, 7);
-    assert.ok(css.includes(`/${scheme.revision ?? REVISION}/${scheme.file}`));
+    const original = schemeImports(scheme.id, undefined, BASE_IMPORTS, false);
+    assert.equal(schemeImports(scheme.id), IMPORT_MIRRORS.reduce((text, mirror) => text.replaceAll(mirror.source, mirror.url), original));
   }
-  assert.equal(await sha256(schemeImports('emerald-scarlet')), 'cea12243a7a2fed0c345353ef0373e6c77ad271a4b9968d6bf7615a527ee4b35');
+  assert.equal(await sha256(schemeImports('emerald-scarlet', undefined, BASE_IMPORTS, false)), 'cea12243a7a2fed0c345353ef0373e6c77ad271a4b9968d6bf7615a527ee4b35');
+});
+
+test('the two pinned mirrors preserve source bytes and recognize old and recovered blocks', async () => {
+  assert.equal(IMPORT_MIRRORS.length, 2);
+  for (const mirror of IMPORT_MIRRORS) {
+    const match = new URL(mirror.source).pathname.match(/^\/SadLaboka\/shikimori\/([a-f0-9]{40})\/(.+)$/);
+    assert.ok(match);
+    assert.equal(mirror.url, `https://cdn.jsdelivr.net/gh/SadLaboka/shikimori@${match[1]}/${match[2]}`);
+    assert.equal(await sha256(execFileSync('git', ['show', `${match[1]}:${match[2]}`], { encoding: 'utf8' })), mirror.sha256);
+  }
+  for (const scheme of SCHEMES) {
+    const original = `${schemeImports(scheme.id, undefined, BASE_IMPORTS, false)}\n\n${AVATAR_HOVER_CSS}`;
+    assert.equal(await recognize(original), scheme.id);
+    const f = fixture(); f.change({ css: original });
+    const view = await f.publisher.inspect();
+    const result = await f.publisher.apply(scheme.id, view.snapshot);
+    assert.equal(result.kind, 'success');
+    assert.equal(f.current.css, schemeCss(scheme.id));
+    assert.equal(f.data.backups[0].css, original);
+    assert.equal((await f.publisher.restore(result.view.snapshot)).view.schemeId, scheme.id);
+    assert.equal(f.current.css, original);
+    assert.equal(await recognize(schemeCss(scheme.id).replace('cdn.jsdelivr.net', 'example.invalid')), null);
+  }
 });
 
 test('schemes saved before the image migration remain recognizable with their original base imports', async () => {
@@ -87,6 +111,29 @@ test('inline hover CSS matches the shared component and both old and new imports
   }
   assert.equal(nextSchemeId('main'), 'emerald-scarlet'); assert.equal(nextSchemeId('emerald-scarlet'), 'gold-jade'); assert.equal(nextSchemeId('gold-jade'), 'main');
   assert.equal(nextSchemeId(null), null);
+});
+
+test('site textarea formatting preserves known schemes and exact backups only', async () => {
+  for (const scheme of SCHEMES) {
+    for (const block of [schemeCss(scheme.id), schemeImports(scheme.id),
+      `${schemeImports(scheme.id, scheme.historicalSources[0].revision, LEGACY_BASE_IMPORTS)}\n\n${LEGACY_AVATAR_HOVER_CSS}`]) {
+      const saved = `\r\n${block.replaceAll('\n', '\r\n')}\r\n`;
+      assert.equal(await recognize(saved), scheme.id);
+      assert.equal(await recognize(`${saved}body { color: red; }`), null);
+      assert.equal(await recognize(saved.replace('fonts.googleapis.com', 'example.invalid')), null);
+    }
+    const f = fixture();
+    const saved = `${schemeCss(scheme.id).replaceAll('\n', '\r\n')}\r\n`;
+    f.change({ css: saved });
+    const view = await f.publisher.inspect();
+    assert.equal(view.snapshot.hash, await sha256(saved));
+    const result = await f.publisher.cycle();
+    assert.equal(result.kind, 'success');
+    assert.equal(result.view.schemeId, nextSchemeId(scheme.id));
+    assert.equal(f.data.backups[0].css, saved);
+    assert.equal((await f.publisher.restore(result.view.snapshot)).kind, 'success');
+    assert.equal(f.current.css, saved);
+  }
 });
 
 test('avatar cycle upgrades the previous inline glow and keeps its exact backup', async () => {
@@ -176,7 +223,8 @@ test('wrong account or style owner cannot write', async () => {
   }
 });
 test('changed source or timestamp requires a fresh selection', async () => {
-  for (const change of [{ css: 'body{color:blue}' }, { updated_at: 'changed' }]) {
+  for (const change of [{ css: 'body{color:blue}' }, { updated_at: 'changed' },
+    { css: schemeCss('main').replaceAll('\n', '\r\n') }]) {
     const f = fixture(); const view = await f.publisher.inspect(); f.change(change);
     await assert.rejects(f.publisher.apply('emerald-scarlet', view.snapshot), /изменился/);
     assert.equal(f.calls.some(call => call.method === 'PATCH'), false);
@@ -224,6 +272,23 @@ test('already installed CSS does not create a backup or PATCH', async () => {
   assert.equal((await f.publisher.apply('main', view.snapshot)).kind, 'unchanged');
   assert.equal(f.data.backups, undefined); assert.equal(f.calls.some(call => call.method === 'PATCH'), false);
 });
+test('inspection and reselecting the same CSS expose failed compilation without PATCH', async () => {
+  for (const change of [{ failed_imports: ['https://example.invalid/a.css', 'https://example.invalid/b.css'] },
+    { compiledPresent: false }]) {
+    const f = fixture(); f.change(change);
+    const view = await f.publisher.inspect();
+    assert.match(view.warning, /CSS сохранён/);
+    if (change.failed_imports) assert.match(view.warning, /импортов: 2/);
+    const result = await f.publisher.apply('main', view.snapshot);
+    assert.equal(result.kind, 'warning');
+    assert.equal(result.message, view.warning);
+    assert.equal(f.data.backups, undefined);
+    assert.equal(f.calls.some(call => call.method === 'PATCH'), false);
+    f.change({ failed_imports: [], compiledPresent: true });
+    assert.equal((await f.publisher.inspect()).warning, null);
+  }
+});
+
 test('unknown scheme and damaged backup cannot be published', async () => {
   const f = fixture(); const view = await f.publisher.inspect();
   await assert.rejects(f.publisher.apply('../other', view.snapshot));

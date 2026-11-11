@@ -53,6 +53,24 @@ test('unknown CSS, wrong ownership and invalid timestamps cannot produce a plan'
   assert.throws(() => validateState({ version: 1, pending: {} }), /журнал/);
 });
 
+test('textarea-saved schemes rotate with exact source hashes and retain the manual hold', async () => {
+  for (const id of CYCLE_ORDER) {
+    const current = style(id);
+    current.css = `${current.css.replaceAll('\n', '\r\n')}\r\n`;
+    const plan = await planRotation(initial(), current, now);
+    assert.equal(plan.kind, 'ready');
+    assert.equal(plan.beforeHash, await sha256(current.css));
+    assert.notEqual(plan.beforeHash, await sha256(schemeCss(id)));
+    assert.equal(plan.schemeId, CYCLE_ORDER[(CYCLE_ORDER.indexOf(id) + 1) % CYCLE_ORDER.length]);
+    const state = { version: 1, lastAuto: { hash: await sha256(schemeCss(id)),
+      updatedAt: current.updated_at, completedAt: current.updated_at, slot: Math.floor(now / INTERVAL) - 1 } };
+    current.updated_at = new Date(now - 1000).toISOString();
+    assert.equal((await planRotation(state, current, now)).kind, 'waiting');
+    current.css += 'body { color: red; }';
+    await assert.rejects(planRotation(initial(), current, now), /Неизвестный/);
+  }
+});
+
 test('a lost PATCH is only reconciled: desired CSS clears pending without a second write', async () => {
   const current = style('emerald-scarlet');
   const pending = { beforeHash: await sha256(schemeCss('main')), desiredHash: await sha256(current.css),

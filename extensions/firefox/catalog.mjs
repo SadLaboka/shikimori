@@ -3,6 +3,20 @@ import { LEGACY_AVATAR_HOVER_CSS } from './avatar-hover-legacy.mjs';
 export const ACCOUNT = Object.freeze({ nickname: 'SadLaboka', userId: 1408017, styleId: 1343722 });
 export const ORIGIN = 'https://shikimori.io';
 export const REVISION = '178429b453a7a5fb3ebf6d63bc666d2e8cf83b1c';
+// Only these two approved, byte-identical sources use a mirror. Keep the full
+// commit IDs: neither the CDN nor recognition may silently follow a branch.
+export const IMPORT_MIRRORS = Object.freeze([
+  Object.freeze({
+    source: 'https://raw.githubusercontent.com/SadLaboka/shikimori/2d919a08e191c50b9293c73f7cc6504f59e4b51a/css/base/main_code_3.css',
+    url: 'https://cdn.jsdelivr.net/gh/SadLaboka/shikimori@2d919a08e191c50b9293c73f7cc6504f59e4b51a/css/base/main_code_3.css',
+    sha256: '9241c9bf7a7e0e526a4d7f642df54e52a0ee8a9f8d15337245eeec92585e1217',
+  }),
+  Object.freeze({
+    source: 'https://raw.githubusercontent.com/SadLaboka/shikimori/178429b453a7a5fb3ebf6d63bc666d2e8cf83b1c/css/themes/emerald-scarlet/styles.css',
+    url: 'https://cdn.jsdelivr.net/gh/SadLaboka/shikimori@178429b453a7a5fb3ebf6d63bc666d2e8cf83b1c/css/themes/emerald-scarlet/styles.css',
+    sha256: 'fe50ed06eb1023099f8ce9d3546947c9ecf03622237956812cfbf4c6fb407548',
+  }),
+]);
 export const BASE_IMPORTS = Object.freeze([
   "@import url('https://fonts.googleapis.com/css2?family=Rubik+Spray+Paint&display=swap');",
   "@import url('https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap');",
@@ -111,11 +125,12 @@ export function nextSchemeId(current) {
   const index = CYCLE_ORDER.indexOf(current);
   return index < 0 ? null : CYCLE_ORDER[(index + 1) % CYCLE_ORDER.length];
 }
-export function schemeImports(id, revisionOverride, baseImports = BASE_IMPORTS) {
+export function schemeImports(id, revisionOverride, baseImports = BASE_IMPORTS, useMirrors = true) {
   const scheme = SCHEMES.find(item => item.id === id);
   if (!scheme) throw new Error('Неизвестная схема.');
   const url = `https://raw.githubusercontent.com/SadLaboka/shikimori/${revisionOverride ?? scheme.revision ?? REVISION}/${scheme.file}`;
-  return [...baseImports, `@import url("${url}");`].join('\n');
+  const css = [...baseImports, `@import url("${url}");`].join('\n');
+  return useMirrors ? IMPORT_MIRRORS.reduce((text, mirror) => text.replaceAll(mirror.source, mirror.url), css) : css;
 }
 export function schemeCss(id) { return `${schemeImports(id)}\n\n${AVATAR_HOVER_CSS}`; }
 export async function sha256(text) {
@@ -123,21 +138,27 @@ export async function sha256(text) {
   return [...new Uint8Array(bytes)].map(value => value.toString(16).padStart(2, '0')).join('');
 }
 export async function recognize(css) {
-  const hash = await sha256(css);
+  // The site's textarea saves CRLF and may add a final newline. Normalize only
+  // recognition; transaction hashes and backups must retain the exact bytes.
+  const normalized = css.replaceAll('\r\n', '\n');
+  const hash = await sha256(normalized);
+  const matchesBlock = candidate => normalized.trim() === candidate.trim();
   for (const scheme of SCHEMES) {
-    const historicalSources = [...(scheme.historicalSources ?? []),
+    const historicalSources = [{ revision: scheme.revision ?? REVISION }, ...(scheme.historicalSources ?? []),
       ...(scheme.previousRevision ? [{ revision: scheme.previousRevision, sourceSha256: scheme.previousSourceSha256 }] : [])];
     for (const source of historicalSources) {
       if (hash === source.sourceSha256) return scheme.id;
       for (const imports of [BASE_IMPORTS, LEGACY_BASE_IMPORTS]) {
-        const previous = schemeImports(scheme.id, source.revision, imports);
-        if (hash === await sha256(previous) || hash === await sha256(`${previous}\n\n${AVATAR_HOVER_CSS}`) ||
-            hash === await sha256(`${previous}\n\n${LEGACY_AVATAR_HOVER_CSS}`)) return scheme.id;
+        for (const useMirrors of [false, true]) {
+          const previous = schemeImports(scheme.id, source.revision, imports, useMirrors);
+          if (matchesBlock(previous) || matchesBlock(`${previous}\n\n${AVATAR_HOVER_CSS}`) ||
+              matchesBlock(`${previous}\n\n${LEGACY_AVATAR_HOVER_CSS}`)) return scheme.id;
+        }
       }
     }
     if (hash === scheme.sourceSha256 || hash === scheme.previousSourceSha256 || hash === scheme.currentSourceSha256 ||
-        hash === await sha256(`${schemeImports(scheme.id)}\n\n${LEGACY_AVATAR_HOVER_CSS}`) || hash === await sha256(schemeImports(scheme.id)) ||
-        hash === await sha256(schemeCss(scheme.id))) return scheme.id;
+        matchesBlock(`${schemeImports(scheme.id)}\n\n${LEGACY_AVATAR_HOVER_CSS}`) || matchesBlock(schemeImports(scheme.id)) ||
+        matchesBlock(schemeCss(scheme.id))) return scheme.id;
   }
   return null;
 }
