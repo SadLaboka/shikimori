@@ -94,6 +94,8 @@ pwsh -NoProfile -File tests/verify-firefox-signed.tests.ps1
 node scripts/build-css.mjs --check
 node scripts/build-emerald-scarlet.mjs --check
 node scripts/build-gold-jade.mjs --check
+node scripts/build-inline-schemes.mjs --check
+node --test tests/inline-schemes.test.mjs
 pnpm --dir tools/firefox-release install --frozen-lockfile --ignore-scripts
 pnpm --dir tools/firefox-release exec web-ext lint --source-dir ../../extensions/firefox --self-hosted --no-config-discovery
 ```

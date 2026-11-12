@@ -35,8 +35,9 @@ Workflow [Rotate Shikimori schemes](../.github/workflows/rotate-schemes.yml) р�
   повторной отправки и автоматического отката нет.
 - Открытые страницы не перезагружаются. Новый CSS виден после перехода/обновления.
 
-Расширение продолжает работать без обновления. Его меню может попросить заново
-прочитать состояние, если Actions уже изменил CSS. Общей блокировки между
+Для полного CSS каталога 0.4.0 требуется Firefox-расширение 0.4.0. Версия 0.3.9
+не распознаёт новые снимки. Меню может попросить заново прочитать состояние,
+если Actions уже изменил CSS. Общей блокировки между
 Firefox и GitHub нет: узкое окно между последним GET и PATCH остаётся,
 поскольку API Shikimori не документирует условную атомарную запись.
 Одновременные запуски самого workflow сериализованы через `concurrency`.
@@ -107,6 +108,31 @@ refresh OAuth. Оно не разрешает автоматически доб�
 публиковать произвольный CSS или выпускать расширение.
 
 ## Данные и восстановление
+
+### Полный CSS в 0.4.0
+
+`schemeCss` возвращает готовый CSS из `extensions/firefox/inline-schemes.mjs`.
+CSS-импортов нет: ни расширение, ни Actions не зависят от загрузки CSS сервером
+Shikimori. Адреса изображений и файлов шрифтов, порядок правил и media сохранены.
+Старые блоки импортов по-прежнему распознаются и сохраняются в backup побайтно.
+
+`scripts/build-inline-schemes.mjs --check` сверяет генерацию со снимком,
+полными commit SHA и SHA256 из каталога и `inline-sources.json`. Четыре модуля
+основы и исходники схем читаются из закреплённых Git-коммитов. Пять правил
+Google Fonts хранятся в `vendor/google-fonts.css`; бинарные файлы шрифтов не
+копируются. Комментарии убраны обработкой предпросмотра, совпадающей с поведением
+Shikimori; авторство остаётся в исходных архивах и README расширения.
+
+Проверяются лимиты 512000 символов и байтов UTF-8, включая сохранение редактором
+с CRLF. Снимок нельзя обновлять одной пересборкой без новой проверки CSSOM,
+состояний и API: одобренные хэши трёх payload записаны в `inline-sources.json`.
+После проверки пересборка — `node scripts/build-inline-schemes.mjs --write`.
+При выпуске сборку `--check` проверяют оба workflow.
+
+Сброс кэша в 0.3.9 не оказался устойчивым: 12 ноября после смены через расширение
+снова оставались ошибки main3 и Gold & Jade. В 0.4.0 этот путь нужен только для
+старых backup с импортами; обычные переключения выполняют один PATCH полного CSS
+и проверяют сохранённый результат без сбросов кэша.
 
 ### Схема не меняется или появились ошибки импорта
 
@@ -207,13 +233,14 @@ State читается через API заново; `vars`-снимок workflow
 Проверки изменённой логики:
 
 ```powershell
-node --test tests/rotation.test.mjs tests/firefox-extension.test.mjs tests/firefox-avatar.test.mjs
+node --test tests/rotation.test.mjs tests/inline-schemes.test.mjs tests/firefox-extension.test.mjs tests/firefox-avatar.test.mjs
 pwsh -NoProfile -File tests/deploy.tests.ps1
 pwsh -NoProfile -File tests/rotation-deploy.tests.ps1
 pwsh -NoProfile -File tests/rotation-upload.tests.ps1
 node scripts/build-css.mjs --check
 node scripts/build-emerald-scarlet.mjs --check
 node scripts/build-gold-jade.mjs --check
+node scripts/build-inline-schemes.mjs --check
 git diff --check
 ```
 

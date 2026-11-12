@@ -8,7 +8,8 @@ import { existsSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { connectBidi,freePort,delay } from './helpers/firefox-remote.mjs';
 const sourceOption=process.argv.find(value=>value.startsWith('--extension-source='))?.slice('--extension-source='.length);
-const failApiCompilation=process.argv.includes('--fail-api-compilation');
+const requireInlineCss=process.argv.includes('--require-inline-css');
+const failApiCompilation=process.argv.includes('--fail-api-compilation')||requireInlineCss;
 const sourceDirectory=sourceOption?path.resolve(sourceOption):fileURLToPath(new URL('../extensions/firefox/',import.meta.url));
 const {ACCOUNT,schemeCss,SCHEMES}=await import(pathToFileURL(path.join(sourceDirectory,'catalog.mjs')).href);
 const output=new URL('../.preview/firefox-extension/',import.meta.url);await mkdir(output,{recursive:true});
@@ -79,7 +80,9 @@ try{
             assert.ok(requestHeaders.cookie?.includes('synthetic_session=test-only')||request.cookies?.some(cookie=>cookie.name==='synthetic_session'));
             // Payload bytes are separately asserted in the production bridge's
             // unit test; verification GET must match the chosen scheme hash.
-            css=schemeCss(patchSchemes[patches]);patches++;revision++;compilationFailed=failApiCompilation;
+            css=schemeCss(patchSchemes[patches]);patches++;revision++;
+            if(requireInlineCss)assert.equal(/@import\b/i.test(css),false,'Switch must send the complete CSS');
+            compilationFailed=failApiCompilation&&(!requireInlineCss||/@import\b/i.test(css));
           }
           body=json({id:ACCOUNT.styleId,owner_id:ACCOUNT.userId,owner_type:'User',css,compiled_css:compilationFailed?'':'body{color:white}',updated_at:`v${revision}`,failed_imports:compilationFailed?['https://example.invalid/unavailable.css']:[]});
         }else if(url.pathname==='/tests/reset_styles_cache'){
@@ -239,8 +242,9 @@ try{
   await evaluate(popup,"document.querySelector('#refresh').click()");
   await wait(popup,"document.querySelector('#status').textContent.includes('Открой Shikimori')");
   await screenshot(popup,'popup-no-tab.png');
-  if(failApiCompilation)assert.equal(compilations,patches,'Every failed API compilation must be repaired once without another PATCH');
-  const report={browser:session.capabilities.browserVersion,extensionVersion:manifest.version,installed:true,sessionAndCsrfVerified:true,switch:true,restore:true,popupClosure:true,settingsPersisted:true,progressStagesVerified:true,activeTabReloadVerified:true,threeSchemeCycle:true,goldJadePopupApply:true,manualUpdateChecks:true,updateChecks,avatarDoubleClickGuard:true,avatarSyntheticClickBlocked:true,avatarUnknownCssBlocked:true,avatarWrongUserBlocked:true,wrongAccountBlocked:true,missingTabHandled:true,patches,failApiCompilation,compilations,timings,requests};
+  if(requireInlineCss)assert.equal(compilations,0,'Complete snapshots must not need cache resets');
+  else if(failApiCompilation)assert.equal(compilations,patches,'Every failed API compilation must be repaired once without another PATCH');
+  const report={browser:session.capabilities.browserVersion,extensionVersion:manifest.version,installed:true,sessionAndCsrfVerified:true,switch:true,restore:true,popupClosure:true,settingsPersisted:true,progressStagesVerified:true,activeTabReloadVerified:true,threeSchemeCycle:true,goldJadePopupApply:true,manualUpdateChecks:true,updateChecks,avatarDoubleClickGuard:true,avatarSyntheticClickBlocked:true,avatarUnknownCssBlocked:true,avatarWrongUserBlocked:true,wrongAccountBlocked:true,missingTabHandled:true,patches,failApiCompilation,requireInlineCss,compilations,timings,requests};
   if(performanceLabel){await mkdir(new URL('performance/',output),{recursive:true});await writeFile(new URL(`performance/${performanceLabel}.json`,output),JSON.stringify(report,null,2));}
   await writeFile(new URL('browser-results.json',output),JSON.stringify(report,null,2));console.log(JSON.stringify({...report,requests:requests.length}));
 }finally{

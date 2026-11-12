@@ -40,10 +40,11 @@ jobs:
           node-version: '22'
       - name: Check rotation, publisher and CSS builds without credentials
         run: |
-          node --test tests/rotation.test.mjs tests/recompile.test.mjs tests/firefox-extension.test.mjs tests/firefox-avatar.test.mjs
+          node --test tests/rotation.test.mjs tests/inline-schemes.test.mjs tests/recompile.test.mjs tests/firefox-extension.test.mjs tests/firefox-avatar.test.mjs
           node scripts/build-css.mjs --check
           node scripts/build-emerald-scarlet.mjs --check
           node scripts/build-gold-jade.mjs --check
+          node scripts/build-inline-schemes.mjs --check
           pwsh -NoProfile -File tests/deploy.tests.ps1
           pwsh -NoProfile -File tests/rotation-deploy.tests.ps1
           pwsh -NoProfile -File tests/rotation-upload.tests.ps1

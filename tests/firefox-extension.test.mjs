@@ -7,6 +7,7 @@ import { ACCOUNT, SCHEMES, REVISION, BASE_IMPORTS, LEGACY_BASE_IMPORTS, IMPORT_M
 import { AVATAR_HOVER_CSS } from '../extensions/firefox/avatar-hover.mjs';
 import { LEGACY_AVATAR_HOVER_CSS } from '../extensions/firefox/avatar-hover-legacy.mjs';
 import { Publisher } from '../extensions/firefox/publisher.mjs';
+const legacyCss = id => `${schemeImports(id)}\n\n${AVATAR_HOVER_CSS}`;
 
 function fixture() {
   let current = { id: ACCOUNT.styleId, owner_id: ACCOUNT.userId, owner_type: 'User', css: schemeCss('main'),
@@ -54,7 +55,7 @@ test('registry imports exact pinned repository files with the six original depen
     assert.equal(await sha256(bytes.toString('utf8')), scheme.sourceSha256);
     assert.deepEqual(bytes.toString('utf8').match(/^@import[^\r\n]+;/gm), BASE_IMPORTS);
     const css = schemeCss(scheme.id);
-    assert.equal(css.match(/@import/g).length, 7);
+    assert.equal((css.match(/@import/g) ?? []).length, 0);
     const original = schemeImports(scheme.id, undefined, BASE_IMPORTS, false);
     assert.equal(schemeImports(scheme.id), IMPORT_MIRRORS.reduce((text, mirror) => text.replaceAll(mirror.source, mirror.url), original));
   }
@@ -80,7 +81,8 @@ test('the two pinned mirrors preserve source bytes and recognize old and recover
     assert.equal(f.data.backups[0].css, original);
     assert.equal((await f.publisher.restore(result.view.snapshot)).view.schemeId, scheme.id);
     assert.equal(f.current.css, original);
-    assert.equal(await recognize(schemeCss(scheme.id).replace('cdn.jsdelivr.net', 'example.invalid')), null);
+    assert.equal(await recognize(legacyCss(scheme.id)), scheme.id);
+    assert.equal(await recognize(schemeCss(scheme.id).replace('fonts.gstatic.com', 'example.invalid')), null);
   }
 });
 
@@ -115,7 +117,7 @@ test('inline hover CSS matches the shared component and both old and new imports
       assert.equal(await recognize(previous), scheme.id);
     }
     assert.equal(await recognize(`${schemeImports(scheme.id)}\n\n${LEGACY_AVATAR_HOVER_CSS}`), scheme.id);
-    assert.equal(schemeCss(scheme.id), `${schemeImports(scheme.id)}\n\n${AVATAR_HOVER_CSS}`);
+    assert.equal(await recognize(legacyCss(scheme.id)), scheme.id);
   }
   assert.equal(nextSchemeId('main'), 'emerald-scarlet'); assert.equal(nextSchemeId('emerald-scarlet'), 'gold-jade'); assert.equal(nextSchemeId('gold-jade'), 'main');
   assert.equal(nextSchemeId(null), null);
@@ -128,7 +130,7 @@ test('site textarea formatting preserves known schemes and exact backups only', 
       const saved = `\r\n${block.replaceAll('\n', '\r\n')}\r\n`;
       assert.equal(await recognize(saved), scheme.id);
       assert.equal(await recognize(`${saved}body { color: red; }`), null);
-      assert.equal(await recognize(saved.replace('fonts.googleapis.com', 'example.invalid')), null);
+      assert.equal(await recognize(saved.replace(/(?:https?:)?\/\//, '//example.invalid/')), null);
     }
     const f = fixture();
     const saved = `${schemeCss(scheme.id).replaceAll('\n', '\r\n')}\r\n`;
@@ -280,24 +282,24 @@ test('failed API compilation is repaired once after exact save, including a lost
   for (const mode of ['ok', 'lost-response']) {
     const f = fixture(); f.controls.patchMode = 'failed-import'; f.controls.compilation = mode;
     const view = await f.publisher.inspect();
-    const result = await f.publisher.apply('emerald-scarlet', view.snapshot);
+    const result = await f.publisher.write(legacyCss('emerald-scarlet'), view.snapshot, 'emerald-scarlet');
     assert.equal(result.kind, 'success'); assert.equal(f.data.pending, undefined);
     assert.equal(f.calls.filter(call => call.method === 'PATCH').length, 1);
     assert.equal(f.calls.filter(call => call.method === 'RECOMPILE').length, 1);
-    assert.equal(f.current.css, schemeCss('emerald-scarlet'));
+    assert.equal(f.current.css, legacyCss('emerald-scarlet'));
   }
 });
 test('a restart never repeats an attempted cache reset, and outside CSS is never overwritten', async () => {
   const f = fixture(); f.controls.patchMode = 'failed-import'; f.controls.compilation = 'lost-verification';
   const view = await f.publisher.inspect();
-  assert.equal((await f.publisher.apply('emerald-scarlet', view.snapshot)).kind, 'uncertain');
+  assert.equal((await f.publisher.write(legacyCss('emerald-scarlet'), view.snapshot, 'emerald-scarlet')).kind, 'uncertain');
   assert.equal(f.data.pending.compilationAttempted, true);
   f.controls.failVerification = false;
   assert.equal((await f.make().reconcile()).kind, 'success');
   assert.equal(f.calls.filter(call => call.method === 'RECOMPILE').length, 1);
   const conflict = fixture(); conflict.controls.patchMode = 'failed-import'; conflict.controls.compilation = 'conflict';
   const prior = await conflict.publisher.inspect();
-  assert.equal((await conflict.publisher.apply('emerald-scarlet', prior.snapshot)).kind, 'uncertain');
+  assert.equal((await conflict.publisher.write(legacyCss('emerald-scarlet'), prior.snapshot, 'emerald-scarlet')).kind, 'uncertain');
   assert.equal((await conflict.make().reconcile()).kind, 'warning');
   assert.equal(conflict.current.css, 'body{color:red}');
   assert.equal(conflict.calls.filter(call => call.method === 'PATCH').length, 1);
@@ -367,6 +369,18 @@ test('bridge uses page session and CSRF only for the fixed API endpoint', async 
   assert.equal(f.calls[0].options.credentials, 'include'); assert.equal(f.calls[0].options.redirect, 'error');
   assert.equal(f.calls[0].options.headers['X-CSRF-Token'], 'synthetic-csrf-test-only');
   assert.equal(f.calls[0].options.body, JSON.stringify({ style: { css: 'body{}' } }));
+});
+
+test('bridge preserves each full scheme in the actual JSON PATCH body', async () => {
+  const f = await bridgeFixture();
+  for (const scheme of SCHEMES) {
+    const css = schemeCss(scheme.id);
+    assert.equal((await f.send({ method: 'PATCH', path: '/api/styles/1343722', css })).ok, true);
+    const decoded = JSON.parse(f.calls.at(-1).options.body);
+    assert.equal(decoded.style.css, css);
+    assert.ok(decoded.style.css.length < 512000);
+    assert.equal(/@import\b/i.test(decoded.style.css), false);
+  }
 });
 test('bridge rejects foreign senders, other endpoints, empty CSS and unsupported methods', async () => {
   const f = await bridgeFixture();

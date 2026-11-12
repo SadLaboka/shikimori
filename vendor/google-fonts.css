@@ -1,0 +1,42 @@
+/* https://fonts.googleapis.com/css2?family=Rubik+Spray+Paint&display=swap */
+@font-face {
+  font-family: 'Rubik Spray Paint';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(//fonts.gstatic.com/s/rubikspraypaint/v1/WnzhHBAoeBPUDTB4EWR82y6EXWPH-Ro-.ttf) format('truetype');
+}
+
+/* https://fonts.googleapis.com/css2?family=DynaPuff:wght400..700&display=swap */
+@font-face {
+  font-family: 'DynaPuff';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(//fonts.gstatic.com/s/dynapuff/v9/z7N5dRvsZDIVHbYPMhZJ3HQ83UaSu4uhr7-ZFeoYkgAr1x8RSxYu6Yg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'DynaPuff';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(//fonts.gstatic.com/s/dynapuff/v9/z7N5dRvsZDIVHbYPMhZJ3HQ83UaSu4uhr7-ZFeoYkgAr1x8RSyQu6Yg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'DynaPuff';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(//fonts.gstatic.com/s/dynapuff/v9/z7N5dRvsZDIVHbYPMhZJ3HQ83UaSu4uhr7-ZFeoYkgAr1x8RS8gp6Yg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'DynaPuff';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(//fonts.gstatic.com/s/dynapuff/v9/z7N5dRvsZDIVHbYPMhZJ3HQ83UaSu4uhr7-ZFeoYkgAr1x8RS_Ep6Yg.ttf) format('truetype');
+}

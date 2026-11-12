@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "description": "Transport snapshots of the existing schemes. Fonts remain at their original gstatic URLs. Copyright and author notices remain in the pinned source CSS and vendor archives.",
+  "fonts": {
+    "file": "vendor/google-fonts.css",
+    "sha256": "ab80ab2061959cfd5f0c2ee83260fd3ed9efcce94f95b38506949f4eedf9e09e",
+    "sources": [
+      "https://fonts.googleapis.com/css2?family=Rubik+Spray+Paint&display=swap",
+      "https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap"
+    ],
+    "snapshotDate": "2026-11-12"
+  },
+  "bases": [
+    {
+      "url": "https://raw.githubusercontent.com/SadLaboka/shikimori/2d919a08e191c50b9293c73f7cc6504f59e4b51a/css/base/main_code_1.css",
+      "sha256": "623e2f05dfd4f3b311177a1c97fac8675d60c1e941989ac89dc56dc71d816543"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/SadLaboka/shikimori/a96dc9d93e8ae8edb76912f8f3ca970a96241c8b/css/base/main_code_2.css",
+      "sha256": "da2a492ad16b7f018852b2307508a61b297bc80a191a6f22b31fdd6ac2950f18"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/SadLaboka/shikimori/2d919a08e191c50b9293c73f7cc6504f59e4b51a/css/base/main_code_3.css",
+      "sha256": "9241c9bf7a7e0e526a4d7f642df54e52a0ee8a9f8d15337245eeec92585e1217"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/SadLaboka/shikimori/2d919a08e191c50b9293c73f7cc6504f59e4b51a/css/base/main_code_4mob.css",
+      "sha256": "bf6e7d80a34645b8eebdcc2a1cc7a404a8a8f624827e1d4984b318fe547f10b2"
+    }
+  ],
+  "schemes": {
+    "main": {
+      "sha256": "d402ea8183196851fd5768a51aaf639d978488bfe7d86c9aced6c6f1b28a8d5c",
+      "characters": 481498,
+      "crlfCharacters": 499382
+    },
+    "emerald-scarlet": {
+      "sha256": "38a6d30856056de4a24f9f7fc22dfd930f3c6ae16c1557a4125eb606ceb75bc7",
+      "characters": 484127,
+      "crlfCharacters": 502074
+    },
+    "gold-jade": {
+      "sha256": "65a04d850933112ae83d67715ec4529a2b3af91b9171a65d03001b839c6437d2",
+      "characters": 487715,
+      "crlfCharacters": 505754
+    }
+  }
+}

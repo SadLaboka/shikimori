@@ -1,5 +1,6 @@
 import { AVATAR_HOVER_CSS } from './avatar-hover.mjs';
 import { LEGACY_AVATAR_HOVER_CSS } from './avatar-hover-legacy.mjs';
+import { INLINE_SCHEMES } from './inline-schemes.mjs';
 export const ACCOUNT = Object.freeze({ nickname: 'SadLaboka', userId: 1408017, styleId: 1343722 });
 export const ORIGIN = 'https://shikimori.io';
 export const REVISION = '178429b453a7a5fb3ebf6d63bc666d2e8cf83b1c';
@@ -132,7 +133,10 @@ export function schemeImports(id, revisionOverride, baseImports = BASE_IMPORTS, 
   const css = [...baseImports, `@import url("${url}");`].join('\n');
   return useMirrors ? IMPORT_MIRRORS.reduce((text, mirror) => text.replaceAll(mirror.source, mirror.url), css) : css;
 }
-export function schemeCss(id) { return `${schemeImports(id)}\n\n${AVATAR_HOVER_CSS}`; }
+export function schemeCss(id) {
+  if (!Object.hasOwn(INLINE_SCHEMES, id)) throw new Error('Неизвестная схема.');
+  return INLINE_SCHEMES[id];
+}
 export async function sha256(text) {
   const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
   return [...new Uint8Array(bytes)].map(value => value.toString(16).padStart(2, '0')).join('');
